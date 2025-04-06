@@ -16,11 +16,6 @@ logs/
 .env
 .env.* 
 
-# Docker files
-docker-compose.override.yml
-.docker/*
-Dockerfile*
-
 # Miscellaneous
 .idea/
 .vscode/
