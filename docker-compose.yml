@@ -2,9 +2,9 @@ services:
   frontend:
     build:
       context: .
-      dockerfile: Dockerfile
-    container_name: react_vite_frontend
+      dockerfile: Dockerfile  #Se indica que se tiene que basar en el Dockerfile para su construcción
+    container_name: react_vite_frontend 
     ports:
-      - "3001:3000"
+      - "3001:3000"           #Se expone el puerto 3001 para el host de la computadora, y el 3000 para el contendor
     environment:
-      API_URL: ${VITE_API_URL}
+      API_URL: ${VITE_API_URL}  #Utiliza la url de .env, referenciada y no quemada, para mayor seguridad. 
