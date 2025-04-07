@@ -1,36 +1,115 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
+# EconoFarma Frontend
 
-First, run the development server:
+Este es el frontend del sistema de gestión de empresas para **EconoFarma**, desarrollado para gestionar las operaciones de una farmacia localizada en el interior de Guatemala. Esta interfaz gráfica permite visualizar, ingresar y manipular datos en tiempo real a través de una SPA moderna.
 
+---
+
+## Tecnologías Utilizadas
+
+- **React** `^19.0.0`
+- **React DOM** `^19.0.0`
+- **Vite** `~6.2.0`
+- **@vitejs/plugin-react** `^4.3.0`
+
+---
+
+## Instalación
+
+### 1. Clona el repositorio
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/DufreyM/ERP-frontend.git
+cd src
 ```
 
-Open [http://localhost:3001](http://localhost:3001) with your browser to see the result.
+### 2. Instala las dependencias
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+### 3. Corre el servidor de desarrollo
+```bash
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Scripts útiles
 
-To learn more about Next.js, take a look at the following resources:
+```json
+"scripts": {
+  "dev": "vite",
+  "build": "vite build",
+  "preview": "vite preview"
+}
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Buenas prácticas
 
-## Deploy on Vercel
+- Usa componentes reutilizables y bien nombrados.
+- Mantén el código limpio y documentado.
+- Sigue la estructura modular.
+- Cada archivo debe incluir encabezado con nombre, descripción y autoría.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Contribuciones
+
+Las contribuciones deben realizarse mediante ramas tipo `feature/`, y hacer pull request hacia `develop`.
+
+---
+
+## 🐳 Guía para usar Docker en el proyecto
+
+### Inicialización del entorno (Docker)
+
+1. Asegúrate de que **Docker Desktop** esté ejecutándose.  
+   > *(Nota: Puedes buscar “Docker Desktop” en el menú de inicio de Windows y abrir la aplicación manualmente, al menos es de esta manera en el caso de windows.)*
+
+2. Abre dos terminales (por ejemplo, utilizando **Windows Terminal** o **CMD/Powershell**):
+   - Una ubicada en la carpeta backend
+   - Otra en la carpeta frontend
+
+3. En **cada terminal**, ejecuta el siguiente comando:
+   
+bash
+   docker-compose up --build
+
+   Este comando compilará e iniciará los contenedores correspondientes para cada servicio.
+
+4. Espera a que se completen los procesos de construcción e inicio.  
+   Docker se encargará del resto automáticamente. ✅
+
+---
+
+### Apagar los contenedores
+
+**Opción 1 – Desde la misma terminal:**  
+Presiona Ctrl + C en la terminal donde está corriendo Docker. Luego espera a que los contenedores se detengan correctamente.
+
+**Opción 2 – Desde otra terminal (preferida):**
+bash
+docker-compose down
+
+
+> Esta opción es la mejor debido a que detiene los contenedores de forma más ordenada y segura.
+
+---
+
+### Reiniciar sin recompilar
+
+Si no se ha modificado el código fuente y simplemente se desea reiniciar los contenedores, puedes usar el siguiente comando (sin la opción --build):
+
+bash
+docker-compose up
+
+
+Esto reutilizará las imágenes ya construidas, lo que acelera el proceso de inicio.
+---
+
+## 📄 Licencia
+
+Proyecto académico desarrollado por estudiantes del Grupo No. 7 del curso de Ingeniería de Software de la Universidad del Valle de Guatemala.
+
