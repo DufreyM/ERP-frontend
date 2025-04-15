@@ -1,21 +1,12 @@
 import { useEffect, useState } from 'react';
+import LoginScreen from './Screens/Login/LoginScreen.jsx';
 
 function App() {
-  const [message, setMessage] = useState(null);
-
-  useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/`)
-      .then((res) => res.json())
-      .then((data) => setMessage(data.message))
-      .catch((err) => setMessage('Error al conectar con la API :('));
-  }, []);
-
-  return (
-    <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
-      <h1>Frontend React + Vite</h1>
-      <p>{message ? message : 'Cargando...'}</p> 
-    </div>
-  );
-}
+    return (
+      <div>
+        <LoginScreen />
+      </div>
+    );
+  }
 
 export default App;
