@@ -1,0 +1,198 @@
+/* LoginBackground.css 
+Conforma la modificación de las cruces del fondo y su disposición, así como los demás elementos
+Autor: Melisa
+Ultima modificación: 20/4/2025 
+*/
+
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;  /* Previene las barras de desplazamiento */
+}
+
+.background {
+    background-color: white;
+    height: 100vh;
+    width: 100vw;
+    position: relative;
+}
+
+/* Fondo con todas las cruces*/
+.content{
+    z-index: 1;
+}
+.groupCross {
+    position: absolute;
+    width: 50vw;
+    height: 60vh;
+    z-index: 0;
+    bottom: 0;
+    left: 0;
+    background-color: transparent;
+}
+
+/* Elementos de la cruz externa */
+.cross {
+    position: relative;
+    width: 60px;
+    height: 60px;
+
+}
+
+.cross::before,
+.cross::after {
+    content: '';
+    position: absolute;
+    background-color: currentColor; /* Usa el color del div */
+}
+
+.cross::before {
+    top: 0;
+    left: 50%;
+    width: 40%;
+    height: 100%;
+    transform: translateX(-50%);
+}
+
+.cross::after {
+    top: 50%;
+    left: 0%;
+    width: 100%;
+    height: 40%;
+    transform: translateY(-50%);
+    z-index: 0;
+}
+
+/*Cruces internas */
+.smallCross {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.smallCross::before,
+.smallCross::after {
+    content: '';
+    position: absolute;
+    background-color: currentColor; /* Usa el color del div */
+}
+
+.smallCross::before {
+    top: 0;
+    left: 50%;
+    width: 20%;
+    height: 100%;
+    transform: translateX(-50%);
+}
+
+.smallCross::after {
+    top: 50%;
+    left: 0%;
+    width: 100%;
+    height: 20%;
+    transform: translateY(-50%);
+    z-index: 0;
+}
+
+/*detalles y colores y tamaños*/
+
+.blue {
+    color: #5a60a5;
+    opacity: 0.4;
+}
+
+.red {
+    color: #bf4242;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0.5;
+
+}
+
+.white{
+    color: white;
+    z-index: 1;
+    transform: scale(0.8);
+}
+
+.big {
+    width: 110px;
+    height: 110px;
+}
+
+.medium{
+    width: 80px;
+    height: 80px;
+}
+
+.small{
+    width: 50px;
+    height: 50px;
+}
+
+/* posiciones */
+/*columna izquierda*/
+.cross:nth-of-type(5){
+    top: 0;
+    left: 0;
+    position: absolute;
+}
+.cross:nth-of-type(1){
+    top: 130px;
+    left: 0;
+    position: absolute;
+}
+.cross.red.big{
+    height: 150px;
+    width: 150px;
+    bottom: 5px;
+    left: 5px;
+    position: absolute;
+}
+
+/*segunda columna*/
+.cross.red.medium{
+    height: 120px;
+    width: 120px;
+    top: 20px;
+    left:100px;
+    position: absolute;
+}
+.cross:nth-of-type(3){
+    bottom: 150px;
+    left: 200px;
+    position: absolute;
+}
+.cross:nth-of-type(4){
+    bottom: 0;
+    left: 300px;
+    position: absolute;
+}
+
+
+/*ultimos 3*/
+.cross.red.small{
+    height: 70px;
+    width: 70px;
+    bottom: 100px;
+    left: 400px;
+    position: absolute;
+}
+
+.cross:nth-of-type(2){
+    bottom: 20px;
+    left: 550px;
+    position: absolute;
+}
+
+.cross:nth-of-type(6){
+    bottom: 0;
+    left: 700px;
+    position: absolute;
+}
+
+
+
+
+

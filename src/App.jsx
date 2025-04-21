@@ -1,11 +1,17 @@
 import { useEffect, useState } from 'react';
 import LoginScreen from './Screens/Login/LoginScreen.jsx';
-
+import LoginBackground from './Screens/Login/LoginBackground.jsx';
 function App() {
     return (
       <div>
-        <LoginScreen />
+        <LoginBackground>
+          <LoginScreen />
+        </LoginBackground>
+        
+        
+
       </div>
+      
     );
   }
 
