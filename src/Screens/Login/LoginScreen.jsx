@@ -4,6 +4,8 @@ Contenedores de la pantalla de inicio de sesión
 Contiene el input de nombre de usuario y su respectivo estado
 Contiene el input de contraseña y su respectivo estado
 Contiene el icono de mostrar/ocultar contraseña y su respectivo estado
+Contiene el texto de reestablecimiento de contraseña y su respectivo estado (también redirige a la página de reestablecimiento)
+Contiene el estilo de los inputs
 Autor: Daniela 
 Ultima modificación: 21/04/2025
 */
@@ -42,6 +44,7 @@ const LoginScreen = () => {
         border: '1px solid #ccc',
         borderRadius: '4px',
         marginBottom: '10px',
+        boxSizing: 'border-box', 
     };
 
     return (
@@ -52,28 +55,37 @@ const LoginScreen = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 height: '100vh',
-                alignContent: 'center',
-                textAlign: 'center',
-
             }}
-        > 
+        >
             {/* Casilla de Usuario */}
-                <input
-                    type="text"
-                    id="username"
-                    value={username}
-                    onChange={handleInputChange}
-                    placeholder="Nombre de usuario"
-                    style={inputStyle}
-                />
-            {/* Casilla de contraseña */}
+            <input
+                type="text"
+                id="username"
+                value={username}
+                onChange={handleInputChange}
+                placeholder="Nombre de usuario"
+                style={inputStyle}
+            />
+            {/* Casilla de contraseña con ícono */}
+            <div
+                style={{
+                    position: 'relative',
+                    maxWidth: '300px',
+                    width: '100%',
+                    marginBottom: '10px',
+                }}
+            >
                 <input
                     type={showPassword ? 'text' : 'password'}
                     id="password"
                     value={password}
                     onChange={handlePasswordChange}
                     placeholder="Contraseña"
-                    style={inputStyle}
+                    style={{
+                        ...inputStyle,
+                        paddingRight: '40px', // Espacio adicional para el ícono
+                        marginBottom: '0',
+                    }}
                 />
                 <span
                     onClick={togglePasswordVisibility}
@@ -88,8 +100,9 @@ const LoginScreen = () => {
                 >
                     <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
                 </span>
+            </div>
             {/* Texto de reestablecimiento */}
-            <div style={{ textAlign: 'center' }}>
+            <div style={{ textAlign: 'center', marginTop: '10px' }}>
                 <span style={{ color: '#003366' }}>
                     ¿Has olvidado tu contraseña?{' '}
                     <span
