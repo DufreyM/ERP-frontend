@@ -5,7 +5,7 @@ Contiene el input de nombre de usuario y su respectivo estado
 Contiene el input de contraseña y su respectivo estado
 Contiene el icono de mostrar/ocultar contraseña y su respectivo estado
 Contiene el texto de reestablecimiento de contraseña y su respectivo estado (también redirige a la página de reestablecimiento)
-Contiene el estilo de los inputs
+Contiene el estilo de los inputs y el botón de iniciar sesión
 Autor: Daniela 
 Ultima modificación: 21/04/2025
 */
@@ -37,6 +37,10 @@ const LoginScreen = () => {
         navigate('/reset-password'); // Redirigir a la página de reestablecimiento
     };
 
+    const handleLogin = () => {
+        console.log('Iniciar sesión'); 
+    };
+
     const inputStyle = {
         padding: '8px',
         width: '100%',
@@ -44,7 +48,27 @@ const LoginScreen = () => {
         border: '1px solid #ccc',
         borderRadius: '4px',
         marginBottom: '10px',
+        boxSizing: 'border-box',
+    };
+
+    const buttonStyle = {
+        backgroundColor: '#5a60A5',
+        color: 'white',
+        border: 'none',
+        borderRadius: '20px', // Esquinas más redondeadas
+        padding: '10px',
+        cursor: 'pointer',
+        fontSize: '16px',
+        fontWeight: 'bold', 
+        width: '100%', 
+        maxWidth: '300px',
+        marginTop: '20px',
+        transition: 'background-color 0.3s ease', // Transición para el hover
         boxSizing: 'border-box', 
+    };
+
+    const buttonHoverStyle = {
+        backgroundColor: '#4a5095', // Color más oscuro al hacer hover
     };
 
     return (
@@ -55,6 +79,8 @@ const LoginScreen = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 height: '100vh',
+                position: 'relative', 
+                zIndex: 2, //Ponerlo encima de los elementos del fondo
             }}
         >
             {/* Casilla de Usuario */}
@@ -118,6 +144,15 @@ const LoginScreen = () => {
                     </span>
                 </span>
             </div>
+            {/* Botón de Iniciar Sesión */}
+            <button
+                onClick={handleLogin}
+                style={buttonStyle}
+                onMouseOver={(e) => (e.target.style.backgroundColor = buttonHoverStyle.backgroundColor)}
+                onMouseOut={(e) => (e.target.style.backgroundColor = buttonStyle.backgroundColor)}
+            >
+                Iniciar Sesión
+            </button>
         </div>
     );
 };
