@@ -6,27 +6,30 @@ Contiene el input de contraseña y su respectivo estado
 Contiene el icono de mostrar/ocultar contraseña y su respectivo estado
 Contiene el texto de reestablecimiento de contraseña y su respectivo estado (también redirige a la página de reestablecimiento)
 Contiene el estilo de los inputs y el botón de iniciar sesión
-Autor: Daniela 
-Ultima modificación: 21/04/2025
+Autor: Daniela y Melisa
+Ultima modificación: 22/04/2025
 */
 
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faEyeSlash, faLock, faEnvelope} from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom'; // Importar hook para navegación
 
 const LoginScreen = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate(); // Hook para redirigir
 
     const handleInputChange = (e) => {
         setUsername(e.target.value);
+        setErrorMessage('');
     };
 
     const handlePasswordChange = (e) => {
         setPassword(e.target.value);
+        setErrorMessage('');
     };
 
     const togglePasswordVisibility = () => {
@@ -38,13 +41,27 @@ const LoginScreen = () => {
     };
 
     const handleLogin = () => {
-        console.log('Iniciar sesión'); 
+        //validaciones para errores
+        if (!username || !password){
+            setErrorMessage('Por favor, completa todos los campos');
+            return;
+        }
+
+        //simulacion de login
+        if (username === 'admin' &&password === '1234'){
+            setErrorMessage('');
+            console.log('Inicio de sesión exitoso')
+            //agregar la redireccion cuando se tenga
+        } else {
+            setErrorMessage('Correo electronico o contraseña incorrectos.')
+        }
+       
     };
 
     const inputStyle = {
         padding: '8px',
         width: '100%',
-        maxWidth: '300px',
+        maxWidth: '400px',
         border: '1px solid #ccc',
         borderRadius: '4px',
         marginBottom: '10px',
@@ -79,27 +96,81 @@ const LoginScreen = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 position: 'relative', 
+                width: '100%',
+                maxWidth: '600px',
                 zIndex: 2, //Ponerlo encima de los elementos del fondo
             }}
         >
+            {/*Mensaje de error*/
+                errorMessage && (
+                    <div style={{ color: 'red', marginTop: '10px' }}>
+                        {errorMessage}
+                    </div>
+                )
+            }
+
             {/* Casilla de Usuario */}
+            <div
+                style={{
+                    position: 'relative',
+                    maxWidth: '400px',
+                    width: '100%',
+                    marginBottom: '10px',
+                }}
+            >
             <input
                 type="text"
                 id="username"
                 value={username}
                 onChange={handleInputChange}
                 placeholder="Nombre de usuario"
-                style={inputStyle}
+                style={{
+                    ...inputStyle,
+                    paddingLeft: '40px',
+                    border: errorMessage ? '1px solid red' : inputStyle.border,
+
+                }}
             />
+                <span
+                    style={{
+                        position: 'absolute',
+                        left: '10px',
+                        top: '40%',
+                        transform: 'translateY(-50%)',
+                        cursor: 'pointer',
+                        userSelect: 'none',
+                        color: '#5a60a5'
+                    }}
+                    >
+                        <FontAwesomeIcon icon={faEnvelope} style={{ color: errorMessage ? 'red' : '#5a60a5' }} />
+
+                </span>
+
+            </div>    
             {/* Casilla de contraseña con ícono */}
             <div
                 style={{
                     position: 'relative',
-                    maxWidth: '300px',
+                    maxWidth: '400px',
                     width: '100%',
                     marginBottom: '10px',
                 }}
             >
+                <span
+                    style={{
+                        position: 'absolute',
+                        left: '10px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        cursor: 'pointer',
+                        userSelect: 'none',
+                        color: '#5a60a5'
+                    }}
+                    >
+                        <FontAwesomeIcon icon={faLock} style={{ color: errorMessage ? 'red' : '#5a60a5' }} />
+
+                </span>
+
                 <input
                     type={showPassword ? 'text' : 'password'}
                     id="password"
@@ -108,8 +179,10 @@ const LoginScreen = () => {
                     placeholder="Contraseña"
                     style={{
                         ...inputStyle,
+                        paddingLeft: '40px',
                         paddingRight: '40px', // Espacio adicional para el ícono
                         marginBottom: '0',
+                        border: errorMessage ? '1px solid red' : inputStyle.border,
                     }}
                 />
                 <span
@@ -121,9 +194,11 @@ const LoginScreen = () => {
                         transform: 'translateY(-50%)',
                         cursor: 'pointer',
                         userSelect: 'none',
+                        color: '#5a60a5'
                     }}
                 >
-                    <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
+                    <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} style={{ color: errorMessage ? 'red' : '#5a60a5' }} />
+
                 </span>
             </div>
             {/* Texto de reestablecimiento */}
@@ -143,6 +218,19 @@ const LoginScreen = () => {
                     </span>
                 </span>
             </div>
+
+
+
+            {/* Botón de Iniciar Sesión */}
+            <button
+                onClick={handleLogin}
+                style={buttonStyle}
+                onMouseOver={(e) => (e.target.style.backgroundColor = buttonHoverStyle.backgroundColor)}
+                onMouseOut={(e) => (e.target.style.backgroundColor = buttonStyle.backgroundColor)}
+            >
+                Iniciar Sesión
+            </button>
+
             {/* Texto de visitador médico */}
             <div style={{ textAlign: 'center', marginTop: '10px' }}>
                 <span style={{ color: '#003366' }}>
@@ -160,15 +248,7 @@ const LoginScreen = () => {
                     </span>
                 </span>
             </div>
-            {/* Botón de Iniciar Sesión */}
-            <button
-                onClick={handleLogin}
-                style={buttonStyle}
-                onMouseOver={(e) => (e.target.style.backgroundColor = buttonHoverStyle.backgroundColor)}
-                onMouseOut={(e) => (e.target.style.backgroundColor = buttonStyle.backgroundColor)}
-            >
-                Iniciar Sesión
-            </button>
+
         </div>
     );
 };

@@ -1,3 +1,9 @@
+/* StyleElements.css 
+Conforma la modificación los elementos como el logo y los iconos y algunos elementos visuales
+Autor: Melisa
+Ultima modificación: 22/4/2025 
+*/
+
 .disposicion {
     display: flex;
     width: 100vw;
@@ -6,7 +12,7 @@
 }
 
 .encabezado{
-    width: 380px;
+    width: 420px;
     display: flex; 
     justify-content: space-between;
     align-items: center;
@@ -14,8 +20,10 @@
 
 .contenedor1{
     align-items: center;
+    justify-content: center;
     display: flex;
     height: 150px;
+    width: 400px;
     z-index: 0;
 }
 .contenedor{
