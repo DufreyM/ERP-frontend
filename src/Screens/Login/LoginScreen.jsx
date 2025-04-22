@@ -4,7 +4,6 @@ Contenedores de la pantalla de inicio de sesión
 Contiene el input de nombre de usuario y su respectivo estado
 Contiene el input de contraseña y su respectivo estado
 Contiene el icono de mostrar/ocultar contraseña y su respectivo estado
-Reset password para redirigir a la pantalla de reestablecimiento de contraseña
 Autor: Daniela 
 Ultima modificación: 21/04/2025
 */
@@ -36,40 +35,48 @@ const LoginScreen = () => {
         navigate('/reset-password'); // Redirigir a la página de reestablecimiento
     };
 
+    const inputStyle = {
+        padding: '8px',
+        width: '100%',
+        maxWidth: '300px',
+        border: '1px solid #ccc',
+        borderRadius: '4px',
+        marginBottom: '10px',
+    };
+
     return (
-        <div style={{ padding: '20px' }}>
+        <div
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '100vh',
+                alignContent: 'center',
+                textAlign: 'center',
+
+            }}
+        > 
             {/* Casilla de Usuario */}
-            <input
-                type="text"
-                id="username"
-                value={username}
-                onChange={handleInputChange}
-                placeholder="Nombre de usuario"
-                style={{
-                    padding: '8px',
-                    width: '100%',
-                    maxWidth: '300px',
-                    border: '1px solid #ccc',
-                    borderRadius: '4px',
-                }}
-            />
+                <input
+                    type="text"
+                    id="username"
+                    value={username}
+                    onChange={handleInputChange}
+                    placeholder="Nombre de usuario"
+                    style={inputStyle}
+                />
             {/* Casilla de contraseña */}
-            <div style={{ position: 'relative', maxWidth: '300px', marginTop: '10px' }}> 
                 <input
                     type={showPassword ? 'text' : 'password'}
                     id="password"
                     value={password}
                     onChange={handlePasswordChange}
                     placeholder="Contraseña"
-                    style={{
-                        padding: '8px',
-                        width: '100%',
-                        border: '1px solid #ccc',
-                        borderRadius: '4px',
-                    }}
+                    style={inputStyle}
                 />
                 <span
-                    onClick={togglePasswordVisibility} //funcion para mostrar/ocultar contraseña
+                    onClick={togglePasswordVisibility}
                     style={{
                         position: 'absolute',
                         right: '10px',
@@ -79,12 +86,10 @@ const LoginScreen = () => {
                         userSelect: 'none',
                     }}
                 >
-                {/* Icono de mostrar/ocultar contraseña */}
-                <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} /> 
+                    <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
                 </span>
-            </div>
             {/* Texto de reestablecimiento */}
-            <div style={{ marginTop: '10px', textAlign: 'center' }}>
+            <div style={{ textAlign: 'center' }}>
                 <span style={{ color: '#003366' }}>
                     ¿Has olvidado tu contraseña?{' '}
                     <span
