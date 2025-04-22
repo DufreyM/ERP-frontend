@@ -78,7 +78,6 @@ const LoginScreen = () => {
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                height: '100vh',
                 position: 'relative', 
                 zIndex: 2, //Ponerlo encima de los elementos del fondo
             }}
