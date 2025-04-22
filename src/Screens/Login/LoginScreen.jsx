@@ -144,6 +144,23 @@ const LoginScreen = () => {
                     </span>
                 </span>
             </div>
+            {/* Texto de visitador médico */}
+            <div style={{ textAlign: 'center', marginTop: '10px' }}>
+                <span style={{ color: '#003366' }}>
+                    ¿Eres visitador médico?{' '}
+                    <span
+                        onClick={handleResetPassword}
+                        style={{
+                            fontWeight: 'bold',
+                            color: '#003366',
+                            cursor: 'pointer',
+                            textDecoration: 'underline',
+                        }}
+                    >
+                        Ingresa
+                    </span>
+                </span>
+            </div>
             {/* Botón de Iniciar Sesión */}
             <button
                 onClick={handleLogin}
