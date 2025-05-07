@@ -109,7 +109,7 @@ const LoginScreen = () => {
                 )
             }
 
-            {/* Casilla de Usuario */}
+            {/* Casilla de correo */}
             <div
                 style={{
                     position: 'relative',
@@ -123,7 +123,7 @@ const LoginScreen = () => {
                 id="username"
                 value={username}
                 onChange={handleInputChange}
-                placeholder="Nombre de usuario"
+                placeholder="Correo"
                 style={{
                     ...inputStyle,
                     paddingLeft: '40px',
@@ -147,6 +147,7 @@ const LoginScreen = () => {
                 </span>
 
             </div>    
+            
             {/* Casilla de contraseña con ícono */}
             <div
                 style={{
