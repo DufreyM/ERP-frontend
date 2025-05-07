@@ -1,4 +1,19 @@
 .divButtonForm {
-    text-align: center;
-    margin-top: 10px;
+    background-color: #5a60A5;
+    color: white;
+    border: none;
+    border-radius: 20px; 
+    padding: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    width: 100%;
+    max-width: 300px;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+    box-sizing: border-box;
 }
+
+.divButtonForm:hover {
+    background-color: #4a5095;
+  }

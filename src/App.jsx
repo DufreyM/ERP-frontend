@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginScreen from './Screens/Login/LoginScreen.jsx';
 import Header from './Screens/Login/Header.jsx'
-import LoginBackground from './Screens/Login/LoginBackground.jsx';
+import LoginBackground from './components/BackgroundLeftCross/LoginBackground.jsx';
 import ResetPassword from './Screens/Login/ResetPassword.jsx'; // Importar la nueva página
 
 function App() {

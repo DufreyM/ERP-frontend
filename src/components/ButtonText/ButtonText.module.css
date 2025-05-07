@@ -1,0 +1,12 @@
+.divButtonText {
+    text-align: center;
+    margin-top: 10px;
+    color: #003366;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.spanButtonText {
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: underline;
+}

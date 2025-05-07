@@ -1,15 +1,19 @@
 import react from "react";
 import styles from './ButtonForm.module.css';
 
-const ButtonForm = () => {
+const ButtonForm = ({
+  text,
+  onClick
+
+}) => {
+    
     return(
-        <div className= {styles.divButtonForm}>
-            <span>
-                <span>
-                    Waaaaa
-                </span>
-            </span>
-        </div>
+        <button 
+        className= {styles.divButtonForm}
+        onClick={onClick}
+        >
+           {text}
+        </button>
     );
 };
 
