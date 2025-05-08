@@ -1,8 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginScreen from './Screens/Login/LoginScreen.jsx';
 import Header from './Screens/Login/Header.jsx'
-import LoginBackground from './components/BackgroundLeftCross/LoginBackground.jsx';
+
 import ResetPassword from './Screens/Login/ResetPassword.jsx'; // Importar la nueva página
+import BackgroundCross from './components/BackgroundCross/BackgroundCross.jsx';
 
 function App() {
     return (
@@ -11,10 +12,13 @@ function App() {
                 <Route
                     path="/"
                     element={
-                        <LoginBackground>
+                        <BackgroundCross
+                        BackgroundCross
+            variant="red" mirrored={false}
+                        >
                             <Header />
                             <LoginScreen />
-                        </LoginBackground>
+                        </BackgroundCross>
                     }
                 />
                 <Route path="/reset-password" element={<ResetPassword />} />

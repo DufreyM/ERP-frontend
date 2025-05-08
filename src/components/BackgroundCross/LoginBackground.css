@@ -4,6 +4,7 @@ Autor: Melisa
 Ultima modificación: 20/4/2025 
 */
 
+
 body {
     margin: 0;
     padding: 0;
@@ -112,8 +113,37 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    opacity: 0.5;
+   
+}
 
+.groupCrossContainer {
+    width: 100%;
+      
+}
+
+
+
+.groupCrossContainer.mirrored .groupCross {
+    left: auto;
+    right: 0;
+    transform: scaleX(-1); /* "desespeja" el contenido para mantener orientación */
+    justify-content: right;
+    
+}
+
+  
+/* Colores dinámicos para cruces “colored” */
+.groupCross.red .colored {
+    color: #bf4242;
+    opacity: 0.5;
+}
+.groupCross.green .colored {
+    color: green;
+    opacity: 0.5;
+}
+.groupCross.purple .colored {
+    color: purple;
+    opacity: 0.5;
 }
 
 .white{
@@ -149,7 +179,7 @@ body {
     left: 0;
     position: absolute;
 }
-.cross.red.big{
+.cross.colored.big{
     height: 150px;
     width: 150px;
     bottom: 5px;
@@ -158,7 +188,7 @@ body {
 }
 
 /*segunda columna*/
-.cross.red.medium{
+.cross.colored.medium{
     height: 120px;
     width: 120px;
     top: 20px;
@@ -178,7 +208,7 @@ body {
 
 
 /*ultimos 3*/
-.cross.red.small{
+.cross.colored.small{
     height: 70px;
     width: 70px;
     bottom: 100px;

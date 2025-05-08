@@ -1,3 +1,18 @@
+/*InputIcono
+Es el Input que del lado izquierdo tiene un espacio para un icono decorativo
+El estilo se encuentra en el archivo InputIcono.module.css
+Atributos:
+  icono: el icono decorativo del lado izquierdo
+  placeholder: el texto que se lee para saber qué se debe de ingresar
+  value: la variable que guarda su contenido
+  onChange: el handler apropiado
+  type: si es texto, int etc
+  error: función de manejo de errores
+  name: nombre
+Autor: Melisa 
+Ultima modificación: 7/5/2025 
+*/
+
 import React, { useState } from 'react';
 import styles from './InputIcono.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
