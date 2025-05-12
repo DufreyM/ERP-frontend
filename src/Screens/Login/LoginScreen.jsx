@@ -11,25 +11,54 @@ Ultima modificación: 7/05/2025
 */
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { login } from '../../services/authService'; 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faLock, faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import { useNavigate } from 'react-router-dom'; // Hook para navegación
+import { login } from '../../services/authService'; // Servicio de autenticación
+import ButtonForm from '../../components/ButtonForm/ButtonForm';
 import IconoInput from '../../components/Inputs/InputIcono';
 import InputPassword from '../../components/Inputs/InputPassword';
-import ButtonForm from '../../components/ButtonForm/ButtonForm';
+import ButtonText from '../../components/ButtonText/ButtonText';
+import Header from './Header';
 
 const LoginScreen = () => {
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
-    const navigate = useNavigate();
+    const navigate = useNavigate(); // Hook para redirigir
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleInputChange = (e) => {
+        setUsername(e.target.value);
+        setErrorMessage('');
+    };
+
+    const handlePasswordChange = (e) => {
+        setPassword(e.target.value);
+        setErrorMessage('');
+    };
+
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
+
+    const handleResetPassword = () => {
+        navigate('/reset-password'); // Redirigir a la página de reestablecimiento
+    };
+
+    const handleLogin = async () => {
+        // Validación de campos vacíos
+        if (!username || !password) {
+            setErrorMessage('Por favor, completa todos los campos');
+            return;
+        }
+
         try {
-            const data = await login(email, password); // Llama al servicio de autenticación
+            // Llamada al servicio de login
+            const data = await login(username, password);
             console.log('Inicio de sesión exitoso:', data);
-            // Redirige al usuario después de un inicio de sesión exitoso
-            navigate('/dashboard'); // Cambia '/dashboard' por la ruta deseada
+            setErrorMessage('');
+            navigate('/dashboard'); // Redirigir al dashboard
         } catch (error) {
             console.error('Error al iniciar sesión:', error);
             setErrorMessage('Correo electrónico o contraseña incorrectos.');
@@ -37,19 +66,21 @@ const LoginScreen = () => {
     };
 
     return (
-        <form
-            onSubmit={handleSubmit}
+        <div
             style={{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                height: '100vh',
                 position: 'relative',
                 width: '100%',
                 maxWidth: '600px',
+                height: '100vh',
             }}
         >
+            {/* Header */}
+            <Header />
+            
             {/* Mensaje de error */}
             {errorMessage && (
                 <div
@@ -66,27 +97,43 @@ const LoginScreen = () => {
 
             {/* Casilla de correo */}
             <IconoInput
-                icono="faEnvelope"
-                placeholder="Correo electrónico"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                icono={faEnvelope}
+                placeholder="Correo"
+                value={username}
+                error={!!errorMessage}
+                onChange={handleInputChange}
                 name="email"
             />
 
-            {/* Casilla de contraseña */}
+            {/* Casilla de contraseña con ícono */}
             <InputPassword
-                showPassword={false}
-                togglePasswordVisibility={() => {}}
-                icono="faLock"
+                showPassword={showPassword}
+                togglePasswordVisibility={togglePasswordVisibility}
+                icono={faLock}
                 placeholder="Contraseña"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                error={!!errorMessage}
+                onChange={handlePasswordChange}
                 name="password"
             />
 
-            {/* Botón de inicio de sesión */}
-            <ButtonForm text="Iniciar sesión" type="submit" />
-        </form>
+            {/* Texto de reestablecimiento */}
+            <ButtonText
+                texto="¿Has olvidado tu contraseña?"
+                textoButton="Reestablecer"
+                accion={handleResetPassword}
+            />
+
+            {/* Botón de Iniciar Sesión */}
+            <ButtonForm text="Iniciar Sesión" onClick={handleLogin} />
+
+            {/* Texto de visitador médico */}
+            <ButtonText
+                texto="¿Eres visitador médico?"
+                textoButton="Ingresa"
+                accion={handleResetPassword}
+            />
+        </div>
     );
 };
 
