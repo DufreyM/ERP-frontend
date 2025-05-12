@@ -11,132 +11,82 @@ Ultima modificación: 7/05/2025
 */
 
 import React, { useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLock, faEnvelope} from '@fortawesome/free-solid-svg-icons';
-import { useNavigate } from 'react-router-dom'; // Importar hook para navegación
+import { useNavigate } from 'react-router-dom';
+import { login } from '../../services/authService'; 
+import IconoInput from '../../components/Inputs/InputIcono';
+import InputPassword from '../../components/Inputs/InputPassword';
 import ButtonForm from '../../components/ButtonForm/ButtonForm';
-import IconoInput from '../../components/InputIcono/InputIcono';
-import InputPassword from '../../components/InputIcono/InputPassword';
-import ButtonText from '../../components/ButtonText/ButtonText';
 
 const LoginScreen = () => {
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
-    const navigate = useNavigate(); // Hook para redirigir
+    const navigate = useNavigate();
 
-    const handleInputChange = (e) => {
-        setUsername(e.target.value);
-        setErrorMessage('');
-    };
-
-    const handlePasswordChange = (e) => {
-        setPassword(e.target.value);
-        setErrorMessage('');
-    };
-
-    const togglePasswordVisibility = () => {
-        setShowPassword(!showPassword);
-    };
-
-    const handleResetPassword = () => {
-        navigate('/reset-password'); // Redirigir a la página de reestablecimiento
-    };
-
-    const handleLogin = () => {
-        //validaciones para errores
-        if (!username || !password){
-            setErrorMessage('Por favor, completa todos los campos');
-            return;
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const data = await login(email, password); // Llama al servicio de autenticación
+            console.log('Inicio de sesión exitoso:', data);
+            // Redirige al usuario después de un inicio de sesión exitoso
+            navigate('/dashboard'); // Cambia '/dashboard' por la ruta deseada
+        } catch (error) {
+            console.error('Error al iniciar sesión:', error);
+            setErrorMessage('Correo electrónico o contraseña incorrectos.');
         }
-
-        //simulacion de login
-        if (username === 'admin' &&password === '1234'){
-            setErrorMessage('');
-            console.log('Inicio de sesión exitoso')
-            //agregar la redireccion cuando se tenga
-        } else {
-            setErrorMessage('Correo electronico o contraseña incorrectos.')
-        }
-       
     };
 
     return (
-        <div
+        <form
+            onSubmit={handleSubmit}
             style={{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                position: 'relative', 
+                height: '100vh',
+                position: 'relative',
                 width: '100%',
                 maxWidth: '600px',
             }}
         >
-            
-            {/*Mensaje de error*/
-                errorMessage && (
-                    <div style={{ 
-                        color: 'red', 
-                        marginTop: '10px', 
-                        fontFamily:'sans-serif', 
-                        fontSize: '15px'
-                    }}>
-                        {errorMessage}
-                    </div>
-                )
-            }
-          
+            {/* Mensaje de error */}
+            {errorMessage && (
+                <div
+                    style={{
+                        color: 'red',
+                        marginTop: '10px',
+                        fontFamily: 'sans-serif',
+                        fontSize: '15px',
+                    }}
+                >
+                    {errorMessage}
+                </div>
+            )}
 
             {/* Casilla de correo */}
-            <IconoInput 
-                icono={faEnvelope}
-                placeholder="Correo"
-                value={username}
-                error={errorMessage}
-                onChange={handleInputChange}
-                name="email">
-            </IconoInput>
-          
+            <IconoInput
+                icono="faEnvelope"
+                placeholder="Correo electrónico"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                name="email"
+            />
 
-            {/* Casilla de contraseña con ícono */}
-            <InputPassword 
-                showPassword={showPassword}
-                togglePasswordVisibility = {togglePasswordVisibility}
-                icono={faLock}
+            {/* Casilla de contraseña */}
+            <InputPassword
+                showPassword={false}
+                togglePasswordVisibility={() => {}}
+                icono="faLock"
                 placeholder="Contraseña"
                 value={password}
-                error={errorMessage}
-                onChange={handlePasswordChange}
+                onChange={(e) => setPassword(e.target.value)}
                 name="password"
-                >
-            </InputPassword>
+            />
 
-
-            {/* Texto de reestablecimiento */}
-            <ButtonText
-                texto = '¿Has olvidado tu contraseña?'
-                textoButton= 'Reestablecer'
-                accion = {handleResetPassword}
-            ></ButtonText>
-
-
-            {/* Botón de Iniciar Sesión */}
-            <ButtonForm
-                text={'Iniciar Sesión'}
-                onClick={handleLogin}
-            ></ButtonForm>
-
-
-            {/* Texto de visitador médico */}
-            <ButtonText
-                texto = '¿Eres visitador médico?'
-                textoButton= 'Ingresa'
-                accion = {handleResetPassword}
-            ></ButtonText>
-
-        </div>
+            {/* Botón de inicio de sesión */}
+            <ButtonForm text="Iniciar sesión" type="submit" />
+        </form>
     );
 };
 
