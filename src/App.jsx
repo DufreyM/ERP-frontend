@@ -4,6 +4,7 @@ import Header from './Screens/Login/Header.jsx'
 
 import ResetPassword from './Screens/Login/ResetPassword.jsx'; // Importar la nueva página
 import BackgroundCross from './components/BackgroundCross/BackgroundCross.jsx';
+import RegisterScreen from './Screens/Register/Register.jsx';
 
 function App() {
     return (
@@ -22,6 +23,15 @@ function App() {
                     }
                 />
                 <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/register-user" element={
+                    <BackgroundCross
+                        variant="red"
+                    >
+                        <RegisterScreen>
+
+                        </RegisterScreen>
+                    </BackgroundCross>
+                }/>
             </Routes>
         </Router>
     );

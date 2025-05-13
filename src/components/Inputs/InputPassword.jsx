@@ -19,7 +19,7 @@ Ultima modificación: 7/5/2025
 import React from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash} from '@fortawesome/free-solid-svg-icons';
-import styles from '../InputIcono/InputIcono.module.css';
+import styles from './InputIcono.module.css';
 
 
 const InputPassword = ({

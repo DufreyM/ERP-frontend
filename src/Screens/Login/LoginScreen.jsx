@@ -15,8 +15,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLock, faEnvelope} from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom'; // Importar hook para navegación
 import ButtonForm from '../../components/ButtonForm/ButtonForm';
-import IconoInput from '../../components/InputIcono/InputIcono';
-import InputPassword from '../../components/InputIcono/InputPassword';
+import IconoInput from '../../components/Inputs/InputIcono';
+import InputPassword from '../../components/Inputs/InputPassword';
 import ButtonText from '../../components/ButtonText/ButtonText';
 
 const LoginScreen = () => {
@@ -43,6 +43,11 @@ const LoginScreen = () => {
     const handleResetPassword = () => {
         navigate('/reset-password'); // Redirigir a la página de reestablecimiento
     };
+
+    //Provisional
+    const handleRegister = () => {
+        navigate('register-user');
+    }
 
     const handleLogin = () => {
         //validaciones para errores
@@ -134,6 +139,12 @@ const LoginScreen = () => {
                 texto = '¿Eres visitador médico?'
                 textoButton= 'Ingresa'
                 accion = {handleResetPassword}
+            ></ButtonText>
+
+            <ButtonText
+                texto = 'Crear una cuenta'
+                textoButton= 'Ingresa'
+                accion = {handleRegister}
             ></ButtonText>
 
         </div>
