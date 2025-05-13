@@ -1,12 +1,12 @@
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
 
 export async function login(email, password) {
-    const response = await fetch(`${API_BASE_URL}/login`, {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, contrasena: password }) 
     });
 
     if (!response.ok) {
@@ -16,6 +16,7 @@ export async function login(email, password) {
 
     return await response.json();
 }
+
 
 export function storeToken(token) {
     localStorage.setItem('jwtToken', token);
