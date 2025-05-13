@@ -29,7 +29,6 @@
 }
 
 .inputStyle {
-    
     padding: 8px;
     width: 100%;
     max-width: 400px;
@@ -38,7 +37,22 @@
     border-radius: 4px;
     box-sizing: border-box;
     padding-left: 40px;
+    color: black;
 }
+
+.inputStyleDate {
+    padding: 8px;
+    width: 132%;
+    max-width: 400px;
+    border: 2px solid #cccccc3f;
+    background-color: #ffffff;
+    border-radius: 4px;
+    box-sizing: border-box;
+    padding-left: 40px;
+    color: black;
+    
+}
+
 
 .errorInput{
     position: relative;
@@ -61,3 +75,43 @@
     color: #5a60a5;
     z-index: 2;
 }
+
+.iconoSelects{
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    pointer-events: none;
+    user-select: none;
+    color: #ffffff;
+    z-index: 2;
+}
+
+.selects {
+    position:relative;
+    display: inline-block;
+    color: black;
+    
+}
+
+.selects select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    color: black;
+}
+
+.inputStyle option {
+    color: black;
+ 
+}
+
+.iconoAbierto {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+
+
+
+

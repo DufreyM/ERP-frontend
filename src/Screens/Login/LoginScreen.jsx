@@ -46,9 +46,11 @@ const LoginScreen = () => {
         navigate('/reset-password'); // Redirigir a la página de reestablecimiento
     };
 
+
     const handleLogin = async () => {
         // Validación de campos vacíos
         if (!email || !password) {
+
             setErrorMessage('Por favor, completa todos los campos');
             return;
         }
@@ -152,10 +154,13 @@ const LoginScreen = () => {
 
             {/* Texto de visitador médico */}
             <ButtonText
+
+
                 texto="¿Eres visitador médico?"
                 textoButton="Ingresa"
                 accion={handleResetPassword}
             />
+
         </div>
     );
 };
