@@ -5,29 +5,31 @@ Contiene el input de nombre de usuario y su respectivo estado
 Contiene el input de contraseña y su respectivo estado
 Contiene el icono de mostrar/ocultar contraseña y su respectivo estado
 Contiene el texto de reestablecimiento de contraseña y su respectivo estado (también redirige a la página de reestablecimiento)
-Contiene el estilo de los inputs y el botón de iniciar sesión
+Contiene el estilo de los inputs y el botón de iniciar sesión conectado a la API
 Autor: Daniela y Melisa
-Ultima modificación: 7/05/2025
+Ultima modificación: 13/05/2025
 */
 
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLock, faEnvelope} from '@fortawesome/free-solid-svg-icons';
-import { useNavigate } from 'react-router-dom'; // Importar hook para navegación
+import { faLock, faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import { useNavigate } from 'react-router-dom'; // Hook para navegación
+import { login, storeToken } from '../../services/authService'; // Servicio de autenticación
 import ButtonForm from '../../components/ButtonForm/ButtonForm';
-import IconoInput from '../../components/InputIcono/InputIcono';
-import InputPassword from '../../components/InputIcono/InputPassword';
+import IconoInput from '../../components/Inputs/InputIcono';
+import InputPassword from '../../components/Inputs/InputPassword';
 import ButtonText from '../../components/ButtonText/ButtonText';
+import Header from './Header';
 
 const LoginScreen = () => {
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate(); // Hook para redirigir
 
     const handleInputChange = (e) => {
-        setUsername(e.target.value);
+        setEmail(e.target.value);
         setErrorMessage('');
     };
 
@@ -44,22 +46,46 @@ const LoginScreen = () => {
         navigate('/reset-password'); // Redirigir a la página de reestablecimiento
     };
 
-    const handleLogin = () => {
-        //validaciones para errores
-        if (!username || !password){
+    const handleLogin = async () => {
+        // Validación de campos vacíos
+        if (!email || !password) {
             setErrorMessage('Por favor, completa todos los campos');
             return;
         }
 
-        //simulacion de login
-        if (username === 'admin' &&password === '1234'){
-            setErrorMessage('');
-            console.log('Inicio de sesión exitoso')
-            //agregar la redireccion cuando se tenga
-        } else {
-            setErrorMessage('Correo electronico o contraseña incorrectos.')
+        try {
+            // Llamada al servicio de login
+            const data = await login(email, password);
+            const { token } = data;
+
+            // Almacenar el token en localStorage
+            storeToken(token);
+
+            // Decodificar el token para obtener el rol y el nombre del usuario
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const { rol_id, email: userEmail } = payload;
+
+            // Redirigir según el rol
+            switch (rol_id) {
+                case 1: // Admin
+                    navigate('/dashboard/admin', { state: { user: userEmail, role: 'Admin' } });
+                    break;
+                case 2: // Dependienta
+                    navigate('/dashboard/dependienta', { state: { user: userEmail, role: 'Dependienta' } });
+                    break;
+                case 3: // Visitador
+                    navigate('/dashboard/visitador', { state: { user: userEmail, role: 'Visitador' } });
+                    break;
+                case 4: // Contador
+                    navigate('/dashboard/contador', { state: { user: userEmail, role: 'Contador' } });
+                    break;
+                default:
+                    navigate('/dashboard', { state: { user: userEmail, role: 'Usuario' } });
+            }
+        } catch (error) {
+            console.error('Error al iniciar sesión:', error);
+            setErrorMessage('Correo electrónico o contraseña incorrectos.');
         }
-       
     };
 
     return (
@@ -69,73 +95,67 @@ const LoginScreen = () => {
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                position: 'relative', 
+                position: 'relative',
                 width: '100%',
                 maxWidth: '600px',
+                height: '100vh',
             }}
         >
+            {/* Header */}
+            <Header />
             
-            {/*Mensaje de error*/
-                errorMessage && (
-                    <div style={{ 
-                        color: 'red', 
-                        marginTop: '10px', 
-                        fontFamily:'sans-serif', 
-                        fontSize: '15px'
-                    }}>
-                        {errorMessage}
-                    </div>
-                )
-            }
-          
+            {/* Mensaje de error */}
+            {errorMessage && (
+                <div
+                    style={{
+                        color: 'red',
+                        marginTop: '10px',
+                        fontFamily: 'sans-serif',
+                        fontSize: '15px',
+                    }}
+                >
+                    {errorMessage}
+                </div>
+            )}
 
             {/* Casilla de correo */}
-            <IconoInput 
+            <IconoInput
                 icono={faEnvelope}
                 placeholder="Correo"
-                value={username}
-                error={errorMessage}
+                value={email}
+                error={!!errorMessage}
                 onChange={handleInputChange}
-                name="email">
-            </IconoInput>
-          
+                name="email"
+            />
 
             {/* Casilla de contraseña con ícono */}
-            <InputPassword 
+            <InputPassword
                 showPassword={showPassword}
-                togglePasswordVisibility = {togglePasswordVisibility}
+                togglePasswordVisibility={togglePasswordVisibility}
                 icono={faLock}
                 placeholder="Contraseña"
                 value={password}
-                error={errorMessage}
+                error={!!errorMessage}
                 onChange={handlePasswordChange}
                 name="password"
-                >
-            </InputPassword>
-
+            />
 
             {/* Texto de reestablecimiento */}
             <ButtonText
-                texto = '¿Has olvidado tu contraseña?'
-                textoButton= 'Reestablecer'
-                accion = {handleResetPassword}
-            ></ButtonText>
-
+                texto="¿Has olvidado tu contraseña?"
+                textoButton="Reestablecer"
+                accion={handleResetPassword}
+            />
 
             {/* Botón de Iniciar Sesión */}
-            <ButtonForm
-                text={'Iniciar Sesión'}
-                onClick={handleLogin}
-            ></ButtonForm>
-
+            <ButtonForm text="Iniciar Sesión" onClick={handleLogin} />
 
             {/* Texto de visitador médico */}
             <ButtonText
-                texto = '¿Eres visitador médico?'
-                textoButton= 'Ingresa'
-                accion = {handleResetPassword}
-            ></ButtonText>
-
+                texto="¿Eres visitador médico?"
+                textoButton="Ingresa"
+                accion={handleResetPassword}
+            />
         </div>
     );
 };
