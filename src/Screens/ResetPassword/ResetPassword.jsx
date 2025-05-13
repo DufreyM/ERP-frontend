@@ -7,7 +7,7 @@ const ResetPassword = () => {
     return (
         <div style={{ textAlign: 'center' }}>
             <BackgroundCross
-            variant="green" mirrored={true}
+            variant="red" mirrored={true}
             >
                 <h1>Página de Reestablecimiento</h1>
                 <p>Pa el siguiente sprinttttt</p>

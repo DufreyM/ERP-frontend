@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginScreen from './Screens/Login/LoginScreen.jsx';
 import Header from './Screens/Login/Header.jsx'
 
-import ResetPassword from './Screens/Login/ResetPassword.jsx'; // Importar la nueva página
+import ResetPassword from './Screens/ResetPassword/ResetPassword.jsx'; // Importar la nueva página
 import BackgroundCross from './components/BackgroundCross/BackgroundCross.jsx';
 import RegisterScreen from './Screens/Register/Register.jsx';
 
@@ -17,7 +17,7 @@ function App() {
                         BackgroundCross
             variant="red" mirrored={false}
                         >
-                            <Header />
+                        
                             <LoginScreen />
                         </BackgroundCross>
                     }
