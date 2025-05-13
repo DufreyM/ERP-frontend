@@ -5,16 +5,16 @@ Contiene el input de nombre de usuario y su respectivo estado
 Contiene el input de contraseña y su respectivo estado
 Contiene el icono de mostrar/ocultar contraseña y su respectivo estado
 Contiene el texto de reestablecimiento de contraseña y su respectivo estado (también redirige a la página de reestablecimiento)
-Contiene el estilo de los inputs y el botón de iniciar sesión
+Contiene el estilo de los inputs y el botón de iniciar sesión conectado a la API
 Autor: Daniela y Melisa
-Ultima modificación: 7/05/2025
+Ultima modificación: 13/05/2025
 */
 
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLock, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom'; // Hook para navegación
-import { login } from '../../services/authService'; // Servicio de autenticación
+import { login, storeToken } from '../../services/authService'; // Servicio de autenticación
 import ButtonForm from '../../components/ButtonForm/ButtonForm';
 import IconoInput from '../../components/Inputs/InputIcono';
 import InputPassword from '../../components/Inputs/InputPassword';
@@ -22,14 +22,14 @@ import ButtonText from '../../components/ButtonText/ButtonText';
 import Header from './Header';
 
 const LoginScreen = () => {
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate(); // Hook para redirigir
 
     const handleInputChange = (e) => {
-        setUsername(e.target.value);
+        setEmail(e.target.value);
         setErrorMessage('');
     };
 
@@ -48,17 +48,40 @@ const LoginScreen = () => {
 
     const handleLogin = async () => {
         // Validación de campos vacíos
-        if (!username || !password) {
+        if (!email || !password) {
             setErrorMessage('Por favor, completa todos los campos');
             return;
         }
 
         try {
             // Llamada al servicio de login
-            const data = await login(username, password);
-            console.log('Inicio de sesión exitoso:', data);
-            setErrorMessage('');
-            navigate('/dashboard'); // Redirigir al dashboard
+            const data = await login(email, password);
+            const { token } = data;
+
+            // Almacenar el token en localStorage
+            storeToken(token);
+
+            // Decodificar el token para obtener el rol y el nombre del usuario
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const { rol_id, email: userEmail } = payload;
+
+            // Redirigir según el rol
+            switch (rol_id) {
+                case 1: // Admin
+                    navigate('/dashboard/admin', { state: { user: userEmail, role: 'Admin' } });
+                    break;
+                case 2: // Dependienta
+                    navigate('/dashboard/dependienta', { state: { user: userEmail, role: 'Dependienta' } });
+                    break;
+                case 3: // Visitador
+                    navigate('/dashboard/visitador', { state: { user: userEmail, role: 'Visitador' } });
+                    break;
+                case 4: // Contador
+                    navigate('/dashboard/contador', { state: { user: userEmail, role: 'Contador' } });
+                    break;
+                default:
+                    navigate('/dashboard', { state: { user: userEmail, role: 'Usuario' } });
+            }
         } catch (error) {
             console.error('Error al iniciar sesión:', error);
             setErrorMessage('Correo electrónico o contraseña incorrectos.');
@@ -99,7 +122,7 @@ const LoginScreen = () => {
             <IconoInput
                 icono={faEnvelope}
                 placeholder="Correo"
-                value={username}
+                value={email}
                 error={!!errorMessage}
                 onChange={handleInputChange}
                 name="email"
