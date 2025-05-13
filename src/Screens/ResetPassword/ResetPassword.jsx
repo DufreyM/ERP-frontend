@@ -15,7 +15,7 @@ const ResetPassword = () => {
         setError('');
 
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/request-password-reset`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/request-password-reset`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -72,7 +72,7 @@ const ResetPassword = () => {
                 />
 
                 {/* Botón de Enviar correo */}
-                <ButtonForm text="Enviar correo" onClick={handleSubmit} />
+                <ButtonForm text="Enviar correo" onClick={handleSubmit} marginBottom="20px" />
 
                 {/* Mensaje de éxito o error */}
                 {message && (
