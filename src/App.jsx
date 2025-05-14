@@ -1,10 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginScreen from './Screens/Login/LoginScreen.jsx';
-import Header from './Screens/Login/Header.jsx'
-
-import ResetPassword from './Screens/ResetPassword/ResetPassword.jsx'; // Importar la nueva página
+import ResetPassword from './Screens/ResetPassword/ResetPassword.jsx';
 import BackgroundCross from './components/BackgroundCross/BackgroundCross.jsx';
 import RegisterScreen from './Screens/Register/Register.jsx';
+import Visitadores from './Screens/Visitadores/Visitadores.jsx';
 
 function App() {
     return (
@@ -13,25 +12,31 @@ function App() {
                 <Route
                     path="/"
                     element={
-                        <BackgroundCross
-                        BackgroundCross
-            variant="red" mirrored={false}
-                        >
-                        
+                        <BackgroundCross variant="red" mirrored={false}>
                             <LoginScreen />
                         </BackgroundCross>
                     }
                 />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/register-user" element={
-                    <BackgroundCross
-                        variant="red"
-                    >
-                        <RegisterScreen>
-
-                        </RegisterScreen>
-                    </BackgroundCross>
-                }/>
+                <Route
+                    path="/visitador"
+                    element={
+                        <BackgroundCross variant="green" mirrored={true}>
+                            <Visitadores />
+                        </BackgroundCross>
+                    }
+                />
+                <Route
+                    path="/reset-password"
+                    element={<ResetPassword />}
+                />
+                <Route
+                    path="/register-user"
+                    element={
+                        <BackgroundCross variant="red">
+                            <RegisterScreen />
+                        </BackgroundCross>
+                    }
+                />
             </Routes>
         </Router>
     );

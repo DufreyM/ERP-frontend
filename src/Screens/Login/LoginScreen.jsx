@@ -27,6 +27,11 @@ const LoginScreen = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate(); // Hook para redirigir
+    
+    
+    const handleVisitador = () => {
+        navigate('/visitador'); 
+    };
 
     const handleInputChange = (e) => {
         setEmail(e.target.value);
@@ -154,11 +159,9 @@ const LoginScreen = () => {
 
             {/* Texto de visitador médico */}
             <ButtonText
-
-
                 texto="¿Eres visitador médico?"
                 textoButton="Ingresa"
-                accion={handleResetPassword}
+                accion={handleVisitador}
             />
 
         </div>
