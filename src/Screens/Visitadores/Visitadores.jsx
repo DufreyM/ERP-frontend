@@ -26,11 +26,22 @@ const Visitadores = () => {
         setShowPassword(!showPassword);
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
+        setError('');
+        setMessage('');
+
+        let fechaFormateada = null;
+        if (fecha instanceof Date && !isNaN(fecha)) {
+            const year = fecha.getFullYear();
+            const month = String(fecha.getMonth() + 1).padStart(2, '0');
+            const day = String(fecha.getDate()).padStart(2, '0');
+            fechaFormateada = `${year}-${month}-${day}`;
+        }
+
         const data = {
             nombre,
             apellido,
-            fecha,
+            fechaNacimiento: fechaFormateada,
             password,
             email,
             telefono,
@@ -40,8 +51,25 @@ const Visitadores = () => {
             telefonoProveedor,
         };
 
-        console.log('Datos listos para enviar al backend:', JSON.stringify(data));
-        setMessage('Datos enviados correctamente.');
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/register-visitador`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Error al registrar al visitador');
+            }
+
+            setMessage('Solicitud enviada correctamente. Revisa tu correo.');
+        } catch (err) {
+            console.error('Error al enviar solicitud de registro:', err);
+            setError('No se pudo enviar la solicitud. Verifica los datos e intenta nuevamente.');
+        }
     };
 
     return (
