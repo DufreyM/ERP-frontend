@@ -1,14 +1,20 @@
 import { Outlet } from "react-router-dom";
-import Navbar from '../components/Navbar/Navbar.jsx'
+import Navbar from '../components/Navbar/Navbar.jsx';
 import "./AdminLayout.css";
-import { FaUser, FaBox, FaCalendar, FaUsers, FaCog } from "react-icons/fa";
+
+import { IoIosNotifications } from "react-icons/io";
+import { IoMdArchive } from "react-icons/io";
+import { FaUser, FaBox, FaClock, FaCalendar, FaUsers, FaCog } from "react-icons/fa";
 
 const adminItems = [
-  { label: "Mi perfil", to: "/admin/perfil", icon: FaUser },
-  { label: "Calendario", to: "/admin/calendario", icon: FaCalendar },
-  { label: "Visitadores médicos", to: "/admin/visitadores", icon: FaUsers },
-  { label: "Configurar perfiles", to: "/admin/perfiles", icon: FaCog },
+  { label: "Notificaciones", to: "/admin/notificaciones", icon: IoIosNotifications },
+  { label: "Archivos", to: "/admin/archivos", icon: IoMdArchive },
+  { label: "Mi perfil", to: "/admin/mi-perfil", icon: FaUser },
+  { label: "Historial (Ventas/compras)", to: "/admin/historial-vc", icon: FaClock },
+  { label: "Configurar empleados/clientes", to: "/admin/configurar-ec", icon: FaCog },
   { label: "Inventario", to: "/admin/inventario", icon: FaBox },
+  { label: "Calendario", to: "/admin/calendario", icon: FaCalendar },
+  { label: "Visitadores médicos", to: "/admin/visitadores-medicos", icon: FaUsers },
 ];
 
 export default function AdminLayout() {
