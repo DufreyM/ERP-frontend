@@ -1,0 +1,51 @@
+.card {
+  background-color: white;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.iconContainer {
+  flex-shrink: 0;
+  margin-right: 1rem;
+}
+
+.icon {
+  font-size: 2rem;
+  color: #00796b;
+}
+
+.info h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.info p {
+  margin: 0.2rem 0;
+}
+
+.activo {
+  color: green;
+  font-weight: bold;
+}
+
+.inactivo {
+  color: red;
+  font-weight: bold;
+}
+
+.actions button {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  margin-left: 0.5rem;
+}
+
+.delete {
+  color: crimson;
+}
