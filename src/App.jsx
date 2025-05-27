@@ -4,6 +4,8 @@ import ResetPassword from './Screens/ResetPassword/ResetPassword.jsx';
 import BackgroundCross from './components/BackgroundCross/BackgroundCross.jsx';
 import RegisterScreen from './Screens/Register/Register.jsx';
 import Visitadores from './Screens/Visitadores/Visitadores.jsx';
+import MiPerfil from './Screens/MiPerfil/MiPerfil.jsx'; 
+
 
 function App() {
     return (
@@ -37,6 +39,14 @@ function App() {
                         </BackgroundCross>
                     }
                 />
+                <Route
+                    path="/mi-perfil"
+                    element={
+                        <BackgroundCross variant="blue">
+                            <MiPerfil />
+                        </BackgroundCross>
+                    }
+                /> 
             </Routes>
         </Router>
     );
