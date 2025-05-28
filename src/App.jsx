@@ -53,12 +53,11 @@ function App() {
                     }
                 /> 
                                 <Route
-                    path="/archivos"
+                    path="/admin/archivos"
                     element={
                             <BackgroundCross variant="orange">
                                 <ArchivosScreen />
                             </BackgroundCross>
-
                     }
                 /> 
             </Routes>
