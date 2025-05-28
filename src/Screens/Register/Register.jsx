@@ -104,19 +104,58 @@ const RegisterScreen = () =>  {
     };
 
 
-    const handleRegister = () => {
-        if (!username || !password || !useremail ||!userlastname ||!birth){
-            setErrorMessage('Por favor, completa todos los campos');
-            return;
-        } else {
+    const handleRegister = async () => {
+    if (!username || !password || !useremail || !userlastname || !birth || !rol) {
+        setErrorMessage('Por favor, completa todos los campos');
+        return;
+    }
+    if (calculateAge(birth) < 18) {
+        setErrorMessage('Debe ser mayor de 18 años para registrar al usuario.');
+        return;
+    }
 
-       
-            setErrorMessage('');
-            console.log("Registrado")
-        };
-   
+    setErrorMessage('');
+
+    const payload = {
+        nombre: username,
+        apellidos: userlastname,
+        rol_id: rol,
+        email: useremail,
+        contrasena: password,
+        fechaNacimiento: birth,
     };
 
+    // Si el rol no es visitador médico (id 3), agrega el local
+    if (rol !== "3" && local) {
+        payload.local = local;
+    }
+
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify(payload),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            setErrorMessage(data.error || 'Error al registrar el usuario');
+            return;
+        }
+
+        // Registro exitoso
+        setErrorMessage('');
+        alert('Usuario registrado correctamente. Se ha enviado un correo de verificación.');
+        navigate('/'); //Cambiar para cuando sepamos a dónde redirigir después del registro
+    } catch (error) {
+        setErrorMessage('Error de red o del servidor');
+    }
+};
 
     return (
         <div
