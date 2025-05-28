@@ -1,0 +1,28 @@
+.right-panel {
+  width: 300px;
+  background-color: #f8f8f8;
+  border-left: 1px solid #ccc;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  padding: 1rem 0.5rem;
+}
+
+.panel-section {
+  border: 1px solid #1a202c;
+  margin-bottom: 1rem;
+  background-color: white;
+}
+
+.panel-header {
+  background-color: #2e384d;
+  color: white;
+  padding: 0.5rem;
+  font-weight: bold;
+  border-bottom: 1px solid #1a202c;
+}
+
+.panel-content {
+  padding: 0.5rem;
+  min-height: 100px;
+}

@@ -1,0 +1,31 @@
+import { Outlet } from "react-router-dom";
+import Navbar from '../components/Navbar/Navbar.jsx';
+import RightPanel from "../components/RightPanel/RightPanel.jsx";
+import "./AdminLayout.css";
+
+import { IoIosNotifications } from "react-icons/io";
+import { IoMdArchive } from "react-icons/io";
+import { FaUser, FaBox, FaClock, FaCalendar, FaUsers, FaCog } from "react-icons/fa";
+
+const adminItems = [
+  { label: "Notificaciones", to: "/admin/notificaciones", icon: IoIosNotifications },
+  { label: "Archivos", to: "/admin/archivos", icon: IoMdArchive },
+  { label: "Mi perfil", to: "/admin/mi-perfil", icon: FaUser },
+  { label: "Historial (Ventas/compras)", to: "/admin/historial-vc", icon: FaClock },
+  { label: "Configurar empleados/clientes", to: "/admin/configurar-ec", icon: FaCog },
+  { label: "Inventario", to: "/admin/inventario", icon: FaBox },
+  { label: "Calendario", to: "/admin/calendario", icon: FaCalendar },
+  { label: "Visitadores médicos", to: "/admin/visitadores-medicos", icon: FaUsers },
+];
+
+export default function AdminLayout() {
+  return (
+    <div className="admin-layout">
+      <Navbar items={adminItems} />
+      <main className="admin-content">
+        <Outlet />
+      </main>
+      <RightPanel />
+    </div>
+  );
+}

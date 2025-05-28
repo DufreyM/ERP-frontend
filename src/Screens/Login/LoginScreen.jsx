@@ -75,7 +75,7 @@ const LoginScreen = () => {
             // Redirigir según el rol
             switch (rol_id) {
                 case 1: // Admin
-                    navigate('/dashboard/admin', { state: { user: userEmail, role: 'Admin' } });
+                    navigate('/admin/dashboard', { state: { user: userEmail, role: 'Admin' } });
                     break;
                 case 2: // Dependienta
                     navigate('/dashboard/dependienta', { state: { user: userEmail, role: 'Dependienta' } });
