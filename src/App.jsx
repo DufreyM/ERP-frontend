@@ -62,7 +62,7 @@ function App() {
                     }
                 /> 
 
-                 <Route path="/admin/calendar"
+                 <Route path="/admin/calendario"
                     element={<CalendarScreen></CalendarScreen>}
                 />
 
