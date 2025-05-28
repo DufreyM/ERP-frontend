@@ -1,0 +1,66 @@
+/* Archivo .css para estilos de la página Archivos 
+    Renato Rojas. 28/05/2025 */
+
+.contenedorGeneral {
+    height: 100dvh;
+    width: 100dvw;    
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.contenedorArchivos {
+    height: 90%;
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* background-color:blue; */
+}
+
+.barraSeleccion {
+    width: 100%;
+    height: 100px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.botonFiltro {
+    height: 34.4px;
+    width: 200px;
+    margin-top: -8px;
+    border-radius: 5px;
+    background-color: #5a60A5;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size:medium;
+}
+
+.botonFiltro:hover {
+    background-color: darkblue;
+  }
+
+
+.table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 80%;
+}
+
+.td, .th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+
+.td:nth-last-child(2), .td:last-child, .th:nth-last-child(2), .th:last-child {
+    text-align: center;
+}
+
+.tr:nth-child(odd) {
+  background-color: #dddddd;
+}

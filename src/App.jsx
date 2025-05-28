@@ -5,6 +5,7 @@ import BackgroundCross from './components/BackgroundCross/BackgroundCross.jsx';
 import RegisterScreen from './Screens/Register/Register.jsx';
 import Visitadores from './Screens/Visitadores/Visitadores.jsx';
 import MiPerfil from './Screens/MiPerfil/MiPerfil.jsx'; 
+import ArchivosScreen from './Screens/Archivos/Archivos.jsx';
 
 
 function App() {
@@ -45,6 +46,15 @@ function App() {
                         <BackgroundCross variant="blue">
                             <MiPerfil />
                         </BackgroundCross>
+                    }
+                /> 
+                                <Route
+                    path="/archivos"
+                    element={
+                            <BackgroundCross variant="orange">
+                                <ArchivosScreen />
+                            </BackgroundCross>
+
                     }
                 /> 
             </Routes>
