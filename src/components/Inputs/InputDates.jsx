@@ -17,6 +17,7 @@ const InputDates = ({
     selected,
     onChange,
     error = false,
+    maxWidth = '500px',
 }) => {
     
     
@@ -25,16 +26,27 @@ const InputDates = ({
         <div className={`${styles.contenedorInput} ${error ? styles.errorInput :''}`}>
 
             <DatePicker
-                className={styles.inputStyleDate}
+               
                 placeholderText = {placeholder}
                 selected = {selected}
                 onChange={onChange}
-                dateFormat="yyyy-MM-dd"   
+                dateFormat="yyyy-MM-dd"  
+               
+
+                className={styles.inputStyleDate}
+                popperPlacement="bottom"
+                wrapperClassName="custom-datepicker-wrapper"
             />
 
             <span className={styles.iconoStyle} >
                 <FontAwesomeIcon icon={icono} style={{ color: error? 'red' : '#5a60a5' }} />
             </span>
+
+            <style jsx>{`
+                .custom-datepicker-wrapper input {
+                    max-width: ${maxWidth};
+                }
+            `}</style>
     
         </div>
     );

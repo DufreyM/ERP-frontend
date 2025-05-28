@@ -8,7 +8,7 @@ Ultima modificación: 20/4/2025
 body {
     margin: 0;
     padding: 0;
-    overflow: hidden;  /* Previene las barras de desplazamiento */
+     /* Previene las barras de desplazamiento */
 }
 
 .background {
