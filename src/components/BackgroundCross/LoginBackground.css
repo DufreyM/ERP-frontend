@@ -146,6 +146,11 @@ body {
     opacity: 0.5;
 }
 
+.groupCross.orange .colored {
+    color: orange;
+    opacity: 0.5;
+}
+
 .white{
     color: white;
     z-index: 1;

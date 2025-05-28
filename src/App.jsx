@@ -7,6 +7,7 @@ import Visitadores from './Screens/Visitadores/Visitadores.jsx';
 import AdminLayout from './layouts/AdminLayout.jsx';
 import AdminDashboard from './Screens/dashboard/admin/Dashboard.jsx'
 import MiPerfil from './Screens/MiPerfil/MiPerfil.jsx'; 
+import ArchivosScreen from './Screens/Archivos/Archivos.jsx';
 
 function App() {
     return (
@@ -49,6 +50,15 @@ function App() {
                         <BackgroundCross variant="blue">
                             <MiPerfil />
                         </BackgroundCross>
+                    }
+                /> 
+                                <Route
+                    path="/archivos"
+                    element={
+                            <BackgroundCross variant="orange">
+                                <ArchivosScreen />
+                            </BackgroundCross>
+
                     }
                 /> 
             </Routes>
