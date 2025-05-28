@@ -9,6 +9,8 @@ import AdminDashboard from './Screens/dashboard/admin/Dashboard.jsx'
 import MiPerfil from './Screens/MiPerfil/MiPerfil.jsx'; 
 import ArchivosScreen from './Screens/Archivos/Archivos.jsx';
 import { CalendarScreen } from './Screens/Calendar/CalendarScreen.jsx';
+import NewPassword from './Screens/ResetPassword/NewPassword.jsx';
+import PasswordSuccess from './Screens/ResetPassword/PasswordSuccess.jsx'
 
 function App() {
     return (
@@ -73,7 +75,6 @@ function App() {
                     path="/reset-password-success"
                     element={<PasswordSuccess />}
                 />
-
             </Routes>
         </Router>
     );
