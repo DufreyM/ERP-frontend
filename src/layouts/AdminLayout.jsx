@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom";
 import Navbar from '../components/Navbar/Navbar.jsx';
+import RightPanel from "../components/RightPanel/RightPanel.jsx";
 import "./AdminLayout.css";
 
 import { IoIosNotifications } from "react-icons/io";
@@ -24,6 +25,7 @@ export default function AdminLayout() {
       <main className="admin-content">
         <Outlet />
       </main>
+      <RightPanel />
     </div>
   );
 }
