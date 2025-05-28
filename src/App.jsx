@@ -4,10 +4,14 @@ import ResetPassword from './Screens/ResetPassword/ResetPassword.jsx';
 import BackgroundCross from './components/BackgroundCross/BackgroundCross.jsx';
 import RegisterScreen from './Screens/Register/Register.jsx';
 import Visitadores from './Screens/Visitadores/Visitadores.jsx';
+<<<<<<< HEAD
 import AdminLayout from './layouts/AdminLayout.jsx';
 import AdminDashboard from './Screens/dashboard/admin/Dashboard.jsx'
 import MiPerfil from './Screens/MiPerfil/MiPerfil.jsx'; 
 import ArchivosScreen from './Screens/Archivos/Archivos.jsx';
+=======
+import { CalendarScreen } from './Screens/Calendar/CalendarScreen.jsx';
+>>>>>>> feature/CalendarScreen
 
 function App() {
     return (
@@ -60,6 +64,11 @@ function App() {
                             </BackgroundCross>
                     }
                 /> 
+
+                 <Route path="/admin/calendar"
+                    element={<CalendarScreen></CalendarScreen>}
+                />
+
             </Routes>
         </Router>
     );
