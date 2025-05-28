@@ -6,6 +6,9 @@ import InputDates from '../../components/Inputs/InputDates';
 import ButtonForm from '../../components/ButtonForm/ButtonForm';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faCalendar, faLock, faEnvelope, faPhone, faNotesMedical, faLocationDot } from '@fortawesome/free-solid-svg-icons';
+import Isotipo from '../../assets/svg/isotipoEconofarma.svg'; 
+import { useNavigate } from 'react-router-dom';
+import ButtonText from '../../components/ButtonText/ButtonText';
 
 const Visitadores = () => {
     const [nombre, setNombre] = useState('');
@@ -21,6 +24,7 @@ const Visitadores = () => {
     const [telefonoProveedor, setTelefonoProveedor] = useState('');
     const [error, setError] = useState('');
     const [message, setMessage] = useState('');
+    const navigate = useNavigate();
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
@@ -72,6 +76,10 @@ const Visitadores = () => {
         }
     };
 
+    const handleRedirectToLogin = () => {
+        navigate('/'); // Redirigir a la página de inicio de sesión
+    }
+
     return (
         <BackgroundCross variant="green" mirrored={true}>
             <div
@@ -87,14 +95,24 @@ const Visitadores = () => {
                 }}
             >
                 {/* Título */}
-                <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                <div style={{ display: 'flex', marginBottom: '0px', gap: '18px',textAlign: 'left' }}>
+                    <img
+                        src={Isotipo}
+                        alt="Isotipo Econofarma"
+                        style={{
+                            width: 120,
+                            height: 120,
+                            minWidth: 120,
+                        }}
+                    />
                     <h1 style={{ color: '#5a60a5', fontFamily: 'Segoe UI', fontWeight: 'bold', margin: 0 }}>
-                        Acceso para
-                    </h1>
-                    <h1 style={{ color: '#5a60a5', fontFamily: 'Segoe UI', fontWeight: 'bold', margin: 0 }}>
-                        Visitadores Médicos
-                    </h1>
+                            Acceso para Visitadores Médicos
+                    </h1>  
                 </div>
+
+                <h2 style={{ color: '#5a60a5', fontFamily: 'Segoe UI', fontWeight: 'bold', marginBottom: '10px', fontSize: '20px' }}>
+                    Datos del visitador
+                </h2>
 
                 {/* Inputs */}
                 <IconoInput
@@ -140,6 +158,11 @@ const Visitadores = () => {
                     onChange={(e) => setTelefono(e.target.value)}
                     name="telefono"
                 />
+
+                <h2 style={{ color: '#5a60a5', fontFamily: 'Segoe UI', fontWeight: 'bold', margin: '25px 0 10px 0', fontSize: '20px', alignSelf: 'flex-middle' }}>
+                    Datos del proveedor
+                </h2>
+
                 <IconoInput
                     icono={faNotesMedical}
                     placeholder="Nombre del Proveedor"
@@ -171,6 +194,12 @@ const Visitadores = () => {
 
                 {/* Botón de enviar */}
                 <ButtonForm text="Enviar solicitud para crear cuenta" onClick={handleSubmit} />
+
+                <ButtonText
+                texto="¿Ya tienes una cuenta?"
+                textoButton="Ir al inicio"
+                accion={handleRedirectToLogin}
+                />
 
                 {/* Mensaje de éxito o error */}
                 {message && (

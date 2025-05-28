@@ -6,6 +6,7 @@ import RegisterScreen from './Screens/Register/Register.jsx';
 import Visitadores from './Screens/Visitadores/Visitadores.jsx';
 import AdminLayout from './layouts/AdminLayout.jsx';
 import AdminDashboard from './Screens/dashboard/admin/Dashboard.jsx'
+import MiPerfil from './Screens/MiPerfil/MiPerfil.jsx'; 
 
 function App() {
     return (
@@ -42,6 +43,14 @@ function App() {
                 <Route path="/admin/dashboard" element={<AdminLayout />}>
                   <Route index element={<AdminDashboard />} />
                 </Route>
+                <Route
+                    path="/mi-perfil"
+                    element={
+                        <BackgroundCross variant="blue">
+                            <MiPerfil />
+                        </BackgroundCross>
+                    }
+                /> 
             </Routes>
         </Router>
     );
