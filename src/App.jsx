@@ -4,6 +4,8 @@ import ResetPassword from './Screens/ResetPassword/ResetPassword.jsx';
 import BackgroundCross from './components/BackgroundCross/BackgroundCross.jsx';
 import RegisterScreen from './Screens/Register/Register.jsx';
 import Visitadores from './Screens/Visitadores/Visitadores.jsx';
+import NewPassword from './Screens/ResetPassword/NewPassword.jsx';
+import PasswordSuccess from './Screens/ResetPassword/PasswordSuccess.jsx'
 
 function App() {
     return (
@@ -36,6 +38,14 @@ function App() {
                             <RegisterScreen />
                         </BackgroundCross>
                     }
+                />
+                <Route
+                    path="/auth/verify-reset"
+                    element={<NewPassword />}
+                />
+                <Route
+                    path="/reset-password-success"
+                    element={<PasswordSuccess />}
                 />
             </Routes>
         </Router>
