@@ -39,14 +39,6 @@ function App() {
                         </BackgroundCross>
                     }
                 />
-                <Route
-                    path="/auth/verify-reset"
-                    element={<NewPassword />}
-                />
-                <Route
-                    path="/reset-password-success"
-                    element={<PasswordSuccess />}
-                />
             </Routes>
         </Router>
     );
