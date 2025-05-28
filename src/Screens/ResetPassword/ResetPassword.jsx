@@ -76,7 +76,7 @@ const ResetPassword = () => {
 
                 {/* Mensaje de éxito o error */}
                 {message && (
-                    <p style={{ color: '#003366', marginTop: '-10px', fontFamily: 'Segoe UI', fontSize: '14px' }}>
+                    <p style={{ color: '#003366', marginTop: '10px', fontFamily: 'Segoe UI', fontSize: '14px' }}>
                         {message}
                     </p>
                 )}
