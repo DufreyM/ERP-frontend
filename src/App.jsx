@@ -65,6 +65,14 @@ function App() {
                  <Route path="/admin/calendario"
                     element={<CalendarScreen></CalendarScreen>}
                 />
+                <Route
+                    path="/auth/verify-reset"
+                    element={<NewPassword />}
+                />
+                <Route
+                    path="/reset-password-success"
+                    element={<PasswordSuccess />}
+                />
 
             </Routes>
         </Router>
