@@ -46,7 +46,7 @@ function App() {
                   <Route index element={<AdminDashboard />} />
                 </Route>
                 <Route
-                    path="/mi-perfil"
+                    path="/admin/mi-perfil"
                     element={
                         <BackgroundCross variant="blue">
                             <MiPerfil />
