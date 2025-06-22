@@ -15,6 +15,7 @@ const BackgroundCross = ({
     children,
     variant = "default",
     mirrored = false,
+    className = "",
 }) => {
 
     return (
@@ -39,12 +40,9 @@ const BackgroundCross = ({
         
             </div>
             </div>
-            <div className="content">
+            <div className={`content ${className}`}>
                 {children}
             </div>
-            
-          
-
         </div>
     );
 };

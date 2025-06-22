@@ -44,29 +44,6 @@ function App() {
                         </BackgroundCross>
                     }
                 />
-                <Route path="/admin/dashboard" element={<AdminLayout />}>
-                  <Route index element={<AdminDashboard />} />
-                </Route>
-                <Route
-                    path="/admin/mi-perfil"
-                    element={
-                        <BackgroundCross variant="blue">
-                            <MiPerfil />
-                        </BackgroundCross>
-                    }
-                /> 
-                                <Route
-                    path="/admin/archivos"
-                    element={
-                            <BackgroundCross variant="orange">
-                                <ArchivosScreen />
-                            </BackgroundCross>
-                    }
-                /> 
-
-                 <Route path="/admin/calendario"
-                    element={<CalendarScreen></CalendarScreen>}
-                />
                 <Route
                     path="/auth/verify-reset"
                     element={<NewPassword />}
@@ -75,6 +52,14 @@ function App() {
                     path="/reset-password-success"
                     element={<PasswordSuccess />}
                 />
+
+                <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<AdminDashboard />} />
+                <Route path="dashboard" element={<AdminDashboard />} />
+                <Route path="mi-perfil" element={<MiPerfil />} />
+                <Route path="archivos" element={<ArchivosScreen />} />
+                <Route path="calendario" element={<CalendarScreen />} />
+                </Route>
             </Routes>
         </Router>
     );

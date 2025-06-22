@@ -43,9 +43,6 @@ export const CalendarScreen= () =>{
     { value: 'lector', label: 'Comprar Medicamento' },
     ];
 
-
-
-
     const [events, setEvents] = useState([
         { id: 1, title: 'Compra de yeso', date: '2025-05-01', descripcion: 'Se necesitan 10 unidades de yeso, ya que Erick las consumió todas' },
         { id: 2, title: 'Completar pago', date: '2025-05-04', descripcion: 'El visitador de LaboratorioFam pasará por una suma de Q250.00' }
@@ -101,8 +98,6 @@ export const CalendarScreen= () =>{
                 //error
                 onChange
                 >
-                    
-       
             </IconoInput>
 
 
@@ -112,14 +107,7 @@ export const CalendarScreen= () =>{
                 <ButtonForm text= 'Cancelar' onClick={closePopup}></ButtonForm>
                 
             </div>
-
-            
-
-          
-            
-
-
-         </Popup>}
+            </Popup>}
         <SimpleTitle text = "Calendario de actividades"/>
 
         <div className='divisionCalendario'>
@@ -143,9 +131,8 @@ export const CalendarScreen= () =>{
             
             />
             </div>
-         
+
             <div className='descripcionStyle'>
-                 
                 <SimpleTitle text = {currentTitle}/>
                 <div className='encabezadoStyle'>
                 
