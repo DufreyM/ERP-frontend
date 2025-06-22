@@ -40,7 +40,7 @@ const BackgroundCross = ({
         
             </div>
             </div>
-            <div className={`content ${className}`}>
+            <div className={`content ${className}`} style={{ display: 'flex', flexDirection: 'column' }}>
                 {children}
             </div>
         </div>
