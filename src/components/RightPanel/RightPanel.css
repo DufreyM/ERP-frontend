@@ -1,9 +1,30 @@
 .right-panel {
-  width: 280px;
-  background-color: #f8f9fa;
-  padding: 1rem;
   height: 100vh;
+  background-color: #f8f9fa;
   overflow-y: auto;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+  transition: width 0.3s ease;
+  z-index: 1000;
+  width: 280px;
+}
+
+.right-panel.collapsed {
+  width: 40px;
+}
+
+.collapse-btn {
+  background-color: #5a60a5;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 0.5rem;
+  width: 100%;
+  text-align: right;
+  font-size: 1rem;
+}
+
+.right-panel.collapsed .collapse-btn {
+  text-align: center;
 }
 
 .panel-section {
@@ -13,7 +34,7 @@
 }
 
 .panel-header {
-  background-color: #2e384d;
+  background-color: #5a60a5;
   color: white;
   padding: 0.5rem;
   font-weight: bold;

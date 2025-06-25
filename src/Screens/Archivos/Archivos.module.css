@@ -8,6 +8,8 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    padding: 1rem;
+    box-sizing: border-box;
 }
 
 .contenedorArchivos {
@@ -16,44 +18,50 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    box-sizing: border-box;
     /* background-color:blue; */
 }
 
 .barraSeleccion {
     width: 100%;
-    height: 100px;
+    min-height: 80px;
     display: flex;
-    flex-direction: row;
-    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
     align-items: center;
-}
+    padding: 1rem;
+    box-sizing: border-box;
 
 .botonFiltro {
-    height: 34.4px;
-    width: 200px;
-    margin-top: -8px;
+    height: 40px;
+    width: 180px;
     border-radius: 5px;
     background-color: #5a60A5;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    font-size:medium;
+    font-size: 1rem;
+    color: white;
+    border: none;
 }
 
 .botonFiltro:hover {
     background-color: darkblue;
-  }
-
+}
 
 .table {
-  font-family: arial, sans-serif;
-  border-collapse: collapse;
-  width: 80%;
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 1000px;
+    overflow-x: auto;
 }
 
 .td, .th {
-  border: 1px solid #dddddd;
-  text-align: left;
-  padding: 8px;
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+    word-wrap: break-word;
 }
 
 
@@ -63,4 +71,43 @@
 
 .tr:nth-child(odd) {
   background-color: #dddddd;
+}
+
+@media (max-width: 768px) {
+    .botonFiltro {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .table {
+        font-size: 0.9rem;
+    }
+
+    .barraSeleccion {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+@media (max-width: 480px) {
+    .td,
+    .th {
+        font-size: 0.8rem;
+        padding: 6px;
+    }
+
+    .botonFiltro {
+        width: 100%;
+    }
+
+    .contenedorArchivos {
+        width: 100%;
+    }
+
+    .table {
+        width: 100%;
+        display: block;
+        overflow-x: auto;
+    }
+}
 }

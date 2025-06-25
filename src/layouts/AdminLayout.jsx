@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 import Navbar from '../components/Navbar/Navbar.jsx';
 import RightPanel from "../components/RightPanel/RightPanel.jsx";
 import "./AdminLayout.css";
-
+import {useState} from "react";
 import { useLocation } from 'react-router-dom';
 import { IoIosNotifications, IoIosHome } from "react-icons/io";
 import { IoMdArchive } from "react-icons/io";
@@ -23,7 +23,9 @@ const adminItems = [
 
 export default function AdminLayout() {
   const { pathname } = useLocation();
-    const variantMap = {
+  const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false);
+
+  const variantMap = {
     "/admin/dashboard": "blue",
     "/admin/mi-perfil": "blue",
     "/admin/archivos": "orange",
@@ -34,12 +36,16 @@ export default function AdminLayout() {
 
   return (
     <BackgroundCross variant={variant} className="admin-background">
-      <div className="admin-layout">
+        <div className={`admin-layout ${rightPanelCollapsed ? 'right-collapsed' : ''}`}>
         <Navbar items={adminItems} />
-        <main className="admin-content">
+        <main
+          className="admin-content">
           <Outlet />
         </main>
-        <RightPanel />
+        <RightPanel
+          collapsed={rightPanelCollapsed}
+          setCollapsed={setRightPanelCollapsed}
+        />
       </div>
     </BackgroundCross>
   );
