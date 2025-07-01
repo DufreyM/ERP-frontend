@@ -8,6 +8,7 @@ import { IoIosNotifications, IoIosHome } from "react-icons/io";
 import { IoMdArchive } from "react-icons/io";
 import { FaUser, FaBox, FaClock, FaCalendar, FaUsers, FaCog } from "react-icons/fa";
 import BackgroundCross from "../components/BackgroundCross/BackgroundCross.jsx";
+import TabsLocales from "../components/TabsLocales/TabsLocales";
 
 const adminItems = [
   { label: "Inicio", to: "/admin/", icon: IoIosHome },
@@ -33,14 +34,21 @@ export default function AdminLayout() {
   };
 
   const variant = variantMap[pathname] || "default";
+  const [selectedLocal, setSelectedLocal] = useState(0);
+  const locales = ["Local 1", "Local 2"];
 
   return (
-    <BackgroundCross variant={variant} className="admin-background">
+    <BackgroundCross variant={variantMap[pathname] || "default"} className="admin-background">
         <div className={`admin-layout ${rightPanelCollapsed ? 'right-collapsed' : ''}`}>
         <Navbar items={adminItems} />
         <main
           className="admin-content">
-          <Outlet />
+          <TabsLocales
+            locales={locales}
+            selectedLocal={selectedLocal}
+            onSelect={setSelectedLocal}
+          />
+          <Outlet context={{ selectedLocal }} />
         </main>
         <RightPanel
           collapsed={rightPanelCollapsed}

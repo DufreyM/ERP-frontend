@@ -1,11 +1,7 @@
-import { useState } from 'react';
-import TabsLocales from '../../../components/TabsLocales/TabsLocales';
-import './Dashboard.css';
+import { useOutletContext } from 'react-router-dom';
 
 const Dashboard = () => {
-    const [selectedLocal, setSelectedLocal] = useState(0);
-
-    const locales = ['Local 1', 'Local 2'];
+    const { selectedLocal } = useOutletContext();
 
     const dataLocales = [
         {
@@ -24,11 +20,9 @@ const Dashboard = () => {
 
     return (
         <div>
-            <TabsLocales
-                locales={locales}
-                selectedLocal={selectedLocal}
-                onSelect={setSelectedLocal}
-            />
+            <h2>{localActual.nombre}</h2>
+            <p>Notificaciones: {localActual.notificaciones.join(', ')}</p>
+            <p>Tareas: {localActual.tareas.join(', ')}</p>
         </div>
     );
 };
