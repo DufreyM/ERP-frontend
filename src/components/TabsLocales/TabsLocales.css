@@ -1,0 +1,35 @@
+.tabs-container {
+    background-color: #9d9eb4;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    top: 0;
+    position: relative;
+    z-index: 10;
+}
+
+.tabs-locales {
+    display: flex;
+    margin-bottom: 1rem;
+}
+
+.tab {
+    width: 150px;
+    padding: 0.75rem;
+    text-align: center;
+    cursor: pointer;
+    background-color: #787ca9;
+    clip-path: polygon(0 0, 90% 0, 100% 100%, 0% 100%);
+    transition: background-color 0.3s;
+    font-weight: 500;
+    color: black;
+    border: 1px solid #787ca9;
+    border-bottom: none;
+}
+
+.tab.active {
+    background-color: white;
+    font-weight: bold;
+    z-index: 2;
+    border-bottom: none;
+}

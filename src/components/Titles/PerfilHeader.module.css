@@ -1,0 +1,61 @@
+.header {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+  padding: 1.5rem;
+  background: linear-gradient(to right, #f9f9f9, #e0f7fa);
+  border-radius: 16px;
+  margin-bottom: 2rem;
+}
+
+.fotoWrapper {
+  position: relative;
+  cursor: pointer;
+}
+
+.fotoPerfil {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #00acc1;
+  transition: 0.3s;
+}
+
+.fotoPerfil:hover {
+  opacity: 0.85;
+}
+
+.info {
+  flex: 1;
+}
+
+.puesto {
+  color: #00796b;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.descripcion {
+  width: 100%;
+  height: 80px;
+  resize: none;
+  border-radius: 10px;
+  padding: 0.6rem;
+  border: 1px solid #bbb;
+  margin-bottom: 0.8rem;
+}
+
+.btnGuardar {
+  padding: 0.5rem 1rem;
+  background-color: #00acc1;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btnGuardar:hover {
+  background-color: #00838f;
+}

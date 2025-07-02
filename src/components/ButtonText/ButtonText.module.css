@@ -1,0 +1,18 @@
+/*ButtonText.module.css
+Es el estilo de ButtonText
+Autor: Melisa 
+Ultima modificación: 7/5/2025 
+*/
+
+.divButtonText {
+    text-align: center;
+    margin-top: 10px;
+    color: #003366;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.spanButtonText {
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: underline;
+}
