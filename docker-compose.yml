@@ -7,4 +7,4 @@ services:
     ports:
       - "3001:3000"           #Se expone el puerto 3001 para el host de la computadora, y el 3000 para el contendor
     environment:
-      VITE_API_URL: ${VITE_API_URL}  #Utiliza la url de .env, referenciada y no quemada, para mayor seguridad.
+      API_URL: ${VITE_API_URL}  #Utiliza la url de .env, referenciada y no quemada, para mayor seguridad. 

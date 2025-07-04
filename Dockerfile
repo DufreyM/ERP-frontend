@@ -5,7 +5,6 @@ WORKDIR /app
 # Instala las dependencias, que están indicadas en el archivo package.json
 COPY package*.json ./
 RUN npm install
-RUN npm install react-icons
 
 # Copia el código fuente
 COPY . .
