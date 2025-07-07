@@ -1,24 +1,26 @@
-import { NavLink } from "react-router-dom";
 import "./Navbar.css";
+import { ButtonsNavbar }  from "./ButtonsNavbar/ButtonsNavbar";
+
 
 const Navbar = ({ items }) => {
   return (
     <nav className="navbar">
-      <ul className="nav-list">
-        {items.map(({ label, to, icon: Icon }) => (
-          <li key={to} className="nav-item">
-            {Icon && <Icon className="nav-icon" />}
-            <NavLink
-              to={to}
-              className={({ isActive }) =>
-                isActive ? "nav-link active" : "nav-link"
-              }
-            >
-              {label}
-            </NavLink>
-          </li>
+    
+
+       <div>
+        {items.map(({ label, to, icon }, index) => (
+         
+            <ButtonsNavbar
+              key={index}
+              icono = {icon}
+              text = {label}
+              to = {to}
+            />
+           
+          
         ))}
-      </ul>
+      </div>
+      
     </nav>
   );
 };

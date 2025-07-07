@@ -38,7 +38,6 @@ const InputPassword = ({
         <div className={`${styles.contenedorInput} ${error ? styles.errorInput :''}`}>
         
              <span className={styles.iconoEye} onClick={() => {
-                console.log("wa");
                 togglePasswordVisibility();
              }}>
                 <FontAwesomeIcon icon={showPassword? faEye : faEyeSlash} style={{ color: error? 'red' : '#5a60a5' }} />

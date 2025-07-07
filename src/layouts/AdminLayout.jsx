@@ -4,22 +4,24 @@ import RightPanel from "../components/RightPanel/RightPanel.jsx";
 import "./AdminLayout.css";
 import {useState} from "react";
 import { useLocation } from 'react-router-dom';
-import { IoIosNotifications, IoIosHome } from "react-icons/io";
-import { IoMdArchive } from "react-icons/io";
-import { FaUser, FaBox, FaClock, FaCalendar, FaUsers, FaCog } from "react-icons/fa";
+
+import { faHome, faBell, faFolder, faUser, faBoxOpen, faSackDollar, faTruckMedical, faCalendarDay, faUserGroup } from '@fortawesome/free-solid-svg-icons';
+
 import BackgroundCross from "../components/BackgroundCross/BackgroundCross.jsx";
 import TabsLocales from "../components/TabsLocales/TabsLocales";
 
 const adminItems = [
-  { label: "Inicio", to: "/admin/", icon: IoIosHome },
-  { label: "Notificaciones", to: "/admin/notificaciones", icon: IoIosNotifications },
-  { label: "Archivos", to: "/admin/archivos", icon: IoMdArchive },
-  { label: "Mi perfil", to: "/admin/mi-perfil", icon: FaUser },
-  { label: "Historial (Ventas/compras)", to: "/admin/historial-vc", icon: FaClock },
-  { label: "Configurar empleados/clientes", to: "/admin/configurar-ec", icon: FaCog },
-  { label: "Inventario", to: "/admin/inventario", icon: FaBox },
-  { label: "Calendario", to: "/admin/calendario", icon: FaCalendar },
-  { label: "Visitadores médicos", to: "/admin/visitadores-medicos", icon: FaUsers },
+  { label: "Inicio", to: "/admin/", icon: faHome },
+  { label: "Archivos", to: "/admin/archivos", icon: faFolder },
+ 
+  
+  { label: "Compras Ventas", to: "/admin/historial-vc", icon: faSackDollar },
+  { label: "Empleados Clientes", to: "/admin/configurar-ec", icon: faUserGroup },
+  { label: "Inventario", to: "/admin/inventario", icon: faBoxOpen },
+  { label: "Calendario", to: "/admin/calendario", icon: faCalendarDay },
+  { label: "Visitadores médicos", to: "/admin/visitadores-medicos", icon: faTruckMedical },
+   { label: "Notificaciones", to: "/admin/notificaciones", icon: faBell },
+  { label: "Mi perfil", to: "/admin/mi-perfil", icon: faUser },
 ];
 
 export default function AdminLayout() {
