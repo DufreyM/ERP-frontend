@@ -11,6 +11,7 @@ import ArchivosScreen from './Screens/Archivos/Archivos.jsx';
 import { CalendarScreen } from './Screens/Calendar/CalendarScreen.jsx';
 import NewPassword from './Screens/ResetPassword/NewPassword.jsx';
 import PasswordSuccess from './Screens/ResetPassword/PasswordSuccess.jsx'
+import PrivateRoute from './components/authcomponent.jsx'; // Importa el componente de ruta privada
 
 function App() {
     return (
@@ -53,8 +54,8 @@ function App() {
                     element={<PasswordSuccess />}
                 />
 
-                <Route path="/admin" element={<AdminLayout />}>
-                <Route index element={<AdminDashboard />} />
+                <Route path="/admin" element={<PrivateRoute><AdminLayout /></PrivateRoute>}>
+                <Route index element={<PrivateRoute><AdminDashboard /></PrivateRoute>} />
                 <Route path="dashboard" element={<AdminDashboard />} />
                 <Route path="mi-perfil" element={<MiPerfil />} />
                 <Route path="archivos" element={<ArchivosScreen />} />
