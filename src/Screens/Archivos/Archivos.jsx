@@ -6,10 +6,81 @@ import React, { useState } from "react"
 import InputSelects from "../../components/Inputs/InputSelects"
 import styles from "./Archivos.module.css"
 import SimpleTitle from "../../components/Titles/SimpleTitle"
-import { faGear,faUser } from '@fortawesome/free-solid-svg-icons';
+import { faGear, faUser, faFilterCircleXmark, faArrowUpAZ, faArrowDownZA } from '@fortawesome/free-solid-svg-icons';
+import { Table } from "../../components/Tables/Table";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 
 const ArchivosScreen = () => {
+  const columnas = [
+    { key: 'archivo', titulo: 'Archivo' },
+    { key: 'autor', titulo: 'Subido por' },
+    { key: 'fecha', titulo: 'Fecha' },
+    { key: 'ver', titulo: 'Vizualizar Archivo' },
+    
+  ]
+
+  const datos = [
+     {
+      archivo: 'informe1.pdf',
+      autor: 'Melisa Mendizábal',
+      fecha: '2/07/2025',
+      ver: 'https://drive.google.com/file/d/1hVSDV4JfMjMc7Dt0e66rV5EYpPeX2WAW/view?usp=sharing',
+   
+    },
+
+    {
+      archivo: 'informe1.pdf',
+      autor: 'Melisa Mendizábal',
+      fecha: '2/07/2025',
+      ver: 'https://drive.google.com/file/d/1O4Oh-8YKCw7gM_7QB44hmh_PccV5N1cN/view?usp=sharing',
+
+    },
+    {
+      archivo: 'informe1.pdf',
+      autor: 'Melisa Mendizábal',
+      fecha: '2/07/2025',
+      ver: 'https://drive.google.com/file/d/1O4Oh-8YKCw7gM_7QB44hmh_PccV5N1cN/view?usp=sharing',
+
+    },
+    {
+      archivo: 'informe1.pdf',
+      autor: 'Melisa Mendizábal',
+      fecha: '2/07/2025',
+      ver: 'https://drive.google.com/file/d/1O4Oh-8YKCw7gM_7QB44hmh_PccV5N1cN/view?usp=sharing',
+
+    },
+    {
+      archivo: 'informe1.pdf',
+      autor: 'Melisa Mendizábal',
+      fecha: '2/07/2025',
+      ver: 'https://drive.google.com/file/d/1O4Oh-8YKCw7gM_7QB44hmh_PccV5N1cN/view?usp=sharing',
+
+    },
+    {
+      archivo: 'informe1.pdf',
+      autor: 'Melisa Mendizábal',
+      fecha: '2/07/2025',
+      ver: 'https://drive.google.com/file/d/1O4Oh-8YKCw7gM_7QB44hmh_PccV5N1cN/view?usp=sharing',
+
+    },
+    {
+      archivo: 'informe1.pdf',
+      autor: 'Melisa Mendizábal',
+      fecha: '2/07/2025',
+      ver: 'https://drive.google.com/file/d/1O4Oh-8YKCw7gM_7QB44hmh_PccV5N1cN/view?usp=sharing',
+
+    },
+    {
+      archivo: 'informe1.pdf',
+      autor: 'Melisa Mendizábal',
+      fecha: '2/07/2025',
+      ver: 'https://drive.google.com/file/d/1O4Oh-8YKCw7gM_7QB44hmh_PccV5N1cN/view?usp=sharing',
+
+    },
+    
+  ]
+
   const [formData, setFormData] = useState({
       rol: "",
       usuarios: "",
@@ -26,41 +97,8 @@ const ArchivosScreen = () => {
     // algo= res.map(nombre,id)
     return algo
   }
-  const handleDownload = (id) => {
-    let url = ''
-    switch (id) {
-      case 1:
-        url = 'https://drive.google.com/uc?export=download&id=1hVSDV4JfMjMc7Dt0e66rV5EYpPeX2WAW'
-        break;
-      case 2:
-        url = 'https://drive.google.com/uc?export=download&id=1O4Oh-8YKCw7gM_7QB44hmh_PccV5N1cN'
-        break;
-      default:
-        break;
-    }
-    const link = document.createElement('a')
-    link.href = url
-    link.target = '_blank'
-    link.click()
-  }
-  const handleWatch = (id) => {
-    let url = ''
-    switch (id) {
-      case 1:
-        url = 'https://drive.google.com/file/d/1hVSDV4JfMjMc7Dt0e66rV5EYpPeX2WAW/view?usp=sharing'
-        break;
-      case 2:
-        url = 'https://drive.google.com/file/d/1O4Oh-8YKCw7gM_7QB44hmh_PccV5N1cN/view?usp=sharing'
-        break;
-      default:
-        break;
-    }
-    const link = document.createElement('a')
-    link.href = url
-    link.target = '_blank'
-    link.rel = 'noopener noreferrer'
-    link.click()
-  }
+ 
+  
   const [showUsuarios, setShowUsuarios] = useState(false)
   const [showFiltros, setShowFiltros] = useState(false);
 
@@ -93,43 +131,31 @@ const ArchivosScreen = () => {
               //se debería de ver como {label:"Melisa Mendizabal", value:"id_contador"},
             }
             />
-            <button className={styles.botonFiltro}>Eliminar filtros</button>
+
+            <div className={styles.IconsFilters}>
+              <FontAwesomeIcon icon={faArrowUpAZ} className= {styles.IconStyle}></FontAwesomeIcon>
+              <FontAwesomeIcon icon={faArrowDownZA} className= {styles.IconStyle}></FontAwesomeIcon>
+              <FontAwesomeIcon icon={faFilterCircleXmark} className= {styles.IconStyle}></FontAwesomeIcon>
+            </div>
+            
+          
+          
           </div>
-            <table className={styles.table}>
-              <tr className={styles.tr}>
-                <th className={styles.th}>Archivo</th>
-                <th className={styles.th}>Subido por:</th>
-                <th className={styles.th}>Ver </th>
-                <th className={styles.th}>Descargar</th>
-                {/* Estos nombres de columnas están bien que estén quemados, porque aunque cambie la data, no van a cambiar los headers */}
-              </tr>
-              <tr>
-                {/* Estos sí hay que hacer una función que los traiga, para poblarlos correctamente.Todos los tr vendrán de BD */}
-                <td className={styles.td}>Reporte mensual</td>
-                <td className={styles.td}>Melisa Mendizabal</td>
-                <td className={styles.td}><button onClick={()=>handleWatch(1)}>Ver</button></td>
-                <td className={styles.td}>
-                  <span onClick={()=>handleDownload(1)} style={{ color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}>
-                    ⭳
-                  </span>
-                </td>
-              </tr>
-              <tr className={styles.tr}>
-                <td className={styles.td}>Rayos X (incidente RonRon)</td>
-                <td className={styles.td}>Erick Marroquín</td>
-                <td className={styles.td}><button onClick={()=>handleWatch(2)}>Ver</button></td>
-                <td className={styles.td}>
-                  <span onClick={()=> handleDownload(2)} style={{ color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}>
-                    ⭳
-                  </span>
-                </td>
-              </tr>
-            </table>
+            
+
+            
+
+            <Table
+              nameColumns={columnas}
+              data={datos}
+            >
+            </Table>
+          
         </div>
       
     </div>
     )
 }
 
-export default ArchivosScreen
+export default ArchivosScreen;
 //1O4Oh-8YKCw7gM_7QB44hmh_PccV5N1cN

@@ -12,6 +12,7 @@ import { CalendarScreen } from './Screens/Calendar/CalendarScreen.jsx';
 import NewPassword from './Screens/ResetPassword/NewPassword.jsx';
 import PasswordSuccess from './Screens/ResetPassword/PasswordSuccess.jsx'
 import PrivateRoute from './components/authcomponent.jsx'; // Importa el componente de ruta privada
+import { Inventario } from './Screens/Inventario/Inventario.jsx';
 
 function App() {
     return (
@@ -56,10 +57,12 @@ function App() {
 
                 <Route path="/admin" element={<PrivateRoute><AdminLayout /></PrivateRoute>}>
                 <Route index element={<PrivateRoute><AdminDashboard /></PrivateRoute>} />
+                <Route path="inventario" element={<Inventario/>} />
                 <Route path="dashboard" element={<AdminDashboard />} />
                 <Route path="mi-perfil" element={<MiPerfil />} />
                 <Route path="archivos" element={<ArchivosScreen />} />
                 <Route path="calendario" element={<CalendarScreen />} />
+                
                 </Route>
             </Routes>
         </Router>
