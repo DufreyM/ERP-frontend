@@ -1,64 +1,66 @@
-.calendarStyle {
-    height: 500;
-    width: 500;
+
+.pantallaCalendario{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+
 }
 
-
-
-h2::first-letter {
-  text-transform: uppercase;
-}
-
-a::first-letter {
-  text-transform: uppercase;
-}
-
-
-.fc-header-toolbar {
-    background-color: rgb(255, 255, 255);
-}
-
-.fc-col-header-cell {
-  background-color: #5a60a5;
-  color: white;
-  font-weight: bold;
-  font-family: 'Segoe UI';
-}
-.fc-toolbar-title{
-   
-  color: #5a60a5;
-  font-weight: bold;
-  font-family: 'Segoe UI';
-}
-
-.fc-event-title-container{
-    background-color: #5a60a5;
-    border-radius: 1px #5a60a5;
-}
-
-.fc-event-title {
-    
-    font-family: 'Segoe UI';
-}
-
-.fc-event-title::first-letter  {
-    text-transform: uppercase;
-}
-
-.fc-today-button {
-    background-color: #5a60a5;
-}
-
-.divisionCalendario {
-    
+.encabezado {
+    width: 99%;
     display: flex;
     flex-direction: row;
-    gap: 10px;
+    margin-bottom: 15px;
 }
 
-.contenedorCalendario {
-    height: 90%;
+.titleDiv {
     width: 80%;
+}
+
+.calendarioyEventos {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+}
+
+
+.contenedorCalendario {
+    width: 80%;
+    background-color: rgba(255, 255, 255, 0.871);
+}
+
+.contentLeft{
+    max-width: 25%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+}
+
+.allTitle{
+    border: solid #abacbc79 2px;
+    border-radius: 10px;
+    margin: 0px 5px;
+    padding: 10px 0px; 
+    background-color: white;
+}
+
+.descripcionStyle {
+    overflow-y: auto;
+    border: solid #abacbc79 2px;
+    border-radius: 10px;
+    margin: 0px 5px;
+    padding: 10px 0px; 
+    background-color: white;
+}
+
+.tituloMes{
+    width: 100%;
+    text-align: center;
+    margin: 0px;
+    padding: 0px;
+    margin-bottom: 10px;
 }
 
 .buttonCalendar {
@@ -72,12 +74,7 @@ a::first-letter {
     border: 0;
 }
 
-.descripcionStyle {
-    width: 20%;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
+
 
 .encabezadoStyle {
     
@@ -118,4 +115,90 @@ a::first-letter {
 
 .desc{
     font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.modalContenido{
+    display: flex;
+    flex-direction: column;
+    color: #5a60A5;
+}
+
+
+
+@media (max-width: 768px) {
+    
+    .calendarioyEventos {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+
+    }
+
+    .contenedorCalendario {
+        width: 100%;
+    
+    
+    }
+
+    .contentLeft {
+
+        max-width: 100%;
+        overflow-y: auto;
+        background-color: brown;
+    }
+
+    
+}
+
+
+
+
+
+h2::first-letter {
+  text-transform: uppercase;
+}
+
+h3::first-letter {
+  text-transform: uppercase;
+}
+
+a::first-letter {
+  text-transform: uppercase;
+}
+
+
+.fc-header-toolbar {
+    background-color: rgb(255, 255, 255);
+}
+
+.fc-col-header-cell {
+  background-color: #8186c2;
+  color: white;
+  font-weight: bold;
+  font-family: 'Segoe UI';
+}
+.fc-toolbar-title{
+   
+  color: #5a60a5;
+  font-weight: bold;
+  font-family: 'Segoe UI';
+}
+
+.fc-event-title-container{
+    background-color: #5a60a5;
+    border-radius: 1px #5a60a5;
+}
+
+.fc-event-title {
+    
+    font-family: 'Segoe UI';
+}
+
+.fc-event-title::first-letter  {
+    text-transform: uppercase;
+}
+
+.fc-today-button {
+    background-color: #5a60a5;
 }

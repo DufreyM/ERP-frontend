@@ -1,8 +1,6 @@
 
 
 
-
-import React, { useState } from 'react';
 import styles from './InputIcono.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import DatePicker from "react-datepicker";
@@ -23,7 +21,7 @@ const InputDates = ({
     
 
     return (
-        <div className={`${styles.contenedorInput} ${error ? styles.errorInput :''}`}>
+        <div className={`${styles.contenedorInputDate} ${error ? styles.errorInput :''}`}>
 
             <DatePicker
                

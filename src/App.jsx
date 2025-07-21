@@ -56,12 +56,16 @@ function App() {
                 />
 
                 <Route path="/admin" element={<PrivateRoute><AdminLayout /></PrivateRoute>}>
-                <Route index element={<PrivateRoute><AdminDashboard /></PrivateRoute>} />
-                <Route path="inventario" element={<Inventario/>} />
-                <Route path="dashboard" element={<AdminDashboard />} />
-                <Route path="mi-perfil" element={<MiPerfil />} />
-                <Route path="archivos" element={<ArchivosScreen />} />
-                <Route path="calendario" element={<CalendarScreen />} />
+                    <Route index element={<PrivateRoute><AdminDashboard /></PrivateRoute>} />
+                    <Route path="inventario" element={<Inventario/>} />
+                    <Route path="dashboard" element={<AdminDashboard />} />
+                    <Route path="mi-perfil" element={<MiPerfil />} />
+
+                    
+                    <Route path="archivos" element={<ArchivosScreen />} />
+                
+                    
+                    <Route path="calendario" element={<CalendarScreen />} />
                 
                 </Route>
             </Routes>

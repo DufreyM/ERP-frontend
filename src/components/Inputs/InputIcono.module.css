@@ -5,6 +5,17 @@
     margin-bottom: 10px;
 }
 
+
+.contenedorInputFile{
+    border: dashed #cccccc8e 2px;
+    border-radius: 5px;
+    padding: 20px;
+    color: #767272;
+    font-size: 15px;
+   
+
+}
+
 .iconoEye{
     position: absolute;
     right: 15px;
@@ -20,7 +31,7 @@
     padding: 8px;
     width: 100%;
     max-width: 400px;
-    border: 2px solid #cccccc3f;
+    border: 2px solid #cccccc8e;
     background-color: #ffffff;
     border-radius: 4px;
     box-sizing: border-box;
@@ -32,7 +43,7 @@
     padding: 8px;
     width: 100%;
     max-width: 400px;
-    border: 2px solid #cccccc3f;
+    border: 2px solid #cccccc8e;
     background-color: #ffffff;
     border-radius: 4px;
     box-sizing: border-box;
@@ -40,17 +51,55 @@
     color: black;
 }
 
-.inputStyleDate {
-    padding: 8px;
-    width: 132%;
+
+.contenedorInputDate {
+    position: relative;
+    display: flex;
     max-width: 400px;
-    border: 2px solid #cccccc3f;
+    width: 99%;
+    border: 2px solid #cccccc8e;
     background-color: #ffffff;
+    border-radius: 4px;
+    margin-bottom: 10px;
+ 
+}
+
+.inputStyleDate {
+       
+    padding: 8px;
+    width: 100%;
+    max-width: 400px;
+    min-width: 388px;
+    border: none;
+    background-color: transparent;
     border-radius: 4px;
     box-sizing: border-box;
     padding-left: 40px;
     color: black;
+    z-index: 0;
     
+}
+
+.inputStyleDate:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #5a60a500; /* reemplazo visual */
+}
+
+
+
+.inputFileStyle{
+    display: flex;
+    flex-direction: column;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    color: #767272;
+    transition: background-color 0.3s;
+}
+
+.iconoFile{
+    font-size: 30px;
+   color: inherit;
 }
 
 

@@ -1,19 +1,112 @@
-import { useRef, useState,useEffect  } from 'react';
+import { useRef, useState,useEffect,   } from 'react';
 
 import FullCalendar from '@fullcalendar/react'
-import dayGridPlugin from '@fullcalendar/daygrid' // a plugin!
+import dayGridPlugin from '@fullcalendar/daygrid'
 import esLocale from '@fullcalendar/core/locales/es';
-import { faPen, faEnvelope, faCalendar, faGear, faHouse, faLockOpen} from '@fortawesome/free-solid-svg-icons';
+import { useOutletContext } from 'react-router-dom';
+import { faPen, faTag, faCalendar, faHourglassStart, faUser, faClipboardList} from '@fortawesome/free-solid-svg-icons';
 import SimpleTitle from '../../components/Titles/SimpleTitle'
 import "./CalendarScreen.css"
+import { useFetch } from "../../utils/useFetch";
 import ButtonForm from '../../components/ButtonForm/ButtonForm';
-import Popup from '../../components/PopupButton/PopupBotton';
+import Popup from '../../components/Popup/Popup';
 import InputDates from '../../components/Inputs/InputDates';
 import IconoInput from '../../components/Inputs/InputIcono';
 import InputSelects from '../../components/Inputs/InputSelects';
+import ButtonHeaders from '../../components/ButtonHeaders/ButtonHeaders';
+import { getToken } from '../../services/authService';
+import { getOptions } from '../../utils/selects';
 
 export const CalendarScreen= () =>{
+
+    //crear el calendario y manejar su adaptabilidad al tamaño
+    const { rightPanelCollapsed } = useOutletContext();
     const calendarRef = useRef(null);
+    
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            const api = calendarRef.current?.getApi();
+            if (api) api.updateSize();
+        }, 500); 
+
+        return () => clearTimeout(timeout);
+    }, [rightPanelCollapsed]);
+
+
+
+
+    //Obtener datos de la base de datos
+    const token = getToken();
+    const { selectedLocal } = useOutletContext();
+    const localSeleccionado = selectedLocal + 1 ;
+    const url = `http://localhost:3000/api/calendario?local_id=${localSeleccionado}`;
+
+    const { data, loading, error } = useFetch(url, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+
+    console.log("datos calendario:")
+    console.log(data)
+    console.log("fin datos calendario:")
+
+    //Variables de datos y formularios
+    const [nombreEvento, setNombreEvento] = useState('');
+    const [fechaEvento, setFechaEvento] = useState(null);
+    const [horaEvento, setHoraEvento] = useState('');
+    const [descripcion, setDescripcion] = useState('');
+
+    const handleNombreEvento = (e) => {
+        setNombreEvento(e.target.value);
+        setErrorMessage('');
+    };
+
+    const handleHoraEvento = (e) => {
+        const value = e.target.value;
+
+        setHoraEvento(e.target.value);
+         if (/^\d{0,2}(:\d{0,2})?$/.test(value)) {
+            setHoraEvento(value);
+            setErrorMessage('');
+        }
+    };
+
+    const handleDescripcion = (e) => {
+        setDescripcion(e.target.value);
+        setErrorMessage('');
+    };
+
+    //opciones de Tipo de recordatorio
+    const [tipoRecordatorio, setTipoRecordatorio] = useState([]);
+    useEffect(() => {
+            getOptions("http://localhost:3000/api/calendario/tipos-evento", item => ({
+                value: item.id,
+                label: item.nombre,
+            })).then(setTipoRecordatorio);
+    }, []);
+
+    // //opciones de estado de recordatorio
+    //  useEffect(() => {
+    //         getOptions("http://localhost:3000/api/visitadores-medicos", item => ({
+    //             value: item.id,
+    //             label: item.nombre,
+    //         })).then(setOpcionsRoles);
+    
+    //     }, []);
+
+    //opciones de Visitadores medicos
+    const [visitadores, setVisitadores] = useState([]);
+    useEffect(() => {
+            getOptions("http://localhost:3000/api/visitadores-medicos", item => ({
+                value: item.id,
+                label: item.nombre,
+            })).then(setVisitadores);
+    
+        }, []);
+
+
+
     const [currentTitle, setCurrentTitle] = useState('');
     const [rol, setRol] = useState('');
     const [selectedEvent, setSelectedEvent] = useState(null);
@@ -26,6 +119,13 @@ export const CalendarScreen= () =>{
 
     const openPopup = () => setIsPopupOpen(true);
     const closePopup = () => setIsPopupOpen(false);
+
+
+    //popUp Nuevo evento
+    const [nuevoEvento, setNuevoEvento] = useState(false);
+    const openNuevoEvento = () => setNuevoEvento(true);
+    const closeNuevoEvento = () => setNuevoEvento(false);
+
 
     const handleRolChange = (e) => {
         setRol(e.target.value);
@@ -61,116 +161,182 @@ export const CalendarScreen= () =>{
 
 
   return (
-
     
-    <div>
-        {<Popup isOpen={isPopupOpen} onClose={closePopup}>
-            <SimpleTitle text= 'Nuevo evento'></SimpleTitle>
+    <div className='pantallaCalendario'>
+        <div className='encabezado'>
+            <div className='titleDiv'>
+                <SimpleTitle text = "Calendario de actividades"/>
+            </div>
+            <ButtonHeaders text = 'Nuevo evento' onClick={openNuevoEvento}></ButtonHeaders>
+
+            {/* Pop up para un nuevo evento*/}
+            {<Popup 
+                isOpen={nuevoEvento} 
+                onClose={closeNuevoEvento}
+                title={'Crear un nuevo recordatorio'}
             
+            >
+                <div className='modalContenido'>
 
-            {/* Casilla de nacimiento*/}
-            <InputDates
-                icono = {faCalendar}
-                placeholder="Fecha de Nacimiento"
-                selected
-                onChange
-                //error
-                maxWidth = '300px'
-            ></InputDates>
+                    <IconoInput
+                    icono = {faPen}
+                    placeholder = {"Nombre del recordatorio"}
+                    value = {nombreEvento}
+                    onChange = {handleNombreEvento}
+                    type = "text"
+                    
+                    name = ""
+                    
+                    ></IconoInput>
 
-            <InputSelects
-                icono={faGear}
-                placeholder="Tipo de rol"
-                value={rol}
-                //error
-                
-                onChange={handleRolChange}
-                name="email"
-                opcions={opcionsRoles}
-                >
+
+                    <InputSelects
+                        icono = {faTag}
+                        placeholder = {"Seleccione el tipo de recordatorio"}
+                        value = {rol}
+                        onChange = {true}
+                        type = "text"
+                        
+                        name = ""
+
+                       
+                        error = {false}
+                    
+                        opcions = {tipoRecordatorio}
+                    
+                    />
+
+
+                     <InputSelects
+                        icono = {faHourglassStart}
+                        placeholder = {"Seleccione el estado del recordatorio"}
+                        value = {rol}
+                        onChange = {true}
+                        type = "text"
+                        
+                        name = ""
+
+                       
+                        error = {false}
+                    
+                        opcions = {[]}
+                    
+                    />
+
+                    <InputSelects
+                        icono = {faUser}
+                        placeholder = {"Seleccione el visitador medico"}
+                        value = {rol}
+                        onChange = {true}
+                        type = "text"
+                        
+                        name = ""
+
+                       
+                        error = {false}
+                    
+                        opcions = {visitadores}
+                    
+                    />
+                        
+
+                    <InputDates
+                        icono = {faCalendar}
+                        placeholder = {"Fecha del recordatorio"}
+                    ></InputDates>
+
+                    <IconoInput
+                        icono = {faClipboardList}
+                        placeholder = {"Seleccione la hora"}
+                        value = {horaEvento}
+                        onChange = {handleHoraEvento}
+                        type = "time"
+                        
+                        name = ""
+                    
+                    ></IconoInput>
+
+                    <IconoInput
+                        icono = {faClipboardList}
+                        placeholder = {"Agregar descripción"}
+                        value = {descripcion}
+                        onChange = {handleDescripcion}
+                        type = "text"
+                        
+                        name = ""
+                    
+                    ></IconoInput>
+  
+                    
+                    
+                </div>
+
+            </Popup>
         
-            </InputSelects>
+            }
+        </div>
 
-            <IconoInput
-                icono={faPen}
-                placeholder="Descripción"
+        <div className='calendarioyEventos'>
+            <div className='contenedorCalendario' >
+                <FullCalendar
+                    headerToolbar={false}
+                    ref={calendarRef}
+                    datesSet={(arg) => setCurrentTitle(arg.view.title)}
+                    locales = {[esLocale]}
+                    locale = "es"
+                    className='calendario'
+                    plugins={[ dayGridPlugin ]}
+                    initialView="dayGridMonth"
+                    weekends={true}
+                    eventClick={(info) => {
+                        setSelectedEvent(info.event);
+                    }}
+                    events = {events}  
                 
-                //error
-                onChange
-                >
-            </IconoInput>
-
-
-
-            <div className='encabezadoStyle'>
-                <ButtonForm text= 'Guardar'></ButtonForm>
-                <ButtonForm text= 'Cancelar' onClick={closePopup}></ButtonForm>
-                
-            </div>
-            </Popup>}
-        <SimpleTitle text = "Calendario de actividades"/>
-
-        <div className='divisionCalendario'>
-            <div className='contenedorCalendario'>
-            <FullCalendar
-                headerToolbar={false}
-                ref={calendarRef}
-                datesSet={(arg) => setCurrentTitle(arg.view.title)}
-                locales = {[esLocale]}
-                locale = "es"
-                
-                plugins={[ dayGridPlugin ]}
-                initialView="dayGridMonth"
-                weekends={true}
-                eventClick={(info) => {
-                    setSelectedEvent(info.event);
-                }}
-                events = {events}
-                
-                
-            
-            />
+                />  
             </div>
 
-            <div className='descripcionStyle'>
-                <SimpleTitle text = {currentTitle}/>
-                <div className='encabezadoStyle'>
-                
-                    <button className= 'buttonCalendar' onClick={handlePrev}>{'<'}</button>
-                    <button className= 'buttonCalendar'onClick={handleToday}>Hoy</button>
-                    <button className= 'buttonCalendar'onClick={handleNext}>{'>'}</button>
-                
-                </div>
+                <div className='contentLeft'>
+                    <div className='allTitle'>
 
-                <div className='event-details'>
-                    {selectedEvent
-                        ? (
-                            <div className = 'divEventos' key={selectedEvent.id}>
-                                
-                                <div className='tStyle'><strong>{selectedEvent.title}</strong></div>
-                                <b className='bStyle'>{selectedEvent.startStr}</b>
-                                <p className='desc'>{selectedEvent.extendedProps.descripcion}</p>
-                                <button className='buttonCalendar' onClick={() => onEditEvent(selectedEvent.id)}>Editar</button>
-                            </div>
-                            )
-                        : (
-                            events.map((ev) => (
-                                <div className = 'divEventos'
-                                key={ev.id}>
+                        <h3 className='tituloMes'>{currentTitle}</h3>
+                        <div className='encabezadoStyle'>
+                            <button className= 'buttonCalendar' onClick={handlePrev}>{'<'}</button>
+                            <button className= 'buttonCalendar'onClick={handleToday}>Hoy</button>
+                            <button className= 'buttonCalendar'onClick={handleNext}>{'>'}</button>
+                        
+                        </div>
+                    </div>
+                    
+                    <div className='descripcionStyle'>
+                        <h3 className='tituloMes'>Recordatorios de hoy</h3>
+                    <div className='event-details'>
+                        {selectedEvent
+                            ? (
+                                <div className = 'divEventos' key={selectedEvent.id}>
                                     
-                                    <div className='tStyle'><strong>{ev.title}</strong></div>
-                                    <b className='bStyle'>{ev.date}</b>
-                                    <p className='desc'>{ev.descripcion}</p>
-                                    <button className= 'buttonCalendar' onClick={() => onEditEvent(ev.id)}>Editar</button>
+                                    <div className='tStyle'><strong>{selectedEvent.title}</strong></div>
+                                    <b className='bStyle'>{selectedEvent.startStr}</b>
+                                    <p className='desc'>{selectedEvent.extendedProps.descripcion}</p>
+                                    <button className='buttonCalendar' onClick={() => onEditEvent(selectedEvent.id)}>Editar</button>
                                 </div>
-                            ))
-                            )
-                        }
+                                )
+                            : (
+                                events.map((ev) => (
+                                    <div className = 'divEventos'
+                                    key={ev.id}>
+                                        
+                                        <div className='tStyle'><strong>{ev.title}</strong></div>
+                                        <b className='bStyle'>{ev.date}</b>
+                                        <p className='desc'>{ev.descripcion}</p>
+                                        <button className= 'buttonCalendar' onClick={() => onEditEvent(ev.id)}>Editar</button>
+                                    </div>
+                                ))
+                                )
+                            }
 
+                    </div>
                 </div>
-
-
-                <ButtonForm text = 'Nuevo evento' onClick={openPopup}></ButtonForm>
                 
                 
 
