@@ -16,6 +16,7 @@ const InputDates = ({
     onChange,
     error = false,
     maxWidth = '500px',
+    minDate,
 }) => {
     
     
@@ -29,7 +30,7 @@ const InputDates = ({
                 selected = {selected}
                 onChange={onChange}
                 dateFormat="yyyy-MM-dd"  
-               
+                minDate={minDate} 
 
                 className={styles.inputStyleDate}
                 popperPlacement="bottom"

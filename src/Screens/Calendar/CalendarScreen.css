@@ -2,23 +2,28 @@
 .pantallaCalendario{
     width: 100%;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    
 
 }
 
-.encabezado {
-    width: 99%;
+.tituloyCalendario {
+    width: 100%;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     margin-bottom: 15px;
+    padding: 10px;
+    padding-right: 20px;
+  
 }
 
 .titleDiv {
-    width: 80%;
+    width: 100%;
 }
 
+
 .calendarioyEventos {
-    width: 100%;
+    width: 25%;
     display: flex;
     flex-direction: row;
     gap: 15px;
@@ -26,42 +31,62 @@
 
 
 .contenedorCalendario {
-    width: 80%;
-    background-color: rgba(255, 255, 255, 0.871);
+    width: 100%;
+    padding-top: 10px;
+    background-color: rgb(255, 255, 255);
 }
 
 .contentLeft{
     max-width: 25%;
     display: flex;
     flex-direction: column;
+    border-radius: 20px 0px 0px 20px;
+    padding: 10px;
     gap: 10px;
+    background-color: rgba(97, 122, 185, 0.116);
+    
 
 }
 
 .allTitle{
-    border: solid #abacbc79 2px;
-    border-radius: 10px;
-    margin: 0px 5px;
-    padding: 10px 0px; 
-    background-color: white;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap:10px;
+    
+   
 }
 
-.descripcionStyle {
-    overflow-y: auto;
-    border: solid #abacbc79 2px;
-    border-radius: 10px;
-    margin: 0px 5px;
-    padding: 10px 0px; 
-    background-color: white;
+
+
+.buttonCalendarRow {
+    font-family: 'Segoe UI';
+    background-color: transparent;
+    font-weight: bold;
+    border-radius: 8px;
+    height: 30px;
+    color: #5a60a5;
+    border: 0;
+    cursor: pointer;
+    
 }
 
-.tituloMes{
-    width: 100%;
-    text-align: center;
-    margin: 0px;
-    padding: 0px;
-    margin-bottom: 10px;
+.buttonCalendarDay{
+    font-family: 'Segoe UI';
+    position: relative;
+    top:20px;
+    left: 40px;;
+    background-color: transparent;
+    font-weight: bold;
+    border-radius: 8px;
+    height: 30px;
+    color: #5a60a5;
+    border: 0;
+    cursor: pointer;
+
 }
+
 
 .buttonCalendar {
     font-family: 'Segoe UI';
@@ -75,45 +100,99 @@
 }
 
 
-
-.encabezadoStyle {
+.encabezadoMesStyle {
     
     display: flex;
     flex-direction: row;
     justify-content: center;
-    gap: 5px;
+    align-items: center;
+    gap:20px;
+
+}
+
+.divbuttons{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0px 30px;
+}
+
+.tituloMes{
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    margin: 0px;
+    font-size: 22px;
+}
+
+.title2{
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    color: #5a60A5;
+    margin: 0px;
+    font-size: 18px;
+}
+
+.descripcionStyle {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    
 }
 
 .divEventos{
-    margin: 10px;
-    border: 2px solid #5a60a5;
+
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    justify-content: space-between;
+    color: #5a60A5;
+    padding-bottom: 5px;
+    margin-bottom: 20px;
     padding: 10px;
-    border-radius: 10px;
+    background-color: rgba(97, 122, 185, 0);
+    border-radius: 5px;
+}
+
+.vineta {
+    margin-top: 9px;
+    
+    min-width: 10px;
+    min-height: 10px;
+    max-width: 10px;
+    max-height: 10px;
+    border-radius: 100%;
+    background-color:#5a60A5;
+}
+
+.contenido {
     display: flex;
     flex-direction: column;
-    justify-content: center; 
-    align-items: center;
+ 
 }
 
 .bStyle{
-    margin: 0;
-    color: #5a60a5;
-    width: 100%;
-    text-align: center;
+    margin: 0px;
+    padding: 0px;
     font-size: 15px;
     font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .tStyle{
     margin: 0;
-    color: #5a60a5;
-    font-size: 19px;
-    width: 100%;
-    text-align: center;
+    padding: 0px;
+    font-size: 17px;
+    font-weight: bold;
     font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .desc{
+    margin: 0;
+    padding: 0px;
+    font-size: 16px;
+    
     font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -145,7 +224,7 @@
 
         max-width: 100%;
         overflow-y: auto;
-        background-color: brown;
+        
     }
 
     

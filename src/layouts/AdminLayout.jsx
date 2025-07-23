@@ -4,7 +4,7 @@ import RightPanel from "../components/RightPanel/RightPanel.jsx";
 import "./AdminLayout.css";
 import {useState} from "react";
 import { useLocation } from 'react-router-dom';
-import { faHome, faBell, faFolder, faUser, faBoxOpen, faSackDollar, faTruckMedical, faCalendarDay, faUserGroup } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faBell, faFolder, faUser, faBoxOpen, faSackDollar, faTruckMedical, faCalendar, faUserGroup } from '@fortawesome/free-solid-svg-icons';
 import BackgroundCross from "../components/BackgroundCross/BackgroundCross.jsx";
 import TabsLocales from "../components/TabsLocales/TabsLocales";
 
@@ -14,7 +14,7 @@ const adminItems = [
   { label: "Compras Ventas", to: "/admin/historial-vc", icon: faSackDollar },
   { label: "Empleados Clientes", to: "/admin/configurar-ec", icon: faUserGroup },
   { label: "Inventario", to: "/admin/inventario", icon: faBoxOpen },
-  { label: "Calendario", to: "/admin/calendario", icon: faCalendarDay },
+  { label: "Calendario", to: "/admin/calendario", icon: faCalendar },
   { label: "Visitadores médicos", to: "/admin/visitadores-medicos", icon: faTruckMedical },
    { label: "Notificaciones", to: "/admin/notificaciones", icon: faBell },
   { label: "Mi perfil", to: "/admin/mi-perfil", icon: faUser },

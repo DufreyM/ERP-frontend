@@ -4,7 +4,7 @@ import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import esLocale from '@fullcalendar/core/locales/es';
 import { useOutletContext } from 'react-router-dom';
-import { faPen, faTag, faCalendar, faHourglassStart, faUser, faClipboardList} from '@fortawesome/free-solid-svg-icons';
+import { faPen, faTag, faCalendar, faCalendarDay, faHourglassStart, faUser, faClipboardList, faAngleLeft, faAngleRight, faClock, faPlusCircle} from '@fortawesome/free-solid-svg-icons';
 import SimpleTitle from '../../components/Titles/SimpleTitle'
 import "./CalendarScreen.css"
 import { useFetch } from "../../utils/useFetch";
@@ -16,11 +16,13 @@ import InputSelects from '../../components/Inputs/InputSelects';
 import ButtonHeaders from '../../components/ButtonHeaders/ButtonHeaders';
 import { getToken } from '../../services/authService';
 import { getOptions } from '../../utils/selects';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export const CalendarScreen= () =>{
 
     //crear el calendario y manejar su adaptabilidad al tamaño
     const { rightPanelCollapsed } = useOutletContext();
+    const [currentTitle, setCurrentTitle] = useState('');
     const calendarRef = useRef(null);
     
     useEffect(() => {
@@ -31,8 +33,6 @@ export const CalendarScreen= () =>{
 
         return () => clearTimeout(timeout);
     }, [rightPanelCollapsed]);
-
-
 
 
     //Obtener datos de la base de datos
@@ -50,6 +50,40 @@ export const CalendarScreen= () =>{
     console.log("datos calendario:")
     console.log(data)
     console.log("fin datos calendario:")
+
+    //opciones de Tipo de recordatorio
+    const [errorMessage, setErrorMessage] = useState('');
+    const [tipoRecordatorio, setTipoRecordatorio] = useState('');
+    const [opcionesTipoRecordatorio, setOpcionesTipoRecordatorio] = useState([]);
+    useEffect(() => {
+            getOptions("http://localhost:3000/api/calendario/tipos-evento", item => ({
+                value: item.id,
+                label: item.nombre,
+            })).then(setOpcionesTipoRecordatorio);
+    }, []);
+
+    //opciones de estado del recordatorio
+    const [estadoRecordatorio, setEstadoRecordatorio] = useState('');
+    const [opcionesEstados, setOpcionesEstados] = useState([]);
+    useEffect(() => {
+            getOptions("http://localhost:3000/api/calendario/estados", item => ({
+                value: item.id,
+                label: item.nombre,
+            })).then(setOpcionesEstados);
+    
+        }, []);
+
+    //opciones de Visitadores medicos
+    const [visitador, setVisitador] = useState('');
+    const [opcionesVisitadores, setOpcionesVisitadores] = useState([]);
+    useEffect(() => {
+            getOptions(`http://localhost:3000/api/visitadores-medicos/por-local/${localSeleccionado}`, item => ({
+                value: item.id,
+                label: `${item.nombre}`,
+            })).then(setOpcionesVisitadores);
+    
+        }, [localSeleccionado]);
+
 
     //Variables de datos y formularios
     const [nombreEvento, setNombreEvento] = useState('');
@@ -77,37 +111,64 @@ export const CalendarScreen= () =>{
         setErrorMessage('');
     };
 
-    //opciones de Tipo de recordatorio
-    const [tipoRecordatorio, setTipoRecordatorio] = useState([]);
-    useEffect(() => {
-            getOptions("http://localhost:3000/api/calendario/tipos-evento", item => ({
-                value: item.id,
-                label: item.nombre,
-            })).then(setTipoRecordatorio);
-    }, []);
+    const handleVisitador = (e) => {
+        setVisitador(e.target.value);
+        setErrorMessage('');
+    };
 
-    // //opciones de estado de recordatorio
-    //  useEffect(() => {
-    //         getOptions("http://localhost:3000/api/visitadores-medicos", item => ({
-    //             value: item.id,
-    //             label: item.nombre,
-    //         })).then(setOpcionsRoles);
+    const handleTipoEvento = (e) => {
+        setTipoRecordatorio(e.target.value);
+        setErrorMessage('');
+    };
+
+    const handleEstadoEvento = (e) => {
+        setEstadoRecordatorio(e.target.value);
+        setErrorMessage('');
+    };
+
+    const handleDate = (date) => {
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const selectedDate = new Date(date);
+        selectedDate.setHours(0, 0, 0, 0);
+
+        if (selectedDate < today) {
+            setErrorMessage("No puedes seleccionar una fecha pasada.");
+            return;
+        }
+        console.log("FECHA ACTUAL SELECCIONADA:", fechaEvento, typeof fechaEvento);
+        setErrorMessage(""); // Limpia el mensaje si todo está bien
+        setFechaEvento(date);
     
-    //     }, []);
+    };
 
-    //opciones de Visitadores medicos
-    const [visitadores, setVisitadores] = useState([]);
-    useEffect(() => {
-            getOptions("http://localhost:3000/api/visitadores-medicos", item => ({
-                value: item.id,
-                label: item.nombre,
-            })).then(setVisitadores);
+    //activar el select de visitadores medicos si se selecciona esa opcion
+    // Definir el estado
+const [selectVisitadores, setSelectVisitadores] = useState(false);
+
+// Primer useEffect - monitorea tipoRecordatorio
+useEffect(() => {
+    console.log(`tipoRecordatorio: ${tipoRecordatorio}`);
+
+    // Solo actualiza si el valor cambia realmente
+    const newState = tipoRecordatorio === 1;
+    if (selectVisitadores !== newState) {
+        setSelectVisitadores(newState); // Actualiza el estado solo si es necesario
+        console.log(`Nuevo estado selectVisitadores: ${newState}`);
+    }
+}, [tipoRecordatorio]);
+
+// Segundo useEffect - monitorea selectVisitadores
+useEffect(() => {
+    console.log(`cambio: ${selectVisitadores}`);
+}, [selectVisitadores]);
+
+
     
-        }, []);
+    
 
-
-
-    const [currentTitle, setCurrentTitle] = useState('');
+    
     const [rol, setRol] = useState('');
     const [selectedEvent, setSelectedEvent] = useState(null);
 
@@ -160,123 +221,57 @@ export const CalendarScreen= () =>{
 
 
 
+
+
+
+
+    if (loading) {
+        return <div>Cargando eventos...</div>;
+    }
+
+    if (error) {
+        return <div>Error al cargar los eventos: {error.message}</div>;
+    }
+
+    if (!data || data.length === 0) {
+        return <div>No hay eventos disponibles.</div>;
+    }
+
+
+
   return (
     
     <div className='pantallaCalendario'>
-        <div className='encabezado'>
+        <button className= 'buttonCalendarDay' onClick={handleToday}>
+            <FontAwesomeIcon icon = {faCalendarDay} style={{fontSize: '25px'}}/>
+        </button>
+
+
+
+        <div className='tituloyCalendario'>
             <div className='titleDiv'>
                 <SimpleTitle text = "Calendario de actividades"/>
             </div>
-            <ButtonHeaders text = 'Nuevo evento' onClick={openNuevoEvento}></ButtonHeaders>
-
-            {/* Pop up para un nuevo evento*/}
-            {<Popup 
-                isOpen={nuevoEvento} 
-                onClose={closeNuevoEvento}
-                title={'Crear un nuevo recordatorio'}
-            
-            >
-                <div className='modalContenido'>
-
-                    <IconoInput
-                    icono = {faPen}
-                    placeholder = {"Nombre del recordatorio"}
-                    value = {nombreEvento}
-                    onChange = {handleNombreEvento}
-                    type = "text"
-                    
-                    name = ""
-                    
-                    ></IconoInput>
 
 
-                    <InputSelects
-                        icono = {faTag}
-                        placeholder = {"Seleccione el tipo de recordatorio"}
-                        value = {rol}
-                        onChange = {true}
-                        type = "text"
-                        
-                        name = ""
+            <div className='allTitle'>
 
-                       
-                        error = {false}
-                    
-                        opcions = {tipoRecordatorio}
-                    
-                    />
-
-
-                     <InputSelects
-                        icono = {faHourglassStart}
-                        placeholder = {"Seleccione el estado del recordatorio"}
-                        value = {rol}
-                        onChange = {true}
-                        type = "text"
-                        
-                        name = ""
-
-                       
-                        error = {false}
-                    
-                        opcions = {[]}
-                    
-                    />
-
-                    <InputSelects
-                        icono = {faUser}
-                        placeholder = {"Seleccione el visitador medico"}
-                        value = {rol}
-                        onChange = {true}
-                        type = "text"
-                        
-                        name = ""
-
-                       
-                        error = {false}
-                    
-                        opcions = {visitadores}
-                    
-                    />
-                        
-
-                    <InputDates
-                        icono = {faCalendar}
-                        placeholder = {"Fecha del recordatorio"}
-                    ></InputDates>
-
-                    <IconoInput
-                        icono = {faClipboardList}
-                        placeholder = {"Seleccione la hora"}
-                        value = {horaEvento}
-                        onChange = {handleHoraEvento}
-                        type = "time"
-                        
-                        name = ""
-                    
-                    ></IconoInput>
-
-                    <IconoInput
-                        icono = {faClipboardList}
-                        placeholder = {"Agregar descripción"}
-                        value = {descripcion}
-                        onChange = {handleDescripcion}
-                        type = "text"
-                        
-                        name = ""
-                    
-                    ></IconoInput>
-  
-                    
-                    
+                
+                <div className='encabezadoMesStyle'>
+                    <button className= 'buttonCalendarRow' onClick={handlePrev}>
+                        <FontAwesomeIcon icon = {faAngleLeft} style={{fontSize: '25px'}}/>
+                    </button>
+                    <h3 className='tituloMes'>{currentTitle}</h3>
+                    <button className= 'buttonCalendarRow'onClick={handleNext}>
+                        <FontAwesomeIcon icon = {faAngleRight} style={{fontSize: '25px'}}/>
+                    </button>
+                
                 </div>
+                
+            </div>
+            
 
-            </Popup>
-        
-            }
-        </div>
 
-        <div className='calendarioyEventos'>
             <div className='contenedorCalendario' >
                 <FullCalendar
                     headerToolbar={false}
@@ -296,53 +291,190 @@ export const CalendarScreen= () =>{
                 />  
             </div>
 
-                <div className='contentLeft'>
-                    <div className='allTitle'>
+            
+        </div>
 
-                        <h3 className='tituloMes'>{currentTitle}</h3>
-                        <div className='encabezadoStyle'>
-                            <button className= 'buttonCalendar' onClick={handlePrev}>{'<'}</button>
-                            <button className= 'buttonCalendar'onClick={handleToday}>Hoy</button>
-                            <button className= 'buttonCalendar'onClick={handleNext}>{'>'}</button>
-                        
+
+
+        
+            
+
+        <div className='contentLeft'>
+
+            <h3 className='tituloMes'>Recordatorios</h3>
+            <div className='divbuttons'>
+
+                <h2 className='title2'>Mes</h2>
+                <button className= 'buttonCalendarRow' onClick={openNuevoEvento}>
+                    <FontAwesomeIcon icon = {faPlusCircle} style={{fontSize: '25px'}}/>
+                </button>
+            </div>
+            
+
+            
+            <div className='descripcionStyle'>
+                
+            <div className='event-details'>
+                {selectedEvent
+                    ? (
+                        <div className = 'divEventos' key={selectedEvent.id}>
+                            <div className='viñeta'/>
+                            <p>deuwfuiehwfuihewui</p>
+
+
+                            <div className='contenido'>
+                                <div className='tStyle'><strong>{selectedEvent.title}</strong></div>
+                                <b className='bStyle'>{selectedEvent.startStr}</b>
+                                <p className='desc'>{selectedEvent.extendedProps.descripcion}</p>
+                                <button className='buttonCalendar' onClick={() => onEditEvent(selectedEvent.id)}>Editar</button>
+                                
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div className='descripcionStyle'>
-                        <h3 className='tituloMes'>Recordatorios de hoy</h3>
-                    <div className='event-details'>
-                        {selectedEvent
-                            ? (
-                                <div className = 'divEventos' key={selectedEvent.id}>
-                                    
-                                    <div className='tStyle'><strong>{selectedEvent.title}</strong></div>
-                                    <b className='bStyle'>{selectedEvent.startStr}</b>
-                                    <p className='desc'>{selectedEvent.extendedProps.descripcion}</p>
-                                    <button className='buttonCalendar' onClick={() => onEditEvent(selectedEvent.id)}>Editar</button>
-                                </div>
-                                )
-                            : (
-                                events.map((ev) => (
-                                    <div className = 'divEventos'
-                                    key={ev.id}>
-                                        
-                                        <div className='tStyle'><strong>{ev.title}</strong></div>
-                                        <b className='bStyle'>{ev.date}</b>
-                                        <p className='desc'>{ev.descripcion}</p>
-                                        <button className= 'buttonCalendar' onClick={() => onEditEvent(ev.id)}>Editar</button>
-                                    </div>
-                                ))
-                                )
-                            }
+                        )
+                    : (
+                        events.map((ev) => (
+                            <div className = 'divEventos'
+                            key={ev.id}>
+                                <div className='vineta'></div>
+                                
+                                
+                                <div className='contenido'>
+                                    <div className='tStyle'>{ev.title}</div>
+                                    <p className='desc'>{ev.descripcion}</p>
+                                    <p className='bStyle'>{ev.date}</p>
+                                </div> 
+                               
+                                <button className= 'buttonCalendarRow' onClick={() => onEditEvent(ev.id)}>
+                                    <FontAwesomeIcon icon = {faPen} style={{fontSize: '20px'}}/>
+                                </button>
+                            </div>
+                        ))
+                        )
+                }
 
-                    </div>
-                </div>
-                
-                
+
+
+                <h2>Eventos del Calendario</h2>
+            <ul>
+                {data.map((evento) => (
+                    <li key={evento.id} >
+                        <h3>{evento.titulo}</h3>
+                        <p><strong>Estado:</strong> {evento.estado.nombre}</p>
+                        <p><strong>Fecha:</strong> {new Date(evento.fecha).toLocaleString()}</p>
+                        <p><strong>Tipo de Evento:</strong> {evento.tipo_evento}</p>
+                        <p><strong>Local:</strong> {evento.local.nombre} - {evento.local.direccion}</p>
+                        <p><strong>Usuario:</strong> {evento.usuario.nombre} {evento.usuario.apellidos}</p>
+                        {evento.visitador && (
+                            <p><strong>Visitador:</strong> {evento.visitador.proveedor_id}</p>
+                        )}
+                    </li>
+                ))}
+            </ul> 
 
             </div>
+        </div>            
+    </div>
+      
 
-        </div>
+
+
+
+
+
+        {/* Pop up para un nuevo evento*/}
+            {<Popup 
+            key={selectVisitadores}
+                isOpen={nuevoEvento} 
+                onClose={closeNuevoEvento}
+                title={'Crear un nuevo recordatorio'}
+            
+            >
+                <div className='modalContenido'>
+
+                    <IconoInput
+                        icono = {faPen}
+                        placeholder = {"Nombre del recordatorio"}
+                        value = {nombreEvento}
+                        onChange = {handleNombreEvento}
+                        type = "text"
+                        
+                        name = ""
+                    
+                    ></IconoInput>
+
+
+                    <InputSelects
+                        icono = {faTag}
+                        placeholder = {"Seleccione el tipo de recordatorio"}
+                        value = {tipoRecordatorio}
+                        opcions = {opcionesTipoRecordatorio}
+                        onChange = {handleTipoEvento}
+                        type = "text"
+                        name = ""
+                        error = {false}
+                    />
+
+
+                     <InputSelects
+                        icono = {faHourglassStart}
+                        placeholder = {"Seleccione el estado del recordatorio"}
+                        value = {estadoRecordatorio}
+                        onChange = {handleEstadoEvento}
+                        type = "text"
+                        name = ""
+                        error = {false}
+                        opcions = {opcionesEstados}
+                    />
+                    
+                    {/* solo se muestra si es seleccionado */}
+                    {selectVisitadores && (
+                        <InputSelects
+                            icono = {faUser}
+                            placeholder = {"Seleccione el visitador medico"}
+                            value = {visitador}
+                            onChange = {handleVisitador}
+                            type = "text"        
+                            name = ""
+                            error = {false}
+                            opcions = {opcionesVisitadores}
+                        />
+                    )}
+                        
+                    <InputDates
+                        icono = {faCalendar}
+                        placeholder = {"Fecha del recordatorio"}
+                        onChange = {handleDate}
+                        selected = {fechaEvento}
+                        minDate={new Date()}
+                    ></InputDates>
+
+                    <IconoInput
+                        icono = {faClock}
+                        placeholder = {"Seleccione la hora"}
+                        value = {horaEvento}
+                        onChange = {handleHoraEvento}
+                        type = "time"
+                        error={false}
+                        name = ""
+                    
+                    ></IconoInput>
+
+                    <IconoInput
+                        icono = {faClipboardList}
+                        placeholder = {"Agregar descripción"}
+                        value = {descripcion}
+                        onChange = {handleDescripcion}
+                        type = "text"
+                        name = ""
+                    ></IconoInput>
+  
+                    
+                    
+                </div>
+
+            </Popup>
+        
+            }
     </div>
   )
 }
