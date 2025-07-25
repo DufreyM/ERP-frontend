@@ -1,20 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import SimpleTitle from '../../components/Titles/SimpleTitle';
-import TabsLocales from '../../components/TabsLocales/TabsLocales';
-import ButtonForm from '../../components/ButtonForm/ButtonForm';
+import IconoInput from '../../components/Inputs/InputIcono.jsx';
 import PopupButton from '../../components/PopupButton/PopupBotton';
 import styles from './InventarioScreen.module.css';
 import ButtonText from '../../components/ButtonText/ButtonText';
 import { useOutletContext } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
 const InventarioScreen = () => {
   const { selectedLocal } = useOutletContext();
   const [productos, setProductos] = useState([]);
+  const [productosOriginales, setProductosOriginales] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [productoSeleccionado, setProductoSeleccionado] = useState(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -24,7 +27,9 @@ const InventarioScreen = () => {
       fetch(`${API_BASE_URL}/api/productos/con-stock?local_id=${selectedLocal + 1}`)
         .then(res => res.json())
         .then(data => {
-          setProductos(Array.isArray(data) ? data : []);
+          const productosArray = Array.isArray(data) ? data : [];
+          setProductos(productosArray);
+          setProductosOriginales(productosArray);
           setLoading(false);
         })
         .catch(() => {
@@ -33,6 +38,33 @@ const InventarioScreen = () => {
         });
     }
   }, [selectedLocal]);
+
+  const handleSearch = () => {
+    if (searchTerm.trim() === '') {
+      setProductos(productosOriginales);
+    } else {
+      const productosFiltrados = productosOriginales.filter(producto =>
+        producto.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setProductos(productosFiltrados);
+    }
+  };
+
+  const handleSearchInputChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    
+    // Si el campo está vacío, mostrar todos los productos
+    if (value.trim() === '') {
+      setProductos(productosOriginales);
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
 
   const handleDelete = async () => {
     if (!productoSeleccionado) return;
@@ -51,10 +83,42 @@ const InventarioScreen = () => {
 
   return (
     <div className={styles.inventarioContainer}>
-      <SimpleTitle title="Inventario" />
-      {/* TabsLocales se maneja en el layout, no aquí */}
+      <SimpleTitle text="Inventario" />
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', minWidth: '400px' }}>
+          <label style={{ color: '#5a60a5', fontWeight: 500, marginBottom: 4 }}>Medicamento</label>
+          <IconoInput
+            icono={faSearch}
+            placeholder="Escribe el nombre de un medicamento"
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            type="text"
+            name="medicamento"
+          />
+        </div>
+        <button
+          onClick={handleSearch}
+          style={{
+            background: '#fff',
+            color: '#5a60a5',
+            border: '2px solid #5a60a5',
+            borderRadius: '20px',
+            padding: '10px 28px',
+            fontWeight: 'bold',
+            fontSize: 16,
+            cursor: 'pointer',
+            marginTop: 22,
+            height: 40,
+            transition: 'background 0.2s, color 0.2s',
+          }}
+        >
+          Buscar
+        </button>
+      </div>
+
       {loading && <div className={styles.loading}>Cargando productos...</div>}
       {error && <div className={styles.error}>{error}</div>}
+      
       <div className={styles.productosGrid}>
         {productos.map(producto => (
           <div
@@ -74,6 +138,7 @@ const InventarioScreen = () => {
           </div>
         ))}
       </div>
+      
       {productoSeleccionado && (
         <PopupButton onClose={() => setProductoSeleccionado(null)}>
           <div className={styles.popupContent}>
