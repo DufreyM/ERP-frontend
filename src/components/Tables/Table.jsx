@@ -22,7 +22,7 @@ export const Table = ({
   const renderCellContent = (col, item) => {
     if (col.key === 'archivo') {
       return (
-        <span  title = {'Ver Archivo'} onClick={() => window.open(item.ver, '_blank')} className={styles.IconStyle}>
+        <span  title = {'Ver Archivo'} onClick={() => window.open(item.archivo, '_blank')} className={styles.IconStyle}>
           <FontAwesomeIcon icon = {faFile} />
           <p className={styles.pTable}>PDF</p>
         </span>

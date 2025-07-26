@@ -23,7 +23,7 @@ const InputFile = ({
         if (archivos && archivos.length > 0) {
             const file = archivos[0];
             setArchivo(file);
-            onChange?.file;
+            onChange?.(file);
         }
 
     }

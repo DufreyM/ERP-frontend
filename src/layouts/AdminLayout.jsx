@@ -46,7 +46,6 @@ export default function AdminLayout() {
         <Navbar items={adminItems} />
         <main
           className="admin-content"
-          style={pathname === '/admin/archivos' ? {overflowY: 'hidden'}: {}}
           
           >
           <TabsLocales

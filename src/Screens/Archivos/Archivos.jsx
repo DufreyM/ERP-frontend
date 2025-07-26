@@ -18,18 +18,39 @@ import InputFile from "../../components/Inputs/InputFile";
 import Filters from "../../components/FIlters/Filters";
 import ButtonHeaders from "../../components/ButtonHeaders/ButtonHeaders";
 import InputDates from "../../components/Inputs/InputDates";
+import { getToken } from '../../services/authService';
 
 
 const ArchivosScreen = () => {
   const { selectedLocal } = useOutletContext();
   const localSeleccionado = selectedLocal + 1 ;
   const {data, loading, error } = useFetch(`http://localhost:3000/documentos-locales?local_id=${localSeleccionado}`);
+  console.log(data);
+
+   
+  const token = getToken();
+  const getPayloadFromToken = (token) => {
+    try {
+      return JSON.parse(atob(token.split('.')[1]));
+    } catch (error) {
+      console.error("Token inválido", error);
+      return null;
+    }
+  };
+
  
   //Estados de filtros
   const [opcionsRoles, setOpcionsRoles] = useState([]);
   const [opcionsUsers, setOpcionsUsers] = useState([]);
   const [usuariosFiltrados, setUsuariosFiltrados] = useState([]);
   const [ordenAscendente, setOrdenAscendente] = useState(true);
+
+  //datos
+  const [errorMessage, setErrorMessage] = useState('');
+  const [nombreArchivo, setNombreArchivo] = useState('');
+  const [fechaVencimiento, setFechaVencimiento] = useState(null);
+  const [archivoPDF, setArchivoPDF] = useState(null);
+
 
   //Editar un archivo
   const [documentoAEliminar, setDocumentoAEliminar] = useState(null);
@@ -49,10 +70,105 @@ const ArchivosScreen = () => {
   const [advertencia, setAdvertencia] = useState(false);
   const closeAdvertencia = () => setAdvertencia(false);
 
-  const onEditEvent = (id) => {
-    console.log("Editar evento con id:", id);
-    openPopup(); // si quieres usar tu popup
+
+
+  const handleNombreArchivo = (e) => {
+        setNombreArchivo(e.target.value);
+        setErrorMessage('');
   };
+
+
+  const handleFechaVencimiento = (date) => {
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const selectedDate = new Date(date);
+        selectedDate.setHours(0, 0, 0, 0);
+
+        if (selectedDate < today) {
+            setErrorMessage("No puedes seleccionar una fecha pasada.");
+            return;
+        }
+        setErrorMessage(""); // Limpia el mensaje si todo está bien
+        setFechaVencimiento(date);
+    
+    };
+
+
+    //Nuevo archivo
+    const subirDocumento = async (token, datos) => {
+      const formData = new FormData();
+      formData.append('nombre', datos.nombre);
+      formData.append('usuario_id', datos.usuario_id);
+      formData.append('local_id', datos.local_id);
+      formData.append('vencimiento', datos.vencimiento);
+      formData.append('archivo', datos.archivo); // es un File, no un string
+
+      const response = await fetch('http://localhost:3000/documentos-locales', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          // No pongas Content-Type, fetch lo hace con FormData automáticamente
+        },
+        body: formData
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Error ${response.status}: ${errorText}`);
+      }
+
+      return await response.json();
+    };
+
+
+    const handleSubirDocumento = async () => {
+      setErrorMessage('');
+
+      if (!nombreArchivo || !archivoPDF || !fechaVencimiento) {
+        setErrorMessage('Por favor, completa todos los campos.');
+        return;
+      }
+
+      const tokenActual = token; 
+      const payload = getPayloadFromToken(tokenActual);
+
+      if (!payload) {
+        setErrorMessage('No se pudo validar el token.');
+        return;
+      }
+
+      const { id: usuarioId} = payload;
+
+      const datos = {
+        nombre: nombreArchivo,
+        usuario_id: usuarioId,
+        local_id: localSeleccionado,
+        vencimiento: fechaVencimiento.toISOString().split('T')[0],
+        archivo: archivoPDF
+      };
+      console.log('estoy mandando:', datos);
+
+      try {
+        const respuesta = await subirDocumento(tokenActual, datos);
+        console.log('Documento subido:', respuesta);
+
+        closeNuevo(); // si tienes un popup para cerrarlo
+        //setNotificacion('Documento subido con éxito');
+      } catch (error) {
+        console.error('Error al subir documento:', error);
+        setErrorMessage('Ocurrió un error al subir el documento.');
+      }
+    };
+
+
+
+
+
+
+
+
+
 
  
 
@@ -151,6 +267,12 @@ const ArchivosScreen = () => {
   };
 
 
+
+
+
+  //Subir Nuevo archivo
+
+
   
   
 
@@ -212,6 +334,7 @@ const ArchivosScreen = () => {
             isOpen={popupNuevo} 
             onClose={closeNuevo}
             title={'Subir nuevo archivo'}
+            onClick={handleSubirDocumento}
           
           >
             <div className={styles.modalContenido}>
@@ -219,10 +342,10 @@ const ArchivosScreen = () => {
                   <IconoInput
                   icono = {faPen}
                   placeholder = {"Asignar nombre visible del archivo"}
-                  value = {nameFile}
-                  onChange = {true}
+                  value = {nombreArchivo}
+                  onChange = {handleNombreArchivo}
                   type = "text"
-                  
+                  error={!!errorMessage}
                   name = ""
                   
                   ></IconoInput>
@@ -230,6 +353,11 @@ const ArchivosScreen = () => {
                   <InputDates
                     icono = {faCalendar}
                     placeholder = {"Fecha de vencimiento del archivo (opcional)"}
+                    onChange={handleFechaVencimiento}
+                    selected={fechaVencimiento}
+                    minDate={new Date()}
+                    error={!!errorMessage}
+
                   ></InputDates>
                
 
@@ -238,15 +366,64 @@ const ArchivosScreen = () => {
                   placeholder = {"Nombre del archivo"}
                   value = {file}
                   accept=".pdf"
-                  onChange = {true}
-                  
+                  onChange = {(file) => setArchivoPDF(file)}
                   name = ""
                   
                   ></InputFile>
+
+                  {errorMessage && (
+                        <p style={{ color: 'red', marginTop: '10px' }}>{errorMessage}</p>
+                    )}
+
+                 
+            </div>
+
+          </Popup>
+    
+          }
+
+
+           {/* Pop up para subir un archivo */}
+          {<Popup 
+            isOpen={false} 
+            onClose={closeNuevo}
+            title={'Subir nuevo archivo'}
+          
+          >
+            <div className={styles.modalContenido}>
+
+                  <IconoInput
+                  icono = {faPen}
+                  placeholder = {"Asignar nombre visible del archivo"}
+                  value = {nombreArchivo}
+                  onChange = {handleNombreArchivo}
+                  type = "text"
+                  error={!!errorMessage}
+                  name = ""
                   
-                
-                    
-                   
+                  ></IconoInput>
+
+                  <InputDates
+                    icono = {faCalendar}
+                    placeholder = {"Fecha de vencimiento del archivo (opcional)"}
+                    onChange={handleFechaVencimiento}
+                    selected={fechaVencimiento}
+                    minDate={new Date()}
+                    error={!!errorMessage}
+
+                  ></InputDates>
+               
+
+                  <InputFile
+                  icono = {faPen}
+                  placeholder = {"Nombre del archivo"}
+                  value = {file}
+                  accept=".pdf"
+                  onChange = {(file) => setArchivoPDF(file)}
+                  name = ""
+                  
+                  ></InputFile>
+
                  
             </div>
 
