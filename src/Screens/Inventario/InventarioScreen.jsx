@@ -133,7 +133,7 @@ const InventarioScreen = () => {
             />
             <h3 className={styles.nombre}>{producto.nombre}</h3>
             <div className={styles.presentacion}>{producto.presentacion}</div>
-            <div className={styles.precio}>{`Q${producto.precio_venta}`}</div>
+            <div className={styles.precio}>{`Q${producto.precioventa}`}</div>
             <div className={styles.stock}>{`Stock: ${producto.stock_actual}`}</div>
           </div>
         ))}

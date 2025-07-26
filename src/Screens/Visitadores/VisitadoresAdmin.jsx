@@ -69,7 +69,7 @@ const VisitadoresAdmin = () => {
           />
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', minWidth: '220px' }}>
-          <label style={{ color: '#222', fontWeight: 500, marginBottom: 4 }}>Proveedor</label>
+          <label style={{ color: '#5a60a5', fontWeight: 500, marginBottom: 4 }}>Proveedor</label>
           <IconoInput
             icono={faSearch}
             placeholder="Ingrese un proveedor"
