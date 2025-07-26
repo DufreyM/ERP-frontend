@@ -1,0 +1,38 @@
+.divButtonForm {
+    background-color: #5a60A5;
+    color: white;
+    border: none;
+    border-radius: 10px; 
+    padding: 12px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-size: 16px;
+    font-weight: bold;
+    min-width: 120px;
+    transition: background-color 0.3s ease;
+    box-sizing: border-box;
+}
+
+.RedButton{
+    background-color: rgb(167, 49, 67)
+}
+
+.LineButton{
+    background-color: white;
+    color: #5a60A5;
+    border: solid 3px #5a60A5;
+
+}
+
+
+.divButtonForm:hover {
+    background-color: #4a5095;
+}
+
+.RedButton:hover{
+    background-color: rgb(130, 31, 31);
+}
+
+.LineButton:hover{
+    background-color: rgba(203, 215, 228, 0.766);
+}

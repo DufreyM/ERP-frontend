@@ -2,134 +2,469 @@
 //Aun falta implementar las funciones reales que consultan a la BD, actualmente solo están comentadas como se pretende sea su funcionamiento
 //Renato Rojas. 28/05/2025
 
-import React, { useState } from "react"
-import InputSelects from "../../components/Inputs/InputSelects"
+import React, { useState, useEffect } from "react"
+import { Outlet, useOutletContext } from 'react-router-dom';
+import { getOptions } from '../../utils/selects';
 import styles from "./Archivos.module.css"
 import SimpleTitle from "../../components/Titles/SimpleTitle"
-import { faGear,faUser } from '@fortawesome/free-solid-svg-icons';
+import { faGear, faUser,  faArrowDownZA, faPen, faCalendar } from '@fortawesome/free-solid-svg-icons';
+import { Table } from "../../components/Tables/Table";
+import Popup from '../../components/Popup/Popup';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useFetch } from "../../utils/useFetch";
+import ButtonForm from "../../components/ButtonForm/ButtonForm";
+import IconoInput from "../../components/Inputs/InputIcono";
+import InputFile from "../../components/Inputs/InputFile";
+import Filters from "../../components/FIlters/Filters";
+import ButtonHeaders from "../../components/ButtonHeaders/ButtonHeaders";
+import InputDates from "../../components/Inputs/InputDates";
+import { getToken } from '../../services/authService';
 
 
 const ArchivosScreen = () => {
+  const { selectedLocal } = useOutletContext();
+  const localSeleccionado = selectedLocal + 1 ;
+  const {data, loading, error } = useFetch(`http://localhost:3000/documentos-locales?local_id=${localSeleccionado}`);
+  console.log(data);
+
+   
+  const token = getToken();
+  const getPayloadFromToken = (token) => {
+    try {
+      return JSON.parse(atob(token.split('.')[1]));
+    } catch (error) {
+      console.error("Token inválido", error);
+      return null;
+    }
+  };
+
+ 
+  //Estados de filtros
+  const [opcionsRoles, setOpcionsRoles] = useState([]);
+  const [opcionsUsers, setOpcionsUsers] = useState([]);
+  const [usuariosFiltrados, setUsuariosFiltrados] = useState([]);
+  const [ordenAscendente, setOrdenAscendente] = useState(true);
+
+  //datos
+  const [errorMessage, setErrorMessage] = useState('');
+  const [nombreArchivo, setNombreArchivo] = useState('');
+  const [fechaVencimiento, setFechaVencimiento] = useState(null);
+  const [archivoPDF, setArchivoPDF] = useState(null);
+
+
+  //Editar un archivo
+  const [documentoAEliminar, setDocumentoAEliminar] = useState(null);
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [file, setFile] = useState('');
+  const [nameFile, setNameFile] = useState('');
+  const openPopup = () => setIsPopupOpen(true);
+  const closePopup = () => setIsPopupOpen(false);
+
+  //Nuevo archivo
+  const [popupNuevo, setPopupNuevo] = useState(false);
+  const openNuevo = () => setPopupNuevo(true);
+  const closeNuevo = () => setPopupNuevo(false);
+
+  //eliminar archivo
+  const [advertencia, setAdvertencia] = useState(false);
+  const closeAdvertencia = () => setAdvertencia(false);
+
+
+
+  const handleNombreArchivo = (e) => {
+        setNombreArchivo(e.target.value);
+        setErrorMessage('');
+  };
+
+
+  const handleFechaVencimiento = (date) => {
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const selectedDate = new Date(date);
+        selectedDate.setHours(0, 0, 0, 0);
+
+        if (selectedDate < today) {
+            setErrorMessage("No puedes seleccionar una fecha pasada.");
+            return;
+        }
+        setErrorMessage(""); // Limpia el mensaje si todo está bien
+        setFechaVencimiento(date);
+    
+    };
+
+
+    //Nuevo archivo
+    const subirDocumento = async (token, datos) => {
+      const formData = new FormData();
+      formData.append('nombre', datos.nombre);
+      formData.append('usuario_id', datos.usuario_id);
+      formData.append('local_id', datos.local_id);
+      formData.append('vencimiento', datos.vencimiento);
+      formData.append('archivo', datos.archivo); // es un File, no un string
+
+      const response = await fetch('http://localhost:3000/documentos-locales', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          // No pongas Content-Type, fetch lo hace con FormData automáticamente
+        },
+        body: formData
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Error ${response.status}: ${errorText}`);
+      }
+
+      return await response.json();
+    };
+
+
+    const handleSubirDocumento = async () => {
+      setErrorMessage('');
+
+      if (!nombreArchivo || !archivoPDF || !fechaVencimiento) {
+        setErrorMessage('Por favor, completa todos los campos.');
+        return;
+      }
+
+      const tokenActual = token; 
+      const payload = getPayloadFromToken(tokenActual);
+
+      if (!payload) {
+        setErrorMessage('No se pudo validar el token.');
+        return;
+      }
+
+      const { id: usuarioId} = payload;
+
+      const datos = {
+        nombre: nombreArchivo,
+        usuario_id: usuarioId,
+        local_id: localSeleccionado,
+        vencimiento: fechaVencimiento.toISOString().split('T')[0],
+        archivo: archivoPDF
+      };
+      console.log('estoy mandando:', datos);
+
+      try {
+        const respuesta = await subirDocumento(tokenActual, datos);
+        console.log('Documento subido:', respuesta);
+
+        closeNuevo(); // si tienes un popup para cerrarlo
+        //setNotificacion('Documento subido con éxito');
+      } catch (error) {
+        console.error('Error al subir documento:', error);
+        setErrorMessage('Ocurrió un error al subir el documento.');
+      }
+    };
+
+
+
+
+
+
+
+
+
+
+ 
+
+  //Opciones de filtrado por Rol
+  useEffect(() => {
+    getOptions("http://localhost:3000/api/roles", item => ({
+        value: item.id,
+        label: item.nombre,
+    })).then((opciones) => {
+      //const data = dataExtendida;
+
+
+      const rolIdEnUso = [...new Set(data.map(doc => doc.usuario?.rol_id))];
+      const rolesUsados = opciones.filter(rol => rolIdEnUso.includes(rol.value));
+      setOpcionsRoles(rolesUsados);
+
+      const mapaUsuarios = new Map();
+
+      data.forEach(doc => {
+        const usuario = doc.usuario;
+        if (!usuario) return;
+
+        if (!mapaUsuarios.has(usuario.id)) {
+          mapaUsuarios.set(usuario.id, {
+            value: usuario.id,
+            label: `${usuario.nombre} ${usuario.apellidos}`,
+            rol_id: usuario.rol_id,
+          });
+        }
+      });
+
+      const opcionesUsuarios = Array.from(mapaUsuarios.values());
+      setOpcionsUsers(opcionesUsuarios);
+
+
+    });
+
+  }, [data]);
+
+
+  const columnas = [  
+    { key: 'nombre', titulo: 'Nombre del archivo' },
+    { key: 'usuario', titulo: 'Subido por' },
+    { key: 'creacion', titulo: 'Fecha de Subido' },
+    { key: 'archivo', titulo: 'Abrir' },
+    { key: 'editar', titulo: 'Editar' },
+    { key: 'eliminar', titulo: 'Eliminar' },
+    
+  ]
+
   const [formData, setFormData] = useState({
       rol: "",
       usuarios: "",
       eliminado: "",
     })
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  }
-  const poblarUsuarios = (labelSelect) =>{
-    //request a la base de datos
-    //req(labelSelect), res
-    const algo = [{}]
-    // algo= res.map(nombre,id)
-    return algo
-  }
-  const handleDownload = (id) => {
-    let url = ''
-    switch (id) {
-      case 1:
-        url = 'https://drive.google.com/uc?export=download&id=1hVSDV4JfMjMc7Dt0e66rV5EYpPeX2WAW'
-        break;
-      case 2:
-        url = 'https://drive.google.com/uc?export=download&id=1O4Oh-8YKCw7gM_7QB44hmh_PccV5N1cN'
-        break;
-      default:
-        break;
+    setFormData((prev) => ({ 
+      ...prev, 
+      [name]: value,
+
+      ...(name ==="rol" && {usuarios:""})
+     }));
+
+     if (name === "rol") {
+      const rolSeleccionado = parseInt(value);
+
+      if (isNaN(rolSeleccionado)) {
+        setUsuariosFiltrados(opcionsUsers); // todos los usuarios
+      } else {
+        const filtrados = opcionsUsers.filter(usuario => usuario.rol_id === rolSeleccionado);
+        setUsuariosFiltrados(filtrados);
+      }
     }
-    const link = document.createElement('a')
-    link.href = url
-    link.target = '_blank'
-    link.click()
-  }
-  const handleWatch = (id) => {
-    let url = ''
-    switch (id) {
-      case 1:
-        url = 'https://drive.google.com/file/d/1hVSDV4JfMjMc7Dt0e66rV5EYpPeX2WAW/view?usp=sharing'
-        break;
-      case 2:
-        url = 'https://drive.google.com/file/d/1O4Oh-8YKCw7gM_7QB44hmh_PccV5N1cN/view?usp=sharing'
-        break;
-      default:
-        break;
+  };
+
+  const eliminarDocumento = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:3000/documentos-locales/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al eliminar el documento');
+      }
+
+      alert('Documento eliminado con éxito');
+
+      // Opcional: recargar los datos
+      window.location.reload(); // o usa un useFetch que se pueda refrescar
+    } catch (error) {
+      console.error(error);
+      alert('Hubo un error al eliminar el documento');
     }
-    const link = document.createElement('a')
-    link.href = url
-    link.target = '_blank'
-    link.rel = 'noopener noreferrer'
-    link.click()
-  }
-  const [showUsuarios, setShowUsuarios] = useState(false)
-  const [showFiltros, setShowFiltros] = useState(false);
+  };
+
+
+
+
+
+  //Subir Nuevo archivo
+
+
+  
+  
+
+  //Mostrar datos
+  const datosFiltrados = (data?.filter(doc => {
+    const coincideRol = formData.rol ? String(doc.usuario?.rol_id) === formData.rol : true;
+    const coincideUsuario = formData.usuarios ? String(doc.usuario?.id) === formData.usuarios : true;
+    return coincideRol && coincideUsuario;
+  }) || []).sort((a, b) => {
+    const nombreA = a.nombre?.toLowerCase() || '';
+    const nombreB = b.nombre?.toLowerCase() || '';
+    return ordenAscendente
+      ? nombreA.localeCompare(nombreB)
+      : nombreB.localeCompare(nombreA);
+  });
+
+  
 
     return(
     <div className={styles.contenedorGeneral}>
-      <SimpleTitle text={"Archivos"}></SimpleTitle>
+      <div className={styles.contenedorEncabezado}>
+        <div className={styles.contenedorTitle}>
+          <SimpleTitle text={"Archivos"}></SimpleTitle>
+        </div>
+        
+        <Filters
+          formData={formData}
+          handleChange={handleChange}
+          opciones={{
+            roles: opcionsRoles,
+            usuarios: usuariosFiltrados
+          }}
+          mostrarFiltros={{
+            rol: true,
+            usuario: true,
+          }}
+          onResetFiltros={() => {
+            setFormData({ rol: "", usuarios: "", eliminado: "" });
+            setUsuariosFiltrados(opcionsUsers);
+            setOrdenAscendente(true);
+          }}
+
+          ordenAscendente={ordenAscendente}
+          setOrdenAscendente={setOrdenAscendente}
+        />
+
+        <ButtonHeaders 
+          text= 'Subir +'
+          onClick={openNuevo}
+        />
+
+      </div> 
+
+
         <div className = {styles.contenedorArchivos}>
-          <div className={styles.barraSeleccion}>
-            <InputSelects 
-            icono={faGear} 
-            placeholder={"Por rol"}
-            value={formData.rol}
-            onChange={handleChange}
-            name="rol"
-            opcions={[
-              {label:"Dependienta", value:"dependienta"},
-              {label:"Contador", value:"contador"},
-              {label:"Química Farmacéutica", value:"quimica_farmaceutica"}
-            ]}
-            />
-            <InputSelects 
-            icono={faUser} 
-            placeholder={"Usuarios"}
-            value={formData.usuarios}
-            onChange={handleChange}
-            name="usuarios"
-            opcions={
-              // va a tocar hacer un select de la base de datos acá
-              poblarUsuarios()
-              //se debería de ver como {label:"Melisa Mendizabal", value:"id_contador"},
-            }
-            />
-            <button className={styles.botonFiltro}>Eliminar filtros</button>
-          </div>
-            <table className={styles.table}>
-              <tr className={styles.tr}>
-                <th className={styles.th}>Archivo</th>
-                <th className={styles.th}>Subido por:</th>
-                <th className={styles.th}>Ver </th>
-                <th className={styles.th}>Descargar</th>
-                {/* Estos nombres de columnas están bien que estén quemados, porque aunque cambie la data, no van a cambiar los headers */}
-              </tr>
-              <tr>
-                {/* Estos sí hay que hacer una función que los traiga, para poblarlos correctamente.Todos los tr vendrán de BD */}
-                <td className={styles.td}>Reporte mensual</td>
-                <td className={styles.td}>Melisa Mendizabal</td>
-                <td className={styles.td}><button onClick={()=>handleWatch(1)}>Ver</button></td>
-                <td className={styles.td}>
-                  <span onClick={()=>handleDownload(1)} style={{ color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}>
-                    ⭳
-                  </span>
-                </td>
-              </tr>
-              <tr className={styles.tr}>
-                <td className={styles.td}>Rayos X (incidente RonRon)</td>
-                <td className={styles.td}>Erick Marroquín</td>
-                <td className={styles.td}><button onClick={()=>handleWatch(2)}>Ver</button></td>
-                <td className={styles.td}>
-                  <span onClick={()=> handleDownload(2)} style={{ color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}>
-                    ⭳
-                  </span>
-                </td>
-              </tr>
-            </table>
+
+          {/* Pop up para subir un archivo */}
+          {<Popup 
+            isOpen={popupNuevo} 
+            onClose={closeNuevo}
+            title={'Subir nuevo archivo'}
+            onClick={handleSubirDocumento}
+          
+          >
+            <div className={styles.modalContenido}>
+
+                  <IconoInput
+                  icono = {faPen}
+                  placeholder = {"Asignar nombre visible del archivo"}
+                  value = {nombreArchivo}
+                  onChange = {handleNombreArchivo}
+                  type = "text"
+                  error={!!errorMessage}
+                  name = ""
+                  
+                  ></IconoInput>
+
+                  <InputDates
+                    icono = {faCalendar}
+                    placeholder = {"Fecha de vencimiento del archivo (opcional)"}
+                    onChange={handleFechaVencimiento}
+                    selected={fechaVencimiento}
+                    minDate={new Date()}
+                    error={!!errorMessage}
+
+                  ></InputDates>
+               
+
+                  <InputFile
+                  icono = {faPen}
+                  placeholder = {"Nombre del archivo"}
+                  value = {file}
+                  accept=".pdf"
+                  onChange = {(file) => setArchivoPDF(file)}
+                  name = ""
+                  
+                  ></InputFile>
+
+                  {errorMessage && (
+                        <p style={{ color: 'red', marginTop: '10px' }}>{errorMessage}</p>
+                    )}
+
+                 
+            </div>
+
+          </Popup>
+    
+          }
+
+
+           {/* Pop up para subir un archivo */}
+          {<Popup 
+            isOpen={false} 
+            onClose={closeNuevo}
+            title={'Subir nuevo archivo'}
+          
+          >
+            <div className={styles.modalContenido}>
+
+                  <IconoInput
+                  icono = {faPen}
+                  placeholder = {"Asignar nombre visible del archivo"}
+                  value = {nombreArchivo}
+                  onChange = {handleNombreArchivo}
+                  type = "text"
+                  error={!!errorMessage}
+                  name = ""
+                  
+                  ></IconoInput>
+
+                  <InputDates
+                    icono = {faCalendar}
+                    placeholder = {"Fecha de vencimiento del archivo (opcional)"}
+                    onChange={handleFechaVencimiento}
+                    selected={fechaVencimiento}
+                    minDate={new Date()}
+                    error={!!errorMessage}
+
+                  ></InputDates>
+               
+
+                  <InputFile
+                  icono = {faPen}
+                  placeholder = {"Nombre del archivo"}
+                  value = {file}
+                  accept=".pdf"
+                  onChange = {(file) => setArchivoPDF(file)}
+                  name = ""
+                  
+                  ></InputFile>
+
+                 
+            </div>
+
+          </Popup>
+    
+          }
+
+
+
+            <Table
+              nameColumns={columnas}
+              data={datosFiltrados}
+              onEliminarClick={(item) =>{ 
+                setDocumentoAEliminar(item);
+                setAdvertencia(true);
+              }}
+              
+            >
+            </Table>
+
+              {/* Pop up para subir un archivo */}
+          {<Popup 
+            isOpen={advertencia} 
+            onClose={closeAdvertencia}
+            title={`¿Estas seguro de eliminar "${documentoAEliminar?.nombre}"?`}
+            onClick ={() => {
+              eliminarDocumento(documentoAEliminar.id);
+              closeAdvertencia();
+            }}
+          >
+
+          </Popup>
+    
+          }
+
+          
         </div>
       
     </div>
     )
 }
 
-export default ArchivosScreen
+export default ArchivosScreen;
 //1O4Oh-8YKCw7gM_7QB44hmh_PccV5N1cN

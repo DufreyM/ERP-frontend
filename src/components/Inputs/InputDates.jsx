@@ -1,8 +1,6 @@
 
 
 
-
-import React, { useState } from 'react';
 import styles from './InputIcono.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import DatePicker from "react-datepicker";
@@ -18,12 +16,13 @@ const InputDates = ({
     onChange,
     error = false,
     maxWidth = '500px',
+    minDate,
 }) => {
     
     
 
     return (
-        <div className={`${styles.contenedorInput} ${error ? styles.errorInput :''}`}>
+        <div className={`${styles.contenedorInputDate} ${error ? styles.errorInput :''}`}>
 
             <DatePicker
                
@@ -31,7 +30,7 @@ const InputDates = ({
                 selected = {selected}
                 onChange={onChange}
                 dateFormat="yyyy-MM-dd"  
-               
+                minDate={minDate} 
 
                 className={styles.inputStyleDate}
                 popperPlacement="bottom"

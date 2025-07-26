@@ -2,8 +2,7 @@ import './RightPanel.css';
 import { useState } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
-const RightPanel = () => {
-    const [collapsed, setCollapsed] = useState(false);
+const RightPanel = ({collapsed, setCollapsed}) => {
 
     return (
         <div className={`right-panel ${collapsed ? 'collapsed' : ''}`}>

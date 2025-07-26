@@ -1,47 +1,17 @@
 
-.pantallaCalendario{
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    
-
-}
-
-.tituloyCalendario {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 15px;
-    padding: 10px;
-    padding-right: 20px;
-  
-}
-
-.titleDiv {
-    width: 100%;
-}
 
 
-
-.contenedorCalendario {
-    width: 100%;
-    padding-top: 10px;
-    background-color: rgb(255, 255, 255);
-}
 
 .contentLeft{
     max-width: 25%;
-    min-width: 25%;
     display: flex;
     flex-direction: column;
     border-radius: 20px 0px 0px 20px;
-    padding:  10px 10px 10px 10px;
+    padding: 10px;
     gap: 10px;
     background-color: rgba(97, 122, 185, 0.116);
-}
-.contentLeft2{
-    padding-left: 15px;
-    margin-right: 10px;
+    
+
 }
 
 .allTitle{
@@ -84,39 +54,6 @@
 }
 
 
-.buttonCalendar {
-    font-family: 'Segoe UI';
-    font-weight: bold;
-    background-color: #5a60a5;
-    border-radius: 8px;
-    height: 30px;
-    width: 70px;
-    color: white;
-    border: 0;
-}
-
-.diaHoy{
-    font-size: 22px;
-    color: #5a60A5;
-    cursor: pointer;
-}
-
-.buttontitletoday{
-    border: none;
-    background-color: transparent;
-}
-
-.eventoEnCalendario{
-    background-color: #5a60A5;
-    padding-left: 2px;
-    border-radius: 3px;
-    width: 100%;
-    color: #f9f9f9;
-}
-
-.eventoEnCalendario::first-letter {
-  text-transform: uppercase;
-}
 
 .encabezadoMesStyle {
     
@@ -128,21 +65,7 @@
 
 }
 
-.subtitulo{
-    margin: 0px;
-    padding: 0px;
-    font-size: 20px;
-    color: #444b92;
-}
 
-.divbuttons{
-    padding-top: 10px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-  
-}
 
 .tituloMes{
     text-align: center;
@@ -169,14 +92,48 @@
     
 }
 
-.Eventos{
+.divEventos{
+
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    justify-content: flex-start;
+    color: #5a60A5;
+    padding-bottom: 5px;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: rgba(97, 122, 185, 0);
+    border-bottom: solid 1px #5a60a56b;
+}
+
+.espaciadoExtremos{
 
     display: flex;
     width: 100%;
-    flex-direction: column;
+    flex-direction: row;
+    gap: 10px;
+    justify-content: space-between;
+    color: #5a60A5;
+}
 
-    background-color: rgba(97, 122, 185, 0);
-   
+.buttonText {
+    background-color: transparent;
+    cursor: pointer;
+    border: none;
+    color: #5a60A5;
+    margin: 0px 3px;
+    font-size: 16px;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.buttonText2 {
+    background-color: transparent;
+    cursor: pointer;
+    border: none;
+    color: #851515;
+    margin: 0px 3px;
+    font-size: 16px;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .vineta {
@@ -193,6 +150,9 @@
 .contenido {
     display: flex;
     flex-direction: column;
+    width: 100%;
+    text-align: left;
+    gap: 3px;
  
 }
 
@@ -203,12 +163,15 @@
     font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.tStyle{
+.tituloEvento{
     margin: 0;
     padding: 0px;
-    font-size: 17px;
+    font-size: 16px;
+    min-width: 70%;
+
     font-weight: bold;
     font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-align: left;
 }
 
 .desc{
@@ -219,35 +182,10 @@
     font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.modalContenido{
-    display: flex;
-    flex-direction: column;
-    color: #5a60A5;
-}
 
 
-.toast {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #f9f9f9;
-  color: #5a60A5;
-  padding: 12px 24px;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  z-index: 9999;
-  opacity: 1;
-  animation: fadeOut 0.5s ease-in-out 2s forwards;
-  font-weight: bold;
-}
 
-@keyframes fadeOut {
-  to {
-    opacity: 0;
-    transform: translateX(-50%) translateY(-10px);
-  }
-}
+
 
 
 
