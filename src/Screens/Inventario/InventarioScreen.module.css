@@ -70,6 +70,12 @@
   margin-bottom: 4px;
   text-align: center;
 }
+.detalles {
+  color: #475569;
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+  text-align: center;
+}
 .precio {
   color: #1e40af;
   font-size: 1.05rem;

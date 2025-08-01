@@ -39,30 +39,18 @@ const InventarioScreen = () => {
     }
   }, [selectedLocal]);
 
-  const handleSearch = () => {
-    if (searchTerm.trim() === '') {
-      setProductos(productosOriginales);
-    } else {
-      const productosFiltrados = productosOriginales.filter(producto =>
-        producto.nombre.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setProductos(productosFiltrados);
-    }
-  };
-
   const handleSearchInputChange = (e) => {
     const value = e.target.value;
     setSearchTerm(value);
     
-    // Si el campo está vacío, mostrar todos los productos
+    // Filtrar productos en tiempo real
     if (value.trim() === '') {
       setProductos(productosOriginales);
-    }
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSearch();
+    } else {
+      const productosFiltrados = productosOriginales.filter(producto =>
+        producto.nombre.toLowerCase().includes(value.toLowerCase())
+      );
+      setProductos(productosFiltrados);
     }
   };
 
@@ -91,29 +79,11 @@ const InventarioScreen = () => {
             icono={faSearch}
             placeholder="Escribe el nombre de un medicamento"
             value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
+            onChange={handleSearchInputChange}
             type="text"
             name="medicamento"
           />
         </div>
-        <button
-          onClick={handleSearch}
-          style={{
-            background: '#fff',
-            color: '#5a60a5',
-            border: '2px solid #5a60a5',
-            borderRadius: '20px',
-            padding: '10px 28px',
-            fontWeight: 'bold',
-            fontSize: 16,
-            cursor: 'pointer',
-            marginTop: 22,
-            height: 40,
-            transition: 'background 0.2s, color 0.2s',
-          }}
-        >
-          Buscar
-        </button>
       </div>
 
       {loading && <div className={styles.loading}>Cargando productos...</div>}
@@ -133,6 +103,7 @@ const InventarioScreen = () => {
             />
             <h3 className={styles.nombre}>{producto.nombre}</h3>
             <div className={styles.presentacion}>{producto.presentacion}</div>
+            <div className={styles.detalles}>{producto.detalles}</div>
             <div className={styles.precio}>{`Q${producto.precioventa}`}</div>
             <div className={styles.stock}>{`Stock: ${producto.stock_actual}`}</div>
           </div>
