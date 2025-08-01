@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import SimpleTitle from '../../components/Titles/SimpleTitle';
 import IconoInput from '../../components/Inputs/InputIcono.jsx';
-import PopupButton from '../../components/PopupButton/PopupBotton';
+import PopupButton from '../../components/Popup/Popup';
 import styles from './InventarioScreen.module.css';
 import ButtonText from '../../components/ButtonText/ButtonText';
 import { useOutletContext } from 'react-router-dom';
