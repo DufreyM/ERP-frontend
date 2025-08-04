@@ -36,7 +36,7 @@ const Filters = ({
                 onClick={() => setAbierto(prev => !prev)}
                 className={styles.filtroBoton}
             >
-                <FontAwesomeIcon icon={faFilter} className={styles.IconStyle}/> Filtros
+                <FontAwesomeIcon icon={faFilter} className={styles.IconStyle1}/> Filtros
             </button>
 
       {abierto && (
@@ -73,13 +73,13 @@ const Filters = ({
               icon={faArrowUpAZ}
               title="Ordenar A-Z"
               onClick={() => setOrdenAscendente(true)}
-              className={styles.IconStyle}
+              className={`${styles.IconStyle} ${ordenAscendente ? styles.activo : ''}`}
             />
             <FontAwesomeIcon
               icon={faArrowDownZA}
               title="Ordenar Z-A"
               onClick={() => setOrdenAscendente(false)}
-              className={styles.IconStyle}
+              className={`${styles.IconStyle} ${!ordenAscendente ? styles.activo : ''}`}
             />
             <FontAwesomeIcon
               icon={faFilterCircleXmark}
