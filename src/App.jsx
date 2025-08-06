@@ -14,6 +14,8 @@ import PasswordSuccess from './Screens/ResetPassword/PasswordSuccess.jsx'
 import PrivateRoute from './components/authcomponent.jsx'; // Importa el componente de ruta privada
 import VisitadoresAdmin from './Screens/Visitadores/VisitadoresAdmin.jsx';
 import InventarioScreen from './Screens/Inventario/InventarioScreen.jsx';
+import NuevaVenta from './Screens/NuevaVenta/NuevaVenta.jsx';
+import HistorialComprasVentas from './Screens/HistorialComprasVentas/HistorialComprasVentas.jsx';
 
 function App() {
     return (
@@ -64,6 +66,8 @@ function App() {
                 <Route path="calendario" element={<CalendarScreen />} />
                 <Route path="visitadores-medicos" element={<VisitadoresAdmin />} />
                 <Route path="inventario" element={<InventarioScreen />} />
+                <Route path="historial-vc" element={<HistorialComprasVentas />}></Route>
+                <Route path= "historial-vc/nueva-venta" element={<NuevaVenta />}></Route>
                 </Route>
             </Routes>
         </Router>

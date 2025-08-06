@@ -1,8 +1,10 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFilter, faGear, faUser,faArrowUpAZ,faArrowDownZA,faFilterCircleXmark,} from '@fortawesome/free-solid-svg-icons';
+import { faMagnifyingGlassDollar,faFilter, faGear, faUser,faArrowUpAZ,faArrowDownZA,faFilterCircleXmark, faCalendar} from '@fortawesome/free-solid-svg-icons';
 import styles from "./Filters.module.css";
 import { useState, useRef, useEffect } from "react";
 import InputSelects from "../Inputs/InputSelects";
+import InputDates from "../Inputs/InputDates";
+import IconoInput from "../Inputs/InputIcono";
 
 const Filters = ({
     formData,
@@ -11,7 +13,11 @@ const Filters = ({
     mostrarFiltros,
     onResetFiltros,
     ordenAscendente,
-    setOrdenAscendente
+    setOrdenAscendente,
+
+
+    mostrarRangoFecha = false,
+    mostrarRangoMonto = false,
 
 }) => {
     const [abierto, setAbierto] = useState(false);
@@ -65,6 +71,51 @@ const Filters = ({
               opcions={opciones.usuarios}
             />
           )}
+
+          {mostrarFiltros?.producto && (
+            <InputSelects
+              icono={faUser}
+              placeholder="Filtrado de archivos por usuario"
+              value={formData.usuarios}
+              onChange={handleChange}
+              name="usuarios"
+              opcions={opciones.usuarios}
+            />
+          )}
+
+          {mostrarRangoFecha? (
+            <div>
+              <InputDates
+                icono = {faCalendar}
+                placeholder={"Filtrar por fecha desde"}
+              >
+              </InputDates>
+
+              <InputDates
+                icono = {faCalendar}
+                placeholder={"Filtrar por fecha hasta"}
+              >
+              </InputDates>
+            </div>
+          ) : <div/>
+          }
+
+          {mostrarRangoMonto? (
+            <div>
+              <IconoInput
+                icono = {faMagnifyingGlassDollar}
+                placeholder={"Filtrar por fecha desde"}
+              >
+              </IconoInput>
+
+              <IconoInput
+                icono = {faMagnifyingGlassDollar}
+                placeholder={"Filtrar por fecha hasta"}
+              >
+              </IconoInput>
+            </div>
+          ) : <div/>
+          }
 
           <h3 className={styles.titleFilters}>Ordenar datos</h3>
 

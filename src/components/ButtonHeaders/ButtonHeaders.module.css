@@ -11,6 +11,7 @@
     min-width: 120px;
     transition: background-color 0.3s ease;
     box-sizing: border-box;
+    
 }
 
 .RedButton{
@@ -20,7 +21,7 @@
 .LineButton{
     background-color: white;
     color: #5a60A5;
-    border: solid 3px #5a60A5;
+    border: solid 2px #5a60A5;
 
 }
 

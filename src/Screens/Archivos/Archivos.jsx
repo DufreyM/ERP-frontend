@@ -35,6 +35,16 @@ const ArchivosScreen = () => {
     }
   };
 
+  const columnas = [  
+    { key: 'nombre', titulo: 'Nombre del archivo' },
+    { key: 'usuario', titulo: 'Subido por' },
+    { key: 'creacion', titulo: 'Fecha de Subido' },
+    { key: 'archivo', titulo: 'Abrir' },
+    { key: 'editar', titulo: 'Editar' },
+    { key: 'eliminar', titulo: 'Eliminar' },
+    
+  ]
+
  
   //Estados de filtros
   const [opcionsRoles, setOpcionsRoles] = useState([]);
@@ -205,16 +215,6 @@ const ArchivosScreen = () => {
 
   }, [data]);
 
-
-  const columnas = [  
-    { key: 'nombre', titulo: 'Nombre del archivo' },
-    { key: 'usuario', titulo: 'Subido por' },
-    { key: 'creacion', titulo: 'Fecha de Subido' },
-    { key: 'archivo', titulo: 'Abrir' },
-    { key: 'editar', titulo: 'Editar' },
-    { key: 'eliminar', titulo: 'Eliminar' },
-    
-  ]
 
   const [formData, setFormData] = useState({
       rol: "",
@@ -478,9 +478,7 @@ const ArchivosScreen = () => {
           </Popup>
     
           }
-
-
-
+          <div className={styles.contenedorTablaArchivos}>
             <Table
               nameColumns={columnas}
               data={datosFiltrados}
@@ -493,8 +491,9 @@ const ArchivosScreen = () => {
                 handleEditarArchivo(item)
               }
               
-            >
-            </Table>
+            
+            />
+          </div>
 
           {/* Pop up para liminar un archivo */}
           {<Popup 

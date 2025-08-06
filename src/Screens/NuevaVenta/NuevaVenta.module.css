@@ -1,0 +1,75 @@
+.titloNuevaVentayBoton{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  text-align: center;
+  width: calc(100% - 30px);
+  padding: 0px 15px;
+  color: #5a60A5;
+}
+
+.tituloNuevaVenta{
+  width: 100%;
+}
+
+.buttonVolverV{
+  background-color: transparent;
+  border: none;
+  color: #5a60A5;
+  cursor: pointer;
+}
+
+.subtituloNuevaVenta{
+    margin: 0px;
+    padding-bottom: 5px;
+    color: #5a60A5;
+}
+
+.encabezadoNuevaVenta{
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+
+    width: auto;
+    
+}
+
+.datosClienteVenta{
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0px 20px 20px;
+    width: 50%;
+    align-items: center;
+    justify-content: center;
+}
+
+.gridDatosCertificacion {
+  display: grid;
+  padding: 25px 0px;
+  margin: 0px;
+  grid-template-columns: auto auto;  
+  grid-template-rows: auto auto auto;
+  gap: 0px 20px; 
+
+}
+
+.gridDatosCertificacion p:nth-child(odd) {
+  justify-self: end;  
+  font-weight: bold;
+  color: #5a60A5;
+  text-align: end;
+}
+
+.gridDatosCertificacion p:nth-child(even) {
+  justify-self: start;  /* Alinea las celdas de la segunda columna a la derecha */
+}
+
+.gridDatosCertificacion p {
+  margin: 0;
+  padding: 0;
+}
+
+.contenedorDatosVenta {
+    padding: 20px;
+    background-color: white;
+}
