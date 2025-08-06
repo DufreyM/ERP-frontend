@@ -97,7 +97,7 @@ const InventarioScreen = () => {
             onClick={() => setProductoSeleccionado(producto)}
           >
             <img
-              src={producto.imagen_url || '/default-user.svg'}
+              src={producto.imagen || '/default-user.svg'}
               alt={producto.nombre}
               className={styles.productoImg}
             />
@@ -114,7 +114,7 @@ const InventarioScreen = () => {
         <PopupButton onClose={() => setProductoSeleccionado(null)}>
           <div className={styles.popupContent}>
             <img
-              src={productoSeleccionado.imagen_url || '/default-user.svg'}
+              src={productoSeleccionado.imagen || '/default-user.svg'}
               alt={productoSeleccionado.nombre}
               className={styles.popupImg}
             />
