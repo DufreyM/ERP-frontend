@@ -4,6 +4,8 @@ import IconoInput from '../../components/Inputs/InputIcono.jsx';
 import PopupButton from '../../components/Popup/Popup';
 import styles from './InventarioScreen.module.css';
 import ButtonText from '../../components/ButtonText/ButtonText';
+import ButtonForm from '../../components/ButtonForm/ButtonForm';
+import InventarioFilters from '../../components/FIlters/InventarioFilters';
 import { useOutletContext } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
@@ -18,6 +20,12 @@ const InventarioScreen = () => {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [formData, setFormData] = useState({
+    tipo: '',
+    ordenPrecio: '',
+    ordenStock: ''
+  });
+  const [ordenAscendente, setOrdenAscendente] = useState(true);
 
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -54,6 +62,109 @@ const InventarioScreen = () => {
     }
   };
 
+  // Función para manejar cambios en los filtros
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // Función para resetear filtros
+  const onResetFiltros = () => {
+    setFormData({
+      tipo: '',
+      ordenPrecio: '',
+      ordenStock: ''
+    });
+    setOrdenAscendente(true);
+    setProductos(productosOriginales);
+  };
+
+  // Función para aplicar filtros
+  const aplicarFiltros = () => {
+    let productosFiltrados = [...productosOriginales];
+
+    // Filtro por tipo
+    if (formData.tipo) {
+      productosFiltrados = productosFiltrados.filter(p => p.detalles === formData.tipo);
+    }
+
+    // Ordenar por precio
+    if (formData.ordenPrecio) {
+      productosFiltrados.sort((a, b) => {
+        const precioA = parseFloat(a.precioventa || a.precio_venta || 0);
+        const precioB = parseFloat(b.precioventa || b.precio_venta || 0);
+        return formData.ordenPrecio === 'asc' ? precioA - precioB : precioB - precioA;
+      });
+    }
+
+    // Ordenar por stock
+    if (formData.ordenStock) {
+      productosFiltrados.sort((a, b) => {
+        const stockA = parseInt(a.stock_actual || 0);
+        const stockB = parseInt(b.stock_actual || 0);
+        return formData.ordenStock === 'asc' ? stockA - stockB : stockB - stockA;
+      });
+    }
+
+    // Aplicar búsqueda sobre los productos filtrados
+    if (searchTerm.trim() === '') {
+      setProductos(productosFiltrados);
+    } else {
+      const productosFiltradosYBusqueda = productosFiltrados.filter(producto =>
+        producto.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setProductos(productosFiltradosYBusqueda);
+    }
+  };
+
+  // Función para manejar el orden alfabético con los iconos
+  const handleOrdenAlfabetico = (ascendente) => {
+    setOrdenAscendente(ascendente);
+    let productosOrdenados = [...productos];
+    
+    productosOrdenados.sort((a, b) => {
+      const nombreA = a.nombre.toLowerCase();
+      const nombreB = b.nombre.toLowerCase();
+      return ascendente 
+        ? nombreA.localeCompare(nombreB)
+        : nombreB.localeCompare(nombreA);
+    });
+    
+    setProductos(productosOrdenados);
+  };
+
+  // Aplicar filtros cuando cambien
+  useEffect(() => {
+    aplicarFiltros();
+  }, [formData, productosOriginales, searchTerm]);
+
+  // Extraer tipos únicos de los productos
+  const tiposUnicos = [...new Set(productosOriginales.map(p => p.detalles))].filter(tipo => tipo);
+
+  const opciones = {
+    tipos: tiposUnicos.map(tipo => ({
+      value: tipo,
+      label: tipo
+    })),
+    ordenPrecio: [
+      { value: 'asc', label: 'Menor a Mayor' },
+      { value: 'desc', label: 'Mayor a Menor' }
+    ],
+    ordenStock: [
+      { value: 'asc', label: 'Menor a Mayor' },
+      { value: 'desc', label: 'Mayor a Menor' }
+    ]
+  };
+
+  const mostrarFiltros = {
+    tipo: true,
+    ordenPrecio: true,
+    ordenStock: true
+  };
+
   const handleDelete = async () => {
     if (!productoSeleccionado) return;
     setDeleting(true);
@@ -84,6 +195,15 @@ const InventarioScreen = () => {
             name="medicamento"
           />
         </div>
+        <InventarioFilters
+          formData={formData}
+          handleChange={handleChange}
+          opciones={opciones}
+          mostrarFiltros={mostrarFiltros}
+          onResetFiltros={onResetFiltros}
+          ordenAscendente={ordenAscendente}
+          setOrdenAscendente={handleOrdenAlfabetico}
+        />
       </div>
 
       {loading && <div className={styles.loading}>Cargando productos...</div>}
