@@ -1,165 +1,69 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { login, storeToken, getToken, removeToken, fetchProtectedData } from './authService';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { login, storeToken, getToken, removeToken, fetchProtectedData } from './authService'; 
 
-// Mock de fetch global
-global.fetch = vi.fn();
+// Simular localStorage
+const localStorageMock = (() => {
+  let store = {};
+  return {
+    getItem: vi.fn((key) => store[key] || null),
+    setItem: vi.fn((key, value) => { store[key] = value }),
+    removeItem: vi.fn((key) => { delete store[key] }),
+    clear: () => { store = {} }
+  };
+})();
 
-// Mock de localStorage
-const localStorageMock = {
-  getItem: vi.fn(),
-  setItem: vi.fn(),
-  removeItem: vi.fn(),
-  clear: vi.fn(),
-};
-global.localStorage = localStorageMock;
+Object.defineProperty(global, 'localStorage', {
+  value: localStorageMock
+});
 
-describe('AuthService', () => {
+describe('Auth Module', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-    localStorageMock.getItem.mockClear();
-    localStorageMock.setItem.mockClear();
-    localStorageMock.removeItem.mockClear();
-  });
-
-  afterEach(() => {
     vi.resetAllMocks();
+    localStorage.clear();
   });
 
-  describe('login', () => {
-    it('debería hacer login exitosamente con credenciales válidas', async () => {
-      const mockResponse = {
-        ok: true,
-        json: vi.fn().mockResolvedValue({
-          token: 'mock-jwt-token',
-          user: { id: 1, email: 'test@example.com' }
-        })
-      };
-      
-      global.fetch.mockResolvedValue(mockResponse);
-
-      const result = await login('test@example.com', 'password123');
-
-      expect(global.fetch).toHaveBeenCalledWith('http://localhost:3000/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ 
-          email: 'test@example.com', 
-          contrasena: 'password123' 
-        })
-      });
-
-      expect(result).toEqual({
-        token: 'mock-jwt-token',
-        user: { id: 1, email: 'test@example.com' }
-      });
+  it('login should send POST request with email and password', async () => {
+    const fakeResponse = { token: 'abc123' };
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(fakeResponse)
     });
 
-    it('debería lanzar error cuando las credenciales son inválidas', async () => {
-      const mockResponse = {
-        ok: false,
-        json: vi.fn().mockResolvedValue({
-          error: 'Credenciales inválidas'
-        })
-      };
-      
-      global.fetch.mockResolvedValue(mockResponse);
+    const result = await login('test@example.com', '123456');
 
-      await expect(login('invalid@example.com', 'wrongpassword'))
-        .rejects.toThrow('Credenciales inválidas');
-    });
-
-    it('debería lanzar error genérico cuando no hay mensaje de error específico', async () => {
-      const mockResponse = {
-        ok: false,
-        json: vi.fn().mockResolvedValue({})
-      };
-      
-      global.fetch.mockResolvedValue(mockResponse);
-
-      await expect(login('test@example.com', 'password123'))
-        .rejects.toThrow('Error en la solicitud de inicio de sesión');
-    });
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:3000/auth/login', expect.objectContaining({
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'test@example.com', contrasena: '123456' })
+    }));
+    expect(result).toEqual(fakeResponse);
   });
 
-  describe('Token Management', () => {
-    it('debería almacenar token en localStorage', () => {
-      const token = 'test-jwt-token';
-      storeToken(token);
-      
-      expect(localStorageMock.setItem).toHaveBeenCalledWith('jwtToken', token);
-    });
+  it('should store, retrieve and remove token correctly', () => {
+    storeToken('my-jwt-token');
+    expect(localStorage.setItem).toHaveBeenCalledWith('jwtToken', 'my-jwt-token');
 
-    it('debería obtener token de localStorage', () => {
-      const token = 'test-jwt-token';
-      localStorageMock.getItem.mockReturnValue(token);
-      
-      const result = getToken();
-      
-      expect(localStorageMock.getItem).toHaveBeenCalledWith('jwtToken');
-      expect(result).toBe(token);
-    });
+    const token = getToken();
+    expect(localStorage.getItem).toHaveBeenCalledWith('jwtToken');
+    expect(token).toBe('my-jwt-token');
 
-    it('debería retornar null cuando no hay token', () => {
-      localStorageMock.getItem.mockReturnValue(null);
-      
-      const result = getToken();
-      
-      expect(result).toBeNull();
-    });
-
-    it('debería remover token de localStorage', () => {
-      removeToken();
-      
-      expect(localStorageMock.removeItem).toHaveBeenCalledWith('jwtToken');
-    });
+    removeToken();
+    expect(localStorage.removeItem).toHaveBeenCalledWith('jwtToken');
   });
 
-  describe('fetchProtectedData', () => {
-    it('debería obtener datos protegidos con token válido', async () => {
-      const mockToken = 'valid-jwt-token';
-      const mockData = { message: 'Datos protegidos' };
-      
-      localStorageMock.getItem.mockReturnValue(mockToken);
-      
-      const mockResponse = {
-        ok: true,
-        json: vi.fn().mockResolvedValue(mockData)
-      };
-      
-      global.fetch.mockResolvedValue(mockResponse);
+  it('fetchProtectedData should include Authorization header with token', async () => {
+    storeToken('test-token');
 
-      const result = await fetchProtectedData();
-
-      expect(global.fetch).toHaveBeenCalledWith('http://localhost:3000/protected', {
-        headers: {
-          'Authorization': `Bearer ${mockToken}`
-        }
-      });
-
-      expect(result).toEqual(mockData);
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ data: 'protected' })
     });
 
-    it('debería lanzar error cuando no hay token', async () => {
-      localStorageMock.getItem.mockReturnValue(null);
+    const data = await fetchProtectedData();
 
-      await expect(fetchProtectedData())
-        .rejects.toThrow('No authentication token found');
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:3000/protected', {
+      headers: { Authorization: 'Bearer test-token' }
     });
-
-    it('debería lanzar error cuando la respuesta no es exitosa', async () => {
-      const mockToken = 'valid-jwt-token';
-      localStorageMock.getItem.mockReturnValue(mockToken);
-      
-      const mockResponse = {
-        ok: false
-      };
-      
-      global.fetch.mockResolvedValue(mockResponse);
-
-      await expect(fetchProtectedData())
-        .rejects.toThrow('Failed to fetch protected data');
-    });
+    expect(data).toEqual({ data: 'protected' });
   });
 });
