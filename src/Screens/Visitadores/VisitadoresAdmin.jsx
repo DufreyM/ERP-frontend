@@ -55,17 +55,17 @@ const VisitadoresAdmin = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleBuscar = () => {
+  // Filtrado reactivo en tiempo real al escribir y cuando cambian los datos
+  useEffect(() => {
     const termNombre = nombre.trim().toLowerCase();
     const termProv = proveedor.trim().toLowerCase();
-    setFiltered(
-      data.filter((item) => {
-        const matchNombre = termNombre === '' || item.nombre.toLowerCase().includes(termNombre);
-        const matchProveedor = termProv === '' || item.proveedor.toLowerCase().includes(termProv);
-        return matchNombre && matchProveedor;
-      })
-    );
-  };
+    const next = data.filter((item) => {
+      const matchNombre = termNombre === '' || item.nombre.toLowerCase().includes(termNombre);
+      const matchProveedor = termProv === '' || item.proveedor.toLowerCase().includes(termProv);
+      return matchNombre && matchProveedor;
+    });
+    setFiltered(next);
+  }, [nombre, proveedor, data]);
 
   const toggleEstatus = async (index) => {
     const current = filtered[index];
@@ -98,16 +98,7 @@ const VisitadoresAdmin = () => {
       if (!res.ok) throw new Error('No se pudo eliminar');
       const nextData = data.filter((d) => d.id !== id);
       setData(nextData);
-      // Reaplicar filtros con términos actuales
-      const termNombre = nombre.trim().toLowerCase();
-      const termProv = proveedor.trim().toLowerCase();
-      setFiltered(
-        nextData.filter((item) => {
-          const matchNombre = termNombre === '' || item.nombre.toLowerCase().includes(termNombre);
-          const matchProveedor = termProv === '' || item.proveedor.toLowerCase().includes(termProv);
-          return matchNombre && matchProveedor;
-        })
-      );
+      // El useEffect de filtrado se encargará de actualizar "filtered"
     } catch (e) {
       alert('Error al eliminar visitador');
     }
@@ -118,7 +109,6 @@ const VisitadoresAdmin = () => {
       <div style={{ marginBottom: '16px' }}>
         <SimpleTitle text="Visitadores médicos" />
       </div>
-
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', minWidth: '220px' }}>
           <label style={{ color: '#5a60a5', fontWeight: 500, marginBottom: 4 }}>Nombre</label>
@@ -142,24 +132,6 @@ const VisitadoresAdmin = () => {
             name="proveedor"
           />
         </div>
-        <button
-          onClick={handleBuscar}
-          style={{
-            background: '#fff',
-            color: '#5a60a5',
-            border: '2px solid #5a60a5',
-            borderRadius: '20px',
-            padding: '10px 28px',
-            fontWeight: 'bold',
-            fontSize: 16,
-            cursor: 'pointer',
-            marginTop: 22,
-            height: 40,
-            transition: 'background 0.2s, color 0.2s',
-          }}
-        >
-          Buscar
-        </button>
       </div>
 
       {loading && <div style={{ color: '#5a60a5', fontWeight: 600, marginBottom: 12 }}>Cargando visitadores...</div>}
