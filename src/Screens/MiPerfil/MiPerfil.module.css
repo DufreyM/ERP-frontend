@@ -86,3 +86,30 @@
   justify-content: center;
   margin-bottom: 1rem;
 }
+
+/* Estilos para que los inputs tengan el mismo ancho que el contenedor del perfil */
+.container :global(.contenedorInput) {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+.container :global(.inputStyle) {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+.container :global(.inputStylePassword) {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+.container :global(.contenedorInputDate) {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+.container :global(.inputStyleDate) {
+  max-width: 100% !important;
+  width: 100% !important;
+  min-width: unset !important;
+}
