@@ -18,6 +18,10 @@ const Filters = ({
 
     mostrarRangoFecha = false,
     mostrarRangoMonto = false,
+    onFechaInicioChange,
+    onFechaFinChange,
+    fechaInicio,
+    fechaFin
 
 }) => {
     const [abierto, setAbierto] = useState(false);
@@ -61,7 +65,7 @@ const Filters = ({
             />
           )}
 
-          {mostrarFiltros?.usuario && (
+          {mostrarFiltros?.usuario || mostrarFiltros?.usuarioID  && (
             <InputSelects
               icono={faUser}
               placeholder="Filtrado de archivos por usuario"
@@ -85,15 +89,21 @@ const Filters = ({
 
           {mostrarRangoFecha? (
             <div>
+              <h4>Filtros por fecha</h4>
               <InputDates
                 icono = {faCalendar}
                 placeholder={"Filtrar por fecha desde"}
+                selected={fechaInicio}
+                onChange={onFechaInicioChange}
               >
               </InputDates>
 
               <InputDates
                 icono = {faCalendar}
                 placeholder={"Filtrar por fecha hasta"}
+                selected={fechaFin}
+                onChange={onFechaFinChange}
+                minDate={fechaInicio}
               >
               </InputDates>
             </div>
