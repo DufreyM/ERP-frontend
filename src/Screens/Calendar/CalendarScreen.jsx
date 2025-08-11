@@ -414,23 +414,6 @@ export const CalendarScreen= () =>{
 
 
 
-    
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    
-
-    
 
     const [selectedEvent, setSelectedEvent] = useState(null);
 
@@ -440,11 +423,6 @@ export const CalendarScreen= () =>{
     const handleToday = () => calendarRef.current.getApi().today();
 
     const [events, setEvents] = useState([]);
-
- 
-
-    
-
 
 
 
@@ -819,6 +797,7 @@ export const CalendarScreen= () =>{
                         value = {nombreEvento}
                         onChange = {handleNombreEvento}
                         type = "text"
+                        error={!!errorMessage}
                         
                         name = ""
                     
@@ -833,7 +812,7 @@ export const CalendarScreen= () =>{
                         onChange = {handleTipoEvento}
                         type = "text"
                         name = ""
-                        error = {false}
+                        error={!!errorMessage}
                     />
 
 
@@ -844,7 +823,7 @@ export const CalendarScreen= () =>{
                         onChange = {handleEstadoEvento}
                         type = "text"
                         name = ""
-                        error = {false}
+                        error={!!errorMessage}
                         opcions = {opcionesEstados}
                     />
                     
@@ -857,7 +836,7 @@ export const CalendarScreen= () =>{
                             onChange = {handleVisitador}
                             type = "text"        
                             name = ""
-                            error = {false}
+                            error={!!errorMessage}
                             opcions = {opcionesVisitadores}
                         />
                     )}
@@ -868,6 +847,7 @@ export const CalendarScreen= () =>{
                         onChange = {handleDate}
                         selected = {fechaEvento}
                         minDate={new Date()}
+                        error={!!errorMessage}
                     ></InputDates>
 
                     <IconoInput
@@ -876,7 +856,7 @@ export const CalendarScreen= () =>{
                         value = {horaEvento}
                         onChange = {handleHoraEvento}
                         type = "time"
-                        error={false}
+                        error={!!errorMessage}
                         name = ""
                     
                     ></IconoInput>
@@ -888,6 +868,7 @@ export const CalendarScreen= () =>{
                         onChange = {handleDescripcion}
                         type = "text"
                         name = ""
+                        error={!!errorMessage}
                     ></IconoInput>
   
                     

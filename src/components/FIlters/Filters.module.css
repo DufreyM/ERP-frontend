@@ -23,6 +23,7 @@
   color: #5a60A5;
 }
 
+
 .filtroDropdown {
   position: absolute;
   border-radius: 5px;
@@ -41,10 +42,24 @@
   margin-top: 1rem;
 }
 
+.IconStyle1 {
+    cursor: pointer;
+    color: #5a60a5;
+    height: 20px;
+
+}
+
 .IconStyle {
     cursor: pointer;
     color: #5a60a5;
-
+    padding: 5px;
     height: 20px;
+}
+
+.activo {
+  color: #ffffff; 
+  background-color: #5a60a5;
+  padding: 5px;
+  border-radius: 5px;
 
 }

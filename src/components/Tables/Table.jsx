@@ -7,6 +7,7 @@ export const Table = ({
     nameColumns,
     data,
     onEliminarClick,
+    onEditarClick
 
 }) => {
   //funcion para validar la fecha
@@ -32,7 +33,7 @@ export const Table = ({
 
     if (col.key === 'editar') {
       return (
-        <span title = {'Editar archivo'} onClick={() => onEliminarClick?.(item)} className={styles.IconStyle}>
+        <span title = {'Editar archivo'} onClick={() => onEditarClick?.(item)} className={styles.IconStyle}>
           <FontAwesomeIcon icon = {faPen} ></FontAwesomeIcon>
         </span>
       )

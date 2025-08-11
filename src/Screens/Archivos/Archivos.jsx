@@ -3,16 +3,14 @@
 //Renato Rojas. 28/05/2025
 
 import React, { useState, useEffect } from "react"
-import { Outlet, useOutletContext } from 'react-router-dom';
+import { useOutletContext } from 'react-router-dom';
 import { getOptions } from '../../utils/selects';
 import styles from "./Archivos.module.css"
 import SimpleTitle from "../../components/Titles/SimpleTitle"
-import { faGear, faUser,  faArrowDownZA, faPen, faCalendar } from '@fortawesome/free-solid-svg-icons';
+import {  faPen, faCalendar } from '@fortawesome/free-solid-svg-icons';
 import { Table } from "../../components/Tables/Table";
 import Popup from '../../components/Popup/Popup';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useFetch } from "../../utils/useFetch";
-import ButtonForm from "../../components/ButtonForm/ButtonForm";
 import IconoInput from "../../components/Inputs/InputIcono";
 import InputFile from "../../components/Inputs/InputFile";
 import Filters from "../../components/FIlters/Filters";
@@ -25,7 +23,6 @@ const ArchivosScreen = () => {
   const { selectedLocal } = useOutletContext();
   const localSeleccionado = selectedLocal + 1 ;
   const {data, loading, error } = useFetch(`http://localhost:3000/documentos-locales?local_id=${localSeleccionado}`);
-  console.log(data);
 
    
   const token = getToken();
@@ -37,6 +34,16 @@ const ArchivosScreen = () => {
       return null;
     }
   };
+
+  const columnas = [  
+    { key: 'nombre', titulo: 'Nombre del archivo' },
+    { key: 'usuario', titulo: 'Subido por' },
+    { key: 'creacion', titulo: 'Fecha de Subido' },
+    { key: 'archivo', titulo: 'Abrir' },
+    { key: 'editar', titulo: 'Editar' },
+    { key: 'eliminar', titulo: 'Eliminar' },
+    
+  ]
 
  
   //Estados de filtros
@@ -209,16 +216,6 @@ const ArchivosScreen = () => {
   }, [data]);
 
 
-  const columnas = [  
-    { key: 'nombre', titulo: 'Nombre del archivo' },
-    { key: 'usuario', titulo: 'Subido por' },
-    { key: 'creacion', titulo: 'Fecha de Subido' },
-    { key: 'archivo', titulo: 'Abrir' },
-    { key: 'editar', titulo: 'Editar' },
-    { key: 'eliminar', titulo: 'Eliminar' },
-    
-  ]
-
   const [formData, setFormData] = useState({
       rol: "",
       usuarios: "",
@@ -267,10 +264,70 @@ const ArchivosScreen = () => {
   };
 
 
+  //editar un archivo
+
+  const [archivoAEditar, setArchivoAEditar] = useState(null);
+  const [editarArchivo, setEditarArchivo] = useState(false);
+  const openEditarArchivo = () => setEditarArchivo(true);
+  const closeEditarArchivo = () => setEditarArchivo(false);
+
+  const handleEditarArchivo = (archivo) => {
+    setArchivoAEditar(archivo);
+    setNombreArchivo(archivo.nombre);
+    setFechaVencimiento(new Date(archivo.vencimiento)); // Asegúrate que venga como string tipo "2025-08-04"
+    setFile(archivo.archivo); // solo para mostrar el nombre
+    openEditarArchivo();
+  };
+
+  const editarDocumento = async (id, datos) => {
+    const response = await fetch(`http://localhost:3000/documentos-locales/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(datos),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Error ${response.status}: ${errorText}`);
+    }
+
+    return await response.json();
+  };
+
+  const handleGuardarEdicion = async () => {
+    if (!nombreArchivo || !fechaVencimiento) {
+      setErrorMessage('Por favor, completa todos los campos.');
+      return;
+    }
+
+    const payload = getPayloadFromToken(token);
+    if (!payload) {
+      setErrorMessage('Token inválido.');
+      return;
+    }
+
+    const datosEditados = {
+      nombre: nombreArchivo,
+      usuario_id: payload.id,
+      local_id: localSeleccionado,
+      vencimiento: fechaVencimiento.toISOString().split('T')[0],
+    };
+
+    try {
+      await editarDocumento(archivoAEditar.id, datosEditados);
+      closeEditarArchivo();
+      window.location.reload(); // o actualiza tu estado si no querés recargar
+    } catch (error) {
+      console.error('Error al editar documento:', error);
+      setErrorMessage('Ocurrió un error al editar el documento.');
+    }
+  };
 
 
 
-  //Subir Nuevo archivo
 
 
   
@@ -383,23 +440,24 @@ const ArchivosScreen = () => {
           }
 
 
-           {/* Pop up para subir un archivo */}
+          {/* Pop up para editar un archivo */}
           {<Popup 
-            isOpen={false} 
-            onClose={closeNuevo}
-            title={'Subir nuevo archivo'}
+            isOpen={editarArchivo} 
+            onClose={closeEditarArchivo}
+            onClick={handleGuardarEdicion}
+            title={'Editar un archivo'}
           
           >
             <div className={styles.modalContenido}>
 
                   <IconoInput
-                  icono = {faPen}
-                  placeholder = {"Asignar nombre visible del archivo"}
-                  value = {nombreArchivo}
-                  onChange = {handleNombreArchivo}
-                  type = "text"
-                  error={!!errorMessage}
-                  name = ""
+                    icono = {faPen}
+                    placeholder = {"Asignar nombre visible del archivo"}
+                    value = {nombreArchivo}
+                    onChange = {handleNombreArchivo}
+                    type = "text"
+                    error={!!errorMessage}
+                    name = ""
                   
                   ></IconoInput>
 
@@ -412,17 +470,7 @@ const ArchivosScreen = () => {
                     error={!!errorMessage}
 
                   ></InputDates>
-               
-
-                  <InputFile
-                  icono = {faPen}
-                  placeholder = {"Nombre del archivo"}
-                  value = {file}
-                  accept=".pdf"
-                  onChange = {(file) => setArchivoPDF(file)}
-                  name = ""
-                  
-                  ></InputFile>
+              
 
                  
             </div>
@@ -430,9 +478,7 @@ const ArchivosScreen = () => {
           </Popup>
     
           }
-
-
-
+          <div className={styles.contenedorTablaArchivos}>
             <Table
               nameColumns={columnas}
               data={datosFiltrados}
@@ -440,11 +486,16 @@ const ArchivosScreen = () => {
                 setDocumentoAEliminar(item);
                 setAdvertencia(true);
               }}
-              
-            >
-            </Table>
 
-              {/* Pop up para subir un archivo */}
+              onEditarClick={(item) =>
+                handleEditarArchivo(item)
+              }
+              
+            
+            />
+          </div>
+
+          {/* Pop up para liminar un archivo */}
           {<Popup 
             isOpen={advertencia} 
             onClose={closeAdvertencia}

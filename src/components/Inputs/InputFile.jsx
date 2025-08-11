@@ -10,6 +10,7 @@ const InputFile = ({
     onChange,
     accept,
     error = false,
+    disabled=false,
 }) => {
 
     const [archivo, setArchivo] = useState(null);
@@ -71,7 +72,7 @@ const InputFile = ({
                     style={{ display: "none" }}
                     type= 'file'
                     name = {name}
-                    
+                    disabled = {disabled}
                     accept={accept}
                     onChange={handleInputChange}
                     placeholder= {placeholder}

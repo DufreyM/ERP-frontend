@@ -71,12 +71,13 @@
 .buttonCalendarDay{
     font-family: 'Segoe UI';
     position: relative;
+    display: flex;
     top:20px;
-    left: 40px;;
+    left: 40px;
     background-color: transparent;
     font-weight: bold;
     border-radius: 8px;
-    height: 30px;
+    height: auto;
     color: #5a60a5;
     border: 0;
     cursor: pointer;
@@ -251,30 +252,90 @@
 
 
 
-
-
 @media (max-width: 768px) {
-    
-    .calendarioyEventos {
+
+   
+    .contentLeft{
+        max-width: 25%;
+        min-width: 25%;
+        display: flex;
+        flex-direction: column;
+        border-radius: 20px;
+        padding:  10px 10px 10px 10px;
+        gap: 10px;
+        background-color: rgb(255, 255, 255);
+        margin-bottom: 15px;
+    }
+
+    .tituloyCalendario {
         width: 100%;
         display: flex;
         flex-direction: column;
-        gap: 15px;
-
+        padding: 0px;
+        margin-bottom: 15px;
+    
+    
     }
+    .pantallaCalendario{
+        position: relative;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        padding: 0;
+        margin: 0;
+    }
+
+
 
     .contenedorCalendario {
+        position: relative;
         width: 100%;
-    
-    
+        padding-top: 10px;
+        background-color: rgb(255, 255, 255);
+        height: auto;
     }
 
-    .contentLeft {
-
+    .contentLeft{
         max-width: 100%;
-        overflow-y: auto;
-        
+        display: flex;
+        flex-direction: column;
+        border-radius: 20px;
+        padding:  10px 10px 10px 10px;
+        gap: 10px;
+        background-color: #eceff7;
+        margin-bottom: 15px;
+
     }
+    .contentLeft2{
+        padding-left: 15px;
+        margin-right: 10px;
+        background-color: #eceff7;
+    }
+
+
+    .buttonCalendarDay{
+     
+        position: absolute;
+        display: flex;
+   
+        top: 9px;
+        left: 10px;
+        font-weight: bold;
+        border-radius: 8px;
+        height: 40px;
+        width: 40px;
+        align-items:start;
+        justify-content:left;
+      
+        z-index: 99;
+        cursor: pointer;
+        padding: 0;
+        margin: 0;
+
+    }
+
+
+
 
     
 }
