@@ -1,21 +1,19 @@
 import { useRef, useState,useEffect,   } from 'react';
-
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import esLocale from '@fullcalendar/core/locales/es';
 import { useOutletContext } from 'react-router-dom';
-import { faPen, faTag, faCalendar, faCalendarDay, faHourglassStart, faUser, faArrowLeft,faClipboardList, faAngleLeft, faAngleRight, faClock, faPlusCircle} from '@fortawesome/free-solid-svg-icons';
+import {faCalendarDay,  faArrowLeft, faAngleLeft, faAngleRight, faPlusCircle} from '@fortawesome/free-solid-svg-icons';
 import SimpleTitle from '../../components/Titles/SimpleTitle'
 import "./CalendarScreen.css"
 import { useFetch } from "../../utils/useFetch";
 import Popup from '../../components/Popup/Popup';
-import InputDates from '../../components/Inputs/InputDates';
-import IconoInput from '../../components/Inputs/InputIcono';
-import InputSelects from '../../components/Inputs/InputSelects';
-import { getOptions } from '../../utils/selects';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { getToken } from '../../services/authService';
 import EventoCard from './EventoCard/EventoCard';
+import { useOpcionsCalendarForm } from '../../hooks/Calendar/useOpcionsCalendarForm';
+import { useEventHandlers } from '../../hooks/Calendar/useEventHandlers';
+import { FormEvents } from './FormEvents/FormEvents';
 
 export const CalendarScreen= () =>{
 
@@ -33,6 +31,10 @@ export const CalendarScreen= () =>{
         return () => clearTimeout(timeout);
     }, [rightPanelCollapsed]);
 
+   const [key, setKey] = useState(0);  
+   const actualizar = () => setKey(prev => prev + 1);
+
+
 
     //Obtener datos de la base de datos
     const token = getToken();
@@ -40,11 +42,11 @@ export const CalendarScreen= () =>{
     const localSeleccionado = selectedLocal + 1 ;
     const url = `http://localhost:3000/api/calendario?local_id=${localSeleccionado}`;
 
-    const { data, loading, error } = useFetch(url, {
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
+    const { data, loading, error, refetch } = useFetch(url, {
+        headers: {'Authorization': `Bearer ${token}`}
     });
+
+    const eventos = Array.isArray(data) ? data : [];
 
 
     useEffect(() => {
@@ -56,9 +58,7 @@ export const CalendarScreen= () =>{
             extendedProps: {
                 descripcion: evento.detalles,
                 raw: evento, // opcional para editar después
-            }
-            }));
-
+            }}));
             setEvents(eventosConvertidos);
         }
     }, [data]);
@@ -67,36 +67,13 @@ export const CalendarScreen= () =>{
 
     //opciones de Tipo de recordatorio
     const [errorMessage, setErrorMessage] = useState('');
+    
     const [tipoRecordatorio, setTipoRecordatorio] = useState('');
-    const [opcionesTipoRecordatorio, setOpcionesTipoRecordatorio] = useState([]);
-    useEffect(() => {
-            getOptions("http://localhost:3000/api/calendario/tipos-evento", item => ({
-                value: item.id, //cambiar babosada aca
-                label: item.nombre,
-            })).then(setOpcionesTipoRecordatorio);
-    }, []);
-
-    //opciones de estado del recordatorio
     const [estadoRecordatorio, setEstadoRecordatorio] = useState('');
-    const [opcionesEstados, setOpcionesEstados] = useState([]);
-    useEffect(() => {
-            getOptions("http://localhost:3000/api/calendario/estados", item => ({
-                value: item.id,
-                label: item.nombre,
-            })).then(setOpcionesEstados);
-    
-        }, []);
-
-    //opciones de Visitadores medicos
     const [visitador, setVisitador] = useState('');
-    const [opcionesVisitadores, setOpcionesVisitadores] = useState([]);
-    useEffect(() => {
-            getOptions(`http://localhost:3000/api/visitadores-medicos/por-local/${localSeleccionado}`, item => ({
-                value: item.id,
-                label: `${item.nombre}`,
-            })).then(setOpcionesVisitadores);
-    
-        }, [localSeleccionado]);
+
+    const { opcionesTipoRecordatorio, opcionesEstados, opcionesVisitadores } = useOpcionsCalendarForm(localSeleccionado);
+
 
 
     //Variables de datos y formularios
@@ -167,18 +144,6 @@ export const CalendarScreen= () =>{
         }
     }, [tipoRecordatorio]);
 
-
-    function combinarFechaYHora(fecha, hora) {
-        if (!fecha || !hora) return null;
-
-        const [horaStr, minutoStr] = hora.split(':');
-        const fechaFinal = new Date(fecha);
-        fechaFinal.setHours(parseInt(horaStr), parseInt(minutoStr), 0, 0);
-        return fechaFinal.toISOString(); // formato ISO 8601
-
-    }
-
-
     //notificacion
     const [notificacion, setNotificacion] = useState('');
     useEffect(() => {
@@ -197,24 +162,27 @@ export const CalendarScreen= () =>{
     const openNuevoEvento = () => setNuevoEvento(true);
     const closeNuevoEvento = () => setNuevoEvento(false);
 
+     //Editar un evento
+    const [eventoAEditar, setEventoAEditar] = useState(null);
+    const [editarEvento, setEditarEvento] = useState(false);
+    const openEditarEvento = () => setEditarEvento(true);
+    const closeEditarEvento = () => setEditarEvento(false);
 
-    const crearEvento = async (token, datosEvento) => {
-        const response = await fetch('http://localhost:3000/api/calendario', {
-            method: 'POST',
-            headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(datosEvento)
-        });
+    //eliminar un evento
+    const [eliminarEvento, setEliminarEvento] = useState(false);
+    const openEliminarEvento = () => setEliminarEvento(true);
+    const closeEliminarEvento = () => setEliminarEvento(false);
+    const [eventoAEliminar, setEventoAEliminar] = useState(null);
 
-        if (!response.ok) {
-            const mensaje = await response.text(); // para depurar errores de backend
-            throw new Error(`Error ${response.status}: ${mensaje}`);
-        }
+    //Obtener estas funciones desde useEventsHandlers (hooks/calendar/useEvents)
+    const { combinarFechaYHora, obtenerHoraDesdeFecha, crearEvento, actualizarEvento, HandleEliminarEvento } = useEventHandlers({
+        token,
+        localId: localSeleccionado,
+        onSuccess: (msg) => setNotificacion(msg),
+        onError: (msg) => setErrorMessage(msg),
+        removeEventFromState: (id) => setEvents(prev => prev.filter(e => e.id !== id))
+    });
 
-        return await response.json();
-    };
 
     const handleCrearEvento = async () => {
         setErrorMessage('');
@@ -228,9 +196,7 @@ export const CalendarScreen= () =>{
             return;
         }
 
-        const tokenActual = token; // Reemplaza con el real
         const fechaISO = combinarFechaYHora(fechaEvento, horaEvento);
-
         const datosEvento = {
             titulo: nombreEvento,
             tipo_evento_id: parseInt(tipoRecordatorio, 10),
@@ -240,37 +206,22 @@ export const CalendarScreen= () =>{
             detalles: descripcion,
             local_id: localSeleccionado
         };
+
         console.log('estoy mandando:', datosEvento);
 
         try {
-            const respuesta = await crearEvento(tokenActual, datosEvento);
+            const respuesta = await crearEvento(datosEvento);
             closeNuevoEvento();
             setNotificacion('Evento creado con éxito');
             console.log('Evento creado:', respuesta);
+            await refetch();
+            actualizar()
             // Puedes cerrar el modal o mostrar una notificación aquí
         } catch (error) {
             console.error('Error al crear evento:', error);
             setErrorMessage('Ocurrió un error al crear el evento. Intenta nuevamente.');
         }
     };
-
-
-    //Editar un evento
-    const [eventoAEditar, setEventoAEditar] = useState(null);
-    const [editarEvento, setEditarEvento] = useState(false);
-    const openEditarEvento = () => setEditarEvento(true);
-    const closeEditarEvento = () => setEditarEvento(false);
-
-    function obtenerHoraDesdeFecha(fechaISO) {
-        if (!fechaISO) return '';
-
-        const fecha = new Date(fechaISO);
-        const horas = fecha.getHours().toString().padStart(2, '0');
-        const minutos = fecha.getMinutes().toString().padStart(2, '0');
-
-        return `${horas}:${minutos}`;
-    }
-
 
     const cargarDatosEventoEnFormulario = (evento) => {
         const tipoId = evento.tipo_evento_id?.toString();
@@ -289,33 +240,12 @@ export const CalendarScreen= () =>{
             } else {
                 setSelectVisitadores(false);
             }
-        }, 0); // incluso con 0ms ya es suficiente
-    };
-
-
-    const actualizarEvento = async (idEvento, token, datosActualizados) => {
-        const response = await fetch(`http://localhost:3000/api/calendario/${idEvento}`, {
-            method: 'PUT',
-            headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(datosActualizados)
-        });
-
-        if (!response.ok) {
-            const mensaje = await response.text();
-            throw new Error(`Error ${response.status}: ${mensaje}`);
-        }
-
-        return await response.json();
+        }, 0); 
     };
 
     const handleEditarEvento = async () => {
         if (!eventoAEditar) return;
         const fechaISO = combinarFechaYHora(fechaEvento, horaEvento);
-
-        const tokenActual = token;
 
         const datos = {
             titulo: nombreEvento,
@@ -326,66 +256,39 @@ export const CalendarScreen= () =>{
             detalles: descripcion
         };
 
-
         try {
-            const respuesta = await actualizarEvento(eventoAEditar, tokenActual, datos);
+            const respuesta = await actualizarEvento(eventoAEditar, datos);
             console.log("Evento actualizado:", respuesta);
             setNotificacion("Evento actualizado con éxito");
             closeEditarEvento();
+            await refetch();
+            setSelectedEvent(null); 
         } catch (error) {
             console.error("Error al actualizar evento:", error);
             setErrorMessage("No se pudo actualizar el evento.");
         }
     };
 
-    //eliminar un evento
-    const [eliminarEvento, setEliminarEvento] = useState(false);
-    const openEliminarEvento = () => setEliminarEvento(true);
-    const closeEliminarEvento = () => setEliminarEvento(false);
-    const [eventoAEliminar, setEventoAEliminar] = useState(null);
-
-    const HandleEliminarEvento = async () => {
-    if (!eventoAEliminar) {
-        console.log("No se ha seleccionado un evento para eliminar.");
-        return; // Asegurarse de que haya un evento seleccionado
-    }
-
-    const token = getToken(); // Asegúrate de obtener el token correctamente
-
-    try {
-      
-        const response = await fetch(`http://localhost:3000/api/calendario/${eventoAEliminar}/marcar-eliminado`, {
-            method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (!response.ok) {
-            const mensaje = await response.text();
-            throw new Error(`Error ${response.status}: ${mensaje}`);
-        }
-
-        // Eliminar el evento del estado
-        setEvents((prevEvents) => prevEvents.filter((evento) => evento.id !== eventoAEliminar));
-
-        setNotificacion("Evento eliminado con éxito");
-        closeEliminarEvento(); // Cerrar el modal
-    } catch (error) {
-        setErrorMessage(`No se pudo eliminar el evento. ${error.message}`);
-    }
-};
-
-    const onDeleteEvent = (eventoId) => {
-        if (!eventoId) {
-            console.error("No se proporcionó un ID de evento válido.");
-            return; // Salir si no hay ID válido
-        }
-
-        setEventoAEliminar(eventoId); // Guardar el ID del evento a eliminar
-        openEliminarEvento(); // Abrir el pop-up para confirmar
+    
+    const handleEliminarYCerrar = async () => {
+        await HandleEliminarEvento(eventoAEliminar); 
+        closeEliminarEvento();   
+        await refetch();       
+        actualizar();    
+        setSelectedEvent(null);      
     };
+
+    const onDeleteEvent = (id) => {
+        const parsedId = parseInt(id, 10);
+        if (!parsedId || isNaN(parsedId)) {
+            console.error("No se proporcionó un ID de evento válido:", id);
+            return;
+        }
+
+        setEventoAEliminar(parsedId); // ✅ ID numérico
+        openEliminarEvento();
+    };
+
 
     const obtenerDiaHoy = () => {
         const hoy = new Date(); // Obtén la fecha de hoy
@@ -393,10 +296,6 @@ export const CalendarScreen= () =>{
         const fechaFormateada = hoy.toLocaleDateString('es-ES', opciones); // 'es-ES' para español
         return fechaFormateada.charAt(0).toUpperCase() + fechaFormateada.slice(1); // Capitalizar la primera letra
     }
-
-    const handleVolver = () => {
-        setSelectedEvent(null); // Volver al listado
-    };
 
     const renderEventContent = (eventInfo) => {
         const tipoEventoId = eventInfo.event.extendedProps?.raw?.tipo_evento_id;
@@ -413,31 +312,12 @@ export const CalendarScreen= () =>{
     };
 
 
-
-
     const [selectedEvent, setSelectedEvent] = useState(null);
-
-
     const handlePrev = () => calendarRef.current.getApi().prev();
     const handleNext = () => calendarRef.current.getApi().next();
     const handleToday = () => calendarRef.current.getApi().today();
 
     const [events, setEvents] = useState([]);
-
-
-
-    if (loading) {
-        return <div>Cargando eventos...</div>;
-    }
-
-    if (error) {
-        return <div>Error al cargar los eventos: {error.message}</div>;
-    }
-
-    if (!data || data.length === 0) {
-        return <div>No hay eventos disponibles.</div>;
-    }
-
 
     //detalles esteticos
     const hoy = new Date();
@@ -446,24 +326,21 @@ export const CalendarScreen= () =>{
     const finSemana = new Date(hoy);
     finSemana.setDate(hoy.getDate() + 6);
 
-    const eventosDeHoy = data.filter(evento => {
+    const eventosDeHoy = eventos.filter(evento => {
         const fechaEvento = new Date(evento.fecha);
         fechaEvento.setHours(0, 0, 0, 0);
         return fechaEvento.getTime() === hoy.getTime();
     });
 
-    const eventosDeLaSemana = data.filter(evento => {
+    const eventosDeLaSemana = eventos.filter(evento => {
         const fechaEvento = new Date(evento.fecha);
         fechaEvento.setHours(0, 0, 0, 0);
         return fechaEvento > hoy && fechaEvento <= finSemana;
     });
 
-
-
-
   return (
     
-    <div className='pantallaCalendario'>
+    <div className='pantallaCalendario' key = {key}>
         {notificacion && (
             <div className="toast">
                 {notificacion}
@@ -482,23 +359,20 @@ export const CalendarScreen= () =>{
             </div>
 
 
-            <div className='allTitle'>
-
-                
+            <div className='allTitle'>     
                 <div className='encabezadoMesStyle'>
                     <button className= 'buttonCalendarRow' onClick={handlePrev}>
                         <FontAwesomeIcon icon = {faAngleLeft} style={{fontSize: '25px'}}/>
                     </button>
+
                     <h3 className='tituloMes'>{currentTitle}</h3>
+
                     <button className= 'buttonCalendarRow'onClick={handleNext}>
                         <FontAwesomeIcon icon = {faAngleRight} style={{fontSize: '25px'}}/>
                     </button>
                 
                 </div>
-                
             </div>
-            
-
 
             <div className='contenedorCalendario' >
                 <FullCalendar
@@ -511,170 +385,154 @@ export const CalendarScreen= () =>{
                     plugins={[ dayGridPlugin ]}
                     initialView="dayGridMonth"
                     weekends={true}                               
-                    eventClick={(info) => {
-                        setSelectedEvent(info.event);
-                    }}
+                    eventClick={(info) => { setSelectedEvent(info.event);}}
                     events = {events}  
                     eventContent={renderEventContent}
-                
                 />  
             </div>
-
-            
         </div>
-
-
-
-        
-            
+  
 
         <div className='contentLeft'>
             <div className='contentLeft2'>
+                <div className='divbuttons'>
+                    <button className= 'buttontitletoday' onClick={handleToday}>
+                        <h2 className='diaHoy'>{obtenerDiaHoy()}</h2>
+                    </button>
 
-            <div className='divbuttons'>
-
-                <button className= 'buttontitletoday' onClick={handleToday}>
-                     <h2 className='diaHoy'>{obtenerDiaHoy()}</h2>
-                </button>
-
-               
-                <button className= 'buttonCalendarRow' onClick={openNuevoEvento}>
-                    <FontAwesomeIcon icon = {faPlusCircle} style={{fontSize: '25px'}}/>
-                </button>
-            </div>
+                
+                    <button className= 'buttonCalendarRow' onClick={openNuevoEvento}>
+                        <FontAwesomeIcon icon = {faPlusCircle} style={{fontSize: '25px'}}/>
+                    </button>
+                </div>
             
 
             
             <div className='descripcionStyle'>
                 
-            <div className='event-details'>
-                {selectedEvent ? (
-                    <>
-                        <h4 className="subtitulo">Evento:</h4>
-                        <div className = 'Eventos' key={selectedEvent.id}>
-                            <EventoCard
-                                key={selectedEvent.id}
-                                id={selectedEvent.id}
-                                title={selectedEvent.title}
-                                descripcion={selectedEvent.extendedProps.descripcion}
-                                date={selectedEvent.start}
-                                estado={selectedEvent.extendedProps.raw?.estado?.nombre}
-                                tipo={
-                                    opcionesTipoRecordatorio.find(
-                                        tipo => tipo.value === selectedEvent.extendedProps.raw?.tipo_evento_id
-                                    )?.label || null
-                                }
-                                visitador={
-                                    opcionesVisitadores.find(
-                                        v => v.value === selectedEvent.extendedProps.raw?.visitador_id
-                                    )?.label || null
-                                }
-                                onEdit={() => {
-                                    cargarDatosEventoEnFormulario(selectedEvent.extendedProps.raw);
-                                    setEventoAEditar(selectedEvent.id);
-                                    openEditarEvento();
-                                }}
-                                onDelete={() => onDeleteEvent(selectedEvent.id)}
-                                expandirInicial={true} // se muestra ya desplegado
-                            />
-                        </div>
-                        <button className='buttonCalendarRow' onClick={() => setSelectedEvent(null)}>
-                            <FontAwesomeIcon icon={faArrowLeft} /> Volver
-                        </button>
+                <div className='event-details'>
+                    {
+                        loading ? ( <div>Cargando eventos...</div>) 
+                        : error ? ( <div>Error al cargar los eventos: {error.message}</div> ) 
+                        : selectedEvent ? (
+                            <>
+                                <h4 className="subtitulo">Evento:</h4>
+                                <div className = 'Eventos' key={selectedEvent.id}>
+                                    {console.log(selectedEvent.id) 
+                                   
+                                    }
+                                    <EventoCard
+                                        key={selectedEvent.id}
+                                        id={selectedEvent.id}
+                                        title={selectedEvent.title}
+                                        descripcion={selectedEvent.extendedProps.descripcion}
+                                        date={selectedEvent.start}
+                                        estado={selectedEvent.extendedProps.raw?.estado?.nombre}
+                                        tipo={opcionesTipoRecordatorio.find(
+                                                tipo => tipo.value === selectedEvent.extendedProps.raw?.tipo_evento_id
+                                            )?.label || null
+                                        }
+                                        visitador={opcionesVisitadores.find(
+                                                v => v.value === selectedEvent.extendedProps.raw?.visitador_id
+                                            )?.label || null
+                                        }
+                                        onEdit={() => {
+                                            cargarDatosEventoEnFormulario(selectedEvent.extendedProps.raw);
+                                            setEventoAEditar(selectedEvent.id);
+                                            openEditarEvento();
+                                        }}
+                                        
+                                        
+                                        onDelete={() => onDeleteEvent(selectedEvent.id)}
+                                        expandirInicial={true} // se muestra ya desplegado
+                                    />
+                                </div>
+                                <button className='buttonCalendarRow' onClick={() => setSelectedEvent(null)}>
+                                    <FontAwesomeIcon icon={faArrowLeft} /> Volver
+                                </button>
                             
-                      
-                    </>
-                ) : (
-                <>
-                    
-                    <h4 className="subtitulo">Eventos de hoy</h4>
-                    {eventosDeHoy.length > 0 ? (
-                        eventosDeHoy.map((evento) => {
-                            const tipoEvento = opcionesTipoRecordatorio.find(tipo => tipo.value === evento.tipo_evento_id)?.label || null;
-                            const nombreVisitador = opcionesVisitadores.find(visitador => visitador.value === evento.visitador_id)?.label || null;
-                            return (
-                                <div className = 'Eventos'>
-                                <EventoCard
-                                    key={evento.id}
-                                    id={evento.id}
-                                    title={evento.titulo}
-                                    descripcion={evento.detalles}
-                                    date={evento.fecha}
-                                    estado={evento.estado?.nombre}
-                                    tipo={tipoEvento}
-                                    local={evento.local}
-                                    usuario={evento.usuario}
-                                    visitador={nombreVisitador}
-                                    onEdit={() => {
-                                        cargarDatosEventoEnFormulario(evento);
-                                        setEventoAEditar(evento.id);
-                                        openEditarEvento();
-                                    }}
-                                    onDelete={() => onDeleteEvent(evento.id)}
-                                />
-                                </div>
-                            );
-                        })
-                    ) : (
-                        <p style={{color:"#5a60A5"}}>No hay eventos para hoy.</p>
-                    )}
+                            </>
+                        ) : (
+                            <>
+                                <h4 className="subtitulo">Eventos de hoy</h4>
 
-                    <h4 className="subtitulo">Resto de la semana</h4>
-                    {eventosDeLaSemana.length > 0 ? (
-                        eventosDeLaSemana.map((evento) => {
-                            const tipoEvento = opcionesTipoRecordatorio.find(tipo => tipo.value === evento.tipo_evento_id)?.label || null;
-                            const nombreVisitador = opcionesVisitadores.find(visitador => visitador.value === evento.visitador_id)?.label || null;
-                            return (
-                                <div className = 'Eventos'>
-                                <EventoCard
-                                    key={evento.id}
-                                    id={evento.id}
-                                    title={evento.titulo}
-                                    descripcion={evento.detalles}
-                                    date={evento.fecha}
-                                    estado={evento.estado?.nombre}
-                                    tipo={tipoEvento}
-                                    local={evento.local}
-                                    usuario={evento.usuario}
-                                    visitador={nombreVisitador}
-                                    onEdit={() => {
-                                        cargarDatosEventoEnFormulario(evento);
-                                        setEventoAEditar(evento.id);
-                                        openEditarEvento();
-                                    }}
-                                    onDelete={() => onDeleteEvent(evento.id)}
-                                />
-                                </div>
-                            );
-                        })
-                    ) : (
-                        <p style={{color:"#5a60A5"}}>No hay más eventos esta semana.</p>
-                    )}
-                </>
-            )}
+                                {eventosDeHoy.length > 0 ? (
+                                    eventosDeHoy.map((evento) => {
+                                        const tipoEvento = opcionesTipoRecordatorio.find(tipo => tipo.value === evento.tipo_evento_id)?.label || null;
+                                        const nombreVisitador = opcionesVisitadores.find(visitador => visitador.value === evento.visitador_id)?.label || null;
+                                        return (
+                                            <div className = 'Eventos'>
+                                                <EventoCard
+                                                    key={evento.id}
+                                                    id={evento.id}
+                                                    title={evento.titulo}
+                                                    descripcion={evento.detalles}
+                                                    date={evento.fecha}
+                                                    estado={evento.estado?.nombre}
+                                                    tipo={tipoEvento}
+                                                    local={evento.local}
+                                                    usuario={evento.usuario}
+                                                    visitador={nombreVisitador}
+                                                    onEdit={() => {
+                                                        cargarDatosEventoEnFormulario(evento);
+                                                        setEventoAEditar(evento.id);
+                                                        openEditarEvento();
+                                                    }}
+                                                    onDelete={() => onDeleteEvent(evento.id)}
+                                                />
+                                            </div>
+                                        );
+                                    })
 
-                   
+                                ) : (
+                                    <p style={{color:"#5a60A5"}}>No hay eventos para hoy.</p>
+                                )}
 
-
-
-             
-
-
-            </div>
+                                <h4 className="subtitulo">Resto de la semana</h4>
+                                    {eventosDeLaSemana.length > 0 ? ( 
+                                        eventosDeLaSemana.map((evento) => {
+                                            const tipoEvento = opcionesTipoRecordatorio.find(tipo => tipo.value === evento.tipo_evento_id)?.label || null;
+                                            const nombreVisitador = opcionesVisitadores.find(visitador => visitador.value === evento.visitador_id)?.label || null;
+                                            return (
+                                                <div className = 'Eventos'>
+                                                    <EventoCard
+                                                        key={evento.id}
+                                                        id={evento.id}
+                                                        title={evento.titulo}
+                                                        descripcion={evento.detalles}
+                                                        date={evento.fecha}
+                                                        estado={evento.estado?.nombre}
+                                                        tipo={tipoEvento}
+                                                        local={evento.local}
+                                                        usuario={evento.usuario}
+                                                        visitador={nombreVisitador}
+                                                        onEdit={() => {
+                                                            cargarDatosEventoEnFormulario(evento);
+                                                            setEventoAEditar(evento.id);
+                                                            openEditarEvento();
+                                                        }}
+                                                        onDelete={() => onDeleteEvent(evento.id)}
+                                                    />
+                                                </div>
+                                            );
+                                        }
+                                    )
+                                ) : (
+                                    <p style={{color:"#5a60A5"}}>No hay más eventos esta semana.</p>
+                                )}
+                            </>
+                        )}
+                </div>
             </div>
         </div>            
     </div>
       
 
-        
         {/* Pop up para un nuevo evento*/}
-            {<Popup 
-       
-                isOpen={eliminarEvento} 
-                onClose={closeEliminarEvento}
-                title={'Eliminar un recordatorio'}
-                onClick={HandleEliminarEvento}
-            
+        {
+            <Popup 
+            isOpen={eliminarEvento} title={'Eliminar un recordatorio'}
+            onClose={closeEliminarEvento} onClick={handleEliminarYCerrar}
             >
                 <div className='modalContenido'>
                     {errorMessage && (
@@ -683,201 +541,71 @@ export const CalendarScreen= () =>{
                 </div>
 
             </Popup>
-        
-            }
-
-
+        }
 
 
         {/* Pop up para un nuevo evento*/}
-            {<Popup 
-            key={selectVisitadores}
-                isOpen={nuevoEvento} 
-                onClose={closeNuevoEvento}
-                title={'Crear un nuevo recordatorio'}
-                onClick={handleCrearEvento}
-            
+        {
+            <Popup 
+                key={selectVisitadores} isOpen={nuevoEvento}  title={'Crear un nuevo recordatorio'} 
+                onClose={closeNuevoEvento} onClick={handleCrearEvento}
             >
                 <div className='modalContenido'>
-
-                    <IconoInput
-                        icono = {faPen}
-                        placeholder = {"Nombre del recordatorio"}
-                        value = {nombreEvento}
-                        onChange = {handleNombreEvento}
-                        type = "text"
-                        error={!!errorMessage}
-                        name = ""
-                    
-                    ></IconoInput>
-
-
-                    <InputSelects
-                        icono = {faTag}
-                        placeholder = {"Seleccione el tipo de recordatorio"}
-                        value = {tipoRecordatorio}
-                        opcions = {opcionesTipoRecordatorio}
-                        onChange = {handleTipoEvento}
-                        type = "text"
-                        name = ""
-                        error={!!errorMessage}
+                    <FormEvents
+                        nombreEvento = {nombreEvento}
+                        handleNombreEvento = {handleNombreEvento}
+                        tipoRecordatorio = {tipoRecordatorio}
+                        opcionesTipoRecordatorio = {opcionesTipoRecordatorio}
+                        handleTipoEvento = {handleTipoEvento}
+                        selectVisitadores = {selectVisitadores}
+                        visitador = {visitador}
+                        handleVisitador = {handleVisitador}
+                        opcionesVisitadores = {opcionesVisitadores}
+                        handleDate = {handleDate}
+                        fechaEvento = {fechaEvento}
+                        horaEvento = {horaEvento}
+                        handleHoraEvento = {handleHoraEvento}
+                        descripcion = {descripcion}
+                        handleDescripcion = {handleDescripcion}
+                        errorMessage = {errorMessage}                
                     />
-                    
-                    {/* solo se muestra si es seleccionado */}
-                    {selectVisitadores && (
-                        <InputSelects
-                            icono = {faUser}
-                            placeholder = {"Seleccione el visitador medico"}
-                            value = {visitador}
-                            onChange = {handleVisitador}
-                            type = "text"        
-                            name = ""
-                            error={!!errorMessage}
-                            opcions = {opcionesVisitadores}
-                        />
-                    )}
-                        
-                    <InputDates
-                        icono = {faCalendar}
-                        placeholder = {"Fecha del recordatorio"}
-                        onChange = {handleDate}
-                        selected = {fechaEvento}
-                        minDate={new Date()}
-                        error={!!errorMessage}
-                    ></InputDates>
-
-                    <IconoInput
-                        icono = {faClock}
-                        placeholder = {"Seleccione la hora"}
-                        value = {horaEvento}
-                        onChange = {handleHoraEvento}
-                        type = "time"
-                        error={!!errorMessage}
-                        name = ""
-                    
-                    ></IconoInput>
-
-                    <IconoInput
-                        icono = {faClipboardList}
-                        placeholder = {"Agregar descripción"}
-                        value = {descripcion}
-                        onChange = {handleDescripcion}
-                        type = "text"
-                        name = ""
-                        error={!!errorMessage}
-                    ></IconoInput>
-
-                    {errorMessage && (
-                        <p style={{ color: 'red', marginTop: '10px' }}>{errorMessage}</p>
-                    )}
-  
-                    
-                    
                 </div>
-
             </Popup>
-        
-            }
+        }
 
             
-        {/* Pop up para editar unevento*/}
-            {<Popup 
-
-                isOpen={editarEvento} 
-                onClose={closeEditarEvento}
-                onClick={handleEditarEvento}
-                title={'Editar un recordatorio'}
-            
+        {/* Pop up para editar un evento*/}
+        {
+            <Popup 
+                isOpen={editarEvento} title={'Editar un recordatorio'}
+                onClose={closeEditarEvento} onClick={handleEditarEvento}
             >
                 <div className='modalContenido'>
-
-                    <IconoInput
-                        icono = {faPen}
-                        placeholder = {"Nombre del recordatorio"}
-                        value = {nombreEvento}
-                        onChange = {handleNombreEvento}
-                        type = "text"
-                        error={!!errorMessage}
-                        
-                        name = ""
-                    
-                    ></IconoInput>
-
-
-                    <InputSelects
-                        icono = {faTag}
-                        placeholder = {"Seleccione el tipo de recordatorio"}
-                        value = {tipoRecordatorio}
-                        opcions = {opcionesTipoRecordatorio}
-                        onChange = {handleTipoEvento}
-                        type = "text"
-                        name = ""
-                        error={!!errorMessage}
-                    />
-
-
-                     <InputSelects
-                        icono = {faHourglassStart}
-                        placeholder = {"Seleccione el estado del recordatorio"}
-                        value = {estadoRecordatorio}
-                        onChange = {handleEstadoEvento}
-                        type = "text"
-                        name = ""
-                        error={!!errorMessage}
-                        opcions = {opcionesEstados}
-                    />
-                    
-                    {/* solo se muestra si es seleccionado */}
-                    {selectVisitadores && (
-                        <InputSelects
-                            icono = {faUser}
-                            placeholder = {"Seleccione el visitador medico"}
-                            value = {visitador}
-                            onChange = {handleVisitador}
-                            type = "text"        
-                            name = ""
-                            error={!!errorMessage}
-                            opcions = {opcionesVisitadores}
-                        />
-                    )}
-                        
-                    <InputDates
-                        icono = {faCalendar}
-                        placeholder = {"Fecha del recordatorio"}
-                        onChange = {handleDate}
-                        selected = {fechaEvento}
-                        minDate={new Date()}
-                        error={!!errorMessage}
-                    ></InputDates>
-
-                    <IconoInput
-                        icono = {faClock}
-                        placeholder = {"Seleccione la hora"}
-                        value = {horaEvento}
-                        onChange = {handleHoraEvento}
-                        type = "time"
-                        error={!!errorMessage}
-                        name = ""
-                    
-                    ></IconoInput>
-
-                    <IconoInput
-                        icono = {faClipboardList}
-                        placeholder = {"Agregar descripción"}
-                        value = {descripcion}
-                        onChange = {handleDescripcion}
-                        type = "text"
-                        name = ""
-                        error={!!errorMessage}
-                    ></IconoInput>
-  
-                    
-                    
+                    <FormEvents
+                        edit = {true}
+                        nombreEvento = {nombreEvento}
+                        handleNombreEvento = {handleNombreEvento}
+                        tipoRecordatorio = {tipoRecordatorio}
+                        opcionesTipoRecordatorio = {opcionesTipoRecordatorio}
+                        handleTipoEvento = {handleTipoEvento}
+                        selectVisitadores = {selectVisitadores}
+                        visitador = {visitador}
+                        handleVisitador = {handleVisitador}
+                        opcionesVisitadores = {opcionesVisitadores}
+                        handleDate = {handleDate}
+                        fechaEvento = {fechaEvento}
+                        horaEvento = {horaEvento}
+                        handleHoraEvento = {handleHoraEvento}
+                        descripcion = {descripcion}
+                        handleDescripcion = {handleDescripcion}
+                        estadoRecordatorio = {estadoRecordatorio}
+                        opcionesEstados = {opcionesEstados}
+                        handleEstadoEvento = {handleEstadoEvento}
+                        errorMessage = {errorMessage}
+                    />                    
                 </div>
-
             </Popup>
-        
-            }
+        }
     </div>
   )
 }
