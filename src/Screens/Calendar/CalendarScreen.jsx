@@ -1,3 +1,13 @@
+/*Calendar Screen
+Es el botón que tiene una pregunta y generalmente redirecciona -> ¿eres visitador médico? ingresa
+El estilo se encuentra en el archivo CalendarScreen.css (no utiliza module ya que la librería del calendario no la acepta)
+Depende de muchos archivos
+Atributos:
+  ninguno
+Autor: Melisa 
+Ultima modificación: 17/8/2025 
+*/
+
 import { useRef, useState,useEffect,   } from 'react';
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
@@ -16,12 +26,10 @@ import { useEventHandlers } from '../../hooks/Calendar/useEventHandlers';
 import { FormEvents } from './FormEvents/FormEvents';
 
 export const CalendarScreen= () =>{
-
-    //crear el calendario y manejar su adaptabilidad al tamaño
-    const { rightPanelCollapsed } = useOutletContext();
+    //crear el calendario y manejar su adaptabilidad al tamaño ya que no se renderiza con la barra de notificaciones.
+    const { rightPanelCollapsed } = useOutletContext();             
     const [currentTitle, setCurrentTitle] = useState('');
     const calendarRef = useRef(null);
-    
     useEffect(() => {
         const timeout = setTimeout(() => {
             const api = calendarRef.current?.getApi();
@@ -31,70 +39,58 @@ export const CalendarScreen= () =>{
         return () => clearTimeout(timeout);
     }, [rightPanelCollapsed]);
 
-   const [key, setKey] = useState(0);  
-   const actualizar = () => setKey(prev => prev + 1);
-
-
+    //Variables para forzar el renderizado de la pagina en caso sea necesario
+    const [key, setKey] = useState(0);  
+    const actualizar = () => setKey(prev => prev + 1);
 
     //Obtener datos de la base de datos
-    const token = getToken();
-    const { selectedLocal } = useOutletContext();
-    const localSeleccionado = selectedLocal + 1 ;
-    const url = `http://localhost:3000/api/calendario?local_id=${localSeleccionado}`;
+    const token = getToken();                       //Se solicita el tocken del inicio de sesión ya que es solicitado en el fetch
+    const { selectedLocal } = useOutletContext();   //Se llama al contexto (En qué local se está)
+    const localSeleccionado = selectedLocal + 1 ;   //Se suma 1 ya que el indice empieza en 0, pero en la base de datos comienza con 1
+    const url = `http://localhost:3000/api/calendario?local_id=${localSeleccionado}`;   //url para los eventos dependiendo del local
 
+    //Se llama a traer la función useFetch (utils/useFetch) que retorna la carga de datos, y existe la opción de forzar un refetch manual en caso de modificaciones a los eventos.
     const { data, loading, error, refetch } = useFetch(url, {
         headers: {'Authorization': `Bearer ${token}`}
     });
 
-    const eventos = Array.isArray(data) ? data : [];
+    const eventos = Array.isArray(data) ? data : [];    //Se guardan los datos en un array
 
-
-    useEffect(() => {
+    useEffect(() => {         //Se llenan con los datos necesarios
         if (data) {
             const eventosConvertidos = data.map(evento => ({
-            id: evento.id,
-            title: evento.titulo,
-            start: evento.fecha,
-            extendedProps: {
-                descripcion: evento.detalles,
-                raw: evento, // opcional para editar después
-            }}));
+                id: evento.id,
+                title: evento.titulo,
+                start: evento.fecha,
+                extendedProps: {
+                    descripcion: evento.detalles,
+                    raw: evento, // opcional para editar después
+                }
+            }));
             setEvents(eventosConvertidos);
         }
     }, [data]);
 
-
-
-    //opciones de Tipo de recordatorio
+    //estado que maneja y muestra errores
     const [errorMessage, setErrorMessage] = useState('');
-    
-    const [tipoRecordatorio, setTipoRecordatorio] = useState('');
-    const [estadoRecordatorio, setEstadoRecordatorio] = useState('');
-    const [visitador, setVisitador] = useState('');
 
+    //Se manda a llamar las siguientes funciones para extraer las opciones disponibles para mostrar en los 3 selects del formulario
+    //Se llaman de useOpcionsCalendarForm (hooks/calendar/useOpcionsCalendarForm) se manda el local, ya que visitadores manda respuestas distintas dependiendo el local
     const { opcionesTipoRecordatorio, opcionesEstados, opcionesVisitadores } = useOpcionsCalendarForm(localSeleccionado);
-
-
 
     //Variables de datos y formularios
     const [nombreEvento, setNombreEvento] = useState('');
     const [fechaEvento, setFechaEvento] = useState(null);
     const [horaEvento, setHoraEvento] = useState('');
     const [descripcion, setDescripcion] = useState('');
+    const [tipoRecordatorio, setTipoRecordatorio] = useState('');
+    const [estadoRecordatorio, setEstadoRecordatorio] = useState('');
+    const [visitador, setVisitador] = useState('');
 
+    //handles para manejar la información de cada Input
     const handleNombreEvento = (e) => {
         setNombreEvento(e.target.value);
         setErrorMessage('');
-    };
-
-    const handleHoraEvento = (e) => {
-        const value = e.target.value;
-
-        setHoraEvento(e.target.value);
-         if (/^\d{0,2}(:\d{0,2})?$/.test(value)) {
-            setHoraEvento(value);
-            setErrorMessage('');
-        }
     };
 
     const handleDescripcion = (e) => {
@@ -117,8 +113,16 @@ export const CalendarScreen= () =>{
         setErrorMessage('');
     };
 
+    const handleHoraEvento = (e) => { //en base de datos se espera un datetime, por lo que se separa en inputs de date y time
+        const value = e.target.value;
+        setHoraEvento(e.target.value);
+         if (/^\d{0,2}(:\d{0,2})?$/.test(value)) {
+            setHoraEvento(value);
+            setErrorMessage('');
+        }
+    };
+
     const handleDate = (date) => {
-        
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const selectedDate = new Date(date);
@@ -133,18 +137,16 @@ export const CalendarScreen= () =>{
     
     };
 
-
-    //activar el select de visitadores medicos si se selecciona esa opcion
+    //activar el select de visitadores medicos si se selecciona esa opcion (en tipo de evento)
     const [selectVisitadores, setSelectVisitadores] = useState(false);
     useEffect(() => {
         const newState = tipoRecordatorio === "1";
-
         if (selectVisitadores !== newState) {
             setSelectVisitadores(newState); 
         }
     }, [tipoRecordatorio]);
 
-    //notificacion
+    //Maneja las noticiaciones de creación eliminación o edición de un estado
     const [notificacion, setNotificacion] = useState('');
     useEffect(() => {
         if (notificacion) {
@@ -156,23 +158,22 @@ export const CalendarScreen= () =>{
         }
     }, [notificacion]);
 
-
-    //popUp Nuevo evento
+    //Nuevo evento (incluye el manejo del popUp)
     const [nuevoEvento, setNuevoEvento] = useState(false);
-    const openNuevoEvento = () => setNuevoEvento(true);
-    const closeNuevoEvento = () => setNuevoEvento(false);
+    const openNuevoEvento = () => {limpiarFormulario(); setNuevoEvento(true)};
+    const closeNuevoEvento = () => {setNuevoEvento(false); setErrorMessage('');};
 
-     //Editar un evento
+    //Editar un evento (incluye el manejo del popUp)
     const [eventoAEditar, setEventoAEditar] = useState(null);
     const [editarEvento, setEditarEvento] = useState(false);
     const openEditarEvento = () => setEditarEvento(true);
-    const closeEditarEvento = () => setEditarEvento(false);
+    const closeEditarEvento = () => {setEditarEvento(false); setErrorMessage('');};
 
-    //eliminar un evento
+    //eliminar un evento (incluye el manejo del popUp)
     const [eliminarEvento, setEliminarEvento] = useState(false);
-    const openEliminarEvento = () => setEliminarEvento(true);
-    const closeEliminarEvento = () => setEliminarEvento(false);
     const [eventoAEliminar, setEventoAEliminar] = useState(null);
+    const openEliminarEvento = () => setEliminarEvento(true);
+    const closeEliminarEvento = () => {setErrorMessage(''); setEliminarEvento(false);};
 
     //Obtener estas funciones desde useEventsHandlers (hooks/calendar/useEvents)
     const { combinarFechaYHora, obtenerHoraDesdeFecha, crearEvento, actualizarEvento, HandleEliminarEvento } = useEventHandlers({
@@ -183,15 +184,15 @@ export const CalendarScreen= () =>{
         removeEventFromState: (id) => setEvents(prev => prev.filter(e => e.id !== id))
     });
 
-
+    //Handle para crear eventos, utiliza varias funciones de otros archivos
     const handleCrearEvento = async () => {
-        setErrorMessage('');
+        setErrorMessage('');    //settea errores en caso no haber incluido datos necesarios
         if (!nombreEvento.trim() || !fechaEvento || !horaEvento  || !tipoRecordatorio) {
             setErrorMessage('Por favor, completa todos los campos obligatorios.');
             return;
         }
 
-        if (selectVisitadores && !visitador) {
+        if (selectVisitadores && !visitador) { //como solo se usa en ciertas ocaciones, se maneja aparte
             setErrorMessage('Debes seleccionar un visitador médico.');
             return;
         }
@@ -206,23 +207,23 @@ export const CalendarScreen= () =>{
             detalles: descripcion,
             local_id: localSeleccionado
         };
-
-        console.log('estoy mandando:', datosEvento);
+        //console.log('estoy mandando:', datosEvento); //asegurarme
 
         try {
             const respuesta = await crearEvento(datosEvento);
-            closeNuevoEvento();
-            setNotificacion('Evento creado con éxito');
-            console.log('Evento creado:', respuesta);
-            await refetch();
-            actualizar()
-            // Puedes cerrar el modal o mostrar una notificación aquí
+            closeNuevoEvento();                             //cierra el popUp
+            setNotificacion('Evento creado con éxito');     //llama a la notificación
+            console.log('Evento creado:', respuesta);       //asegurarme
+            await refetch();                                //hace un refetch para volver a llamar los datos que se actualizaron
+            actualizar()                                    //vuelve a renderizar por si acaso
+           
         } catch (error) {
             console.error('Error al crear evento:', error);
             setErrorMessage('Ocurrió un error al crear el evento. Intenta nuevamente.');
         }
     };
 
+    //Esta función se utiliza al intentar editar un evento, ya que llena el popup con los datos almacenados y poder modificarlos a partir de eso (ux) (NO tocar)
     const cargarDatosEventoEnFormulario = (evento) => {
         const tipoId = evento.tipo_evento_id?.toString();
         setNombreEvento(evento.titulo);
@@ -233,7 +234,7 @@ export const CalendarScreen= () =>{
         setHoraEvento(obtenerHoraDesdeFecha(evento.fecha));
         setDescripcion(evento.detalles);
 
-        // pa que actualice 
+        // pa que actualice el select en caso el evento necesite al visitador
         setTimeout(() => {
             if (tipoId === '1') {
                 setSelectVisitadores(true);
@@ -243,6 +244,20 @@ export const CalendarScreen= () =>{
         }, 0); 
     };
 
+    //limpia lo anterior
+    const limpiarFormulario = () => {
+        setNombreEvento('');
+        setDescripcion('');
+        setFechaEvento(null);
+        setHoraEvento('');
+        setTipoRecordatorio('');
+        setEstadoRecordatorio('');
+        setVisitador('');
+        setSelectVisitadores(false);
+        setErrorMessage('');
+    };
+
+    //Handle para editar el evento, depende de funciones de otros archivos 
     const handleEditarEvento = async () => {
         if (!eventoAEditar) return;
         const fechaISO = combinarFechaYHora(fechaEvento, horaEvento);
@@ -254,30 +269,31 @@ export const CalendarScreen= () =>{
             visitador_id: selectVisitadores ? parseInt(visitador) : null,
             fecha: fechaISO,
             detalles: descripcion
-        };
+        }; 
 
-        try {
+        try { //la misma cosa que en crear datos
             const respuesta = await actualizarEvento(eventoAEditar, datos);
             console.log("Evento actualizado:", respuesta);
             setNotificacion("Evento actualizado con éxito");
             closeEditarEvento();
             await refetch();
-            setSelectedEvent(null); 
+            setSelectedEvent(null);     //esta funciona cuando se intenta editar desde un evento especifico para que deje de mostrar datos anteriores
         } catch (error) {
             console.error("Error al actualizar evento:", error);
             setErrorMessage("No se pudo actualizar el evento.");
         }
     };
 
-    
+    //Compacta todo lo que se hace al eliminar
     const handleEliminarYCerrar = async () => {
         await HandleEliminarEvento(eventoAEliminar); 
         closeEliminarEvento();   
         await refetch();       
         actualizar();    
-        setSelectedEvent(null);      
+        setSelectedEvent(null);        //esta funciona cuando se intenta editar desde un evento especifico para que deje de mostrar datos anteriores
     };
 
+    //Es la función que se encarga de abrir el popUp y mandar el id del elemento que se quiere eleminar
     const onDeleteEvent = (id) => {
         const parsedId = parseInt(id, 10);
         if (!parsedId || isNaN(parsedId)) {
@@ -289,7 +305,7 @@ export const CalendarScreen= () =>{
         openEliminarEvento();
     };
 
-
+    //obtiene el día de hoy xd
     const obtenerDiaHoy = () => {
         const hoy = new Date(); // Obtén la fecha de hoy
         const opciones = { weekday: 'long', day: 'numeric' }; // Formato: Día de la semana, Día del mes
@@ -297,6 +313,7 @@ export const CalendarScreen= () =>{
         return fechaFormateada.charAt(0).toUpperCase() + fechaFormateada.slice(1); // Capitalizar la primera letra
     }
 
+    //Renrediza los eventos pequeñitos en calendario no en la barra vertical izquierda
     const renderEventContent = (eventInfo) => {
         const tipoEventoId = eventInfo.event.extendedProps?.raw?.tipo_evento_id;
 
@@ -311,20 +328,18 @@ export const CalendarScreen= () =>{
         );
     };
 
-
-    const [selectedEvent, setSelectedEvent] = useState(null);
+    //Si hay un evnto especifico seleecionado o no
+    const [selectedEvent, setSelectedEvent] = useState(null); 
+    const [events, setEvents] = useState([]);
+    
+    //Hadles para el funcionamiento de botones de la librería de calendario
     const handlePrev = () => calendarRef.current.getApi().prev();
     const handleNext = () => calendarRef.current.getApi().next();
     const handleToday = () => calendarRef.current.getApi().today();
 
-    const [events, setEvents] = useState([]);
-
-    //detalles esteticos
+    //detalles esteticos, ayuda a determinar el dia de hoy, para mostrar lo eventos de hoy
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
-
-    const finSemana = new Date(hoy);
-    finSemana.setDate(hoy.getDate() + 6);
 
     const eventosDeHoy = eventos.filter(evento => {
         const fechaEvento = new Date(evento.fecha);
@@ -332,13 +347,19 @@ export const CalendarScreen= () =>{
         return fechaEvento.getTime() === hoy.getTime();
     });
 
+    //lo mismo que lo anterior pero determina una semana
+    const finSemana = new Date(hoy);
+    finSemana.setDate(hoy.getDate() + 6);
+
     const eventosDeLaSemana = eventos.filter(evento => {
         const fechaEvento = new Date(evento.fecha);
         fechaEvento.setHours(0, 0, 0, 0);
         return fechaEvento > hoy && fechaEvento <= finSemana;
     });
 
-  return (
+
+    //Por fin, el return
+    return (
     
     <div className='pantallaCalendario' key = {key}>
         {notificacion && (
@@ -350,8 +371,6 @@ export const CalendarScreen= () =>{
         <button className= 'buttonCalendarDay' onClick={handleToday}>
             <FontAwesomeIcon icon = {faCalendarDay} style={{fontSize: '25px'}}/>
         </button>
-
-
 
         <div className='tituloyCalendario'>
             <div className='titleDiv'>
@@ -374,6 +393,7 @@ export const CalendarScreen= () =>{
                 </div>
             </div>
 
+            {/* El Calendario como tal con los eventos */}
             <div className='contenedorCalendario' >
                 <FullCalendar
                     headerToolbar={false}
@@ -409,7 +429,12 @@ export const CalendarScreen= () =>{
 
             
             <div className='descripcionStyle'>
-                
+                {/* 
+                    La barra lateral, muestra si se están cargando los eventos, si no se pudo acceder a la base de datos
+                    Muestra el evento seleccionado al hacerle click a uno de los eventos en el calendario general
+                    Inicialmente muestra los eventos de hoy y de un rango en 6 días, si no hay, lo especifica
+                */}
+
                 <div className='event-details'>
                     {
                         loading ? ( <div>Cargando eventos...</div>) 
@@ -418,9 +443,7 @@ export const CalendarScreen= () =>{
                             <>
                                 <h4 className="subtitulo">Evento:</h4>
                                 <div className = 'Eventos' key={selectedEvent.id}>
-                                    {console.log(selectedEvent.id) 
-                                   
-                                    }
+                                
                                     <EventoCard
                                         key={selectedEvent.id}
                                         id={selectedEvent.id}
@@ -544,7 +567,7 @@ export const CalendarScreen= () =>{
         }
 
 
-        {/* Pop up para un nuevo evento*/}
+        {/* Pop up para un nuevo evento, utilica un componete que compacta el formulario*/}
         {
             <Popup 
                 key={selectVisitadores} isOpen={nuevoEvento}  title={'Crear un nuevo recordatorio'} 
@@ -572,9 +595,8 @@ export const CalendarScreen= () =>{
                 </div>
             </Popup>
         }
-
-            
-        {/* Pop up para editar un evento*/}
+   
+        {/* Pop up para editar un evento, utilica un componete que compacta el formulario*/}
         {
             <Popup 
                 isOpen={editarEvento} title={'Editar un recordatorio'}
