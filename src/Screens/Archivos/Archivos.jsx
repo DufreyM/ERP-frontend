@@ -17,6 +17,8 @@ import Filters from "../../components/FIlters/Filters";
 import ButtonHeaders from "../../components/ButtonHeaders/ButtonHeaders";
 import InputDates from "../../components/Inputs/InputDates";
 import { getToken } from '../../services/authService';
+import ButtonDisplay from "../../components/ButtonDisplay/ButtonDisplay";
+import OrderBy from "../../components/OrderBy/OrderBy";
 
 
 const ArchivosScreen = () => {
@@ -354,6 +356,8 @@ const ArchivosScreen = () => {
         <div className={styles.contenedorTitle}>
           <SimpleTitle text={"Archivos"}></SimpleTitle>
         </div>
+
+       
         
         <Filters
           formData={formData}
@@ -375,6 +379,7 @@ const ArchivosScreen = () => {
           ordenAscendente={ordenAscendente}
           setOrdenAscendente={setOrdenAscendente}
         />
+        <OrderBy></OrderBy>
 
         <ButtonHeaders 
           text= 'Subir +'

@@ -1,0 +1,13 @@
+.contenedorVisibleOptionFilter{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+   
+}
+
+.tituloIconoOptionFIlter {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    align-items: center;
+}

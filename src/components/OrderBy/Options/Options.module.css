@@ -1,0 +1,7 @@
+.contenedorOptions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    color: #5a60A5;
+}
