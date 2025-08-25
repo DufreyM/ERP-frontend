@@ -18,18 +18,19 @@ const ButtonText = ({
     accion
 }) => {
     return(
-        <div className= {styles.divButtonText}>
+        <button className= {styles.divButtonText}
+        onClick={accion}>
+            
+            {texto}
             <span>
-                {texto}
-                <span>
-                    {' '}
-                </span>
-                <span className={styles.spanButtonText}
-                onClick={accion}>
-                    {textoButton}
-                </span>
+                {' '}
             </span>
-        </div>
+            <span className={styles.spanButtonText}
+            >
+                {textoButton}
+            </span>
+            
+        </button>
     );
 };
 
