@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import BackgroundCross from '../../components/BackgroundCross/BackgroundCross';
 import IconoInput from '../../components/Inputs/InputIcono';
 import InputPassword from '../../components/Inputs/InputPassword';
-import InputDates from '../../components/Inputs/InputDates';
 import ButtonForm from '../../components/ButtonForm/ButtonForm';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faCalendar, faLock, faEnvelope, faPhone, faNotesMedical, faLocationDot } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faLock, faEnvelope, faPhone, faFilePdf } from '@fortawesome/free-solid-svg-icons';
 import Isotipo from '../../assets/svg/isotipoEconofarma.svg'; 
 import { useNavigate } from 'react-router-dom';
 import ButtonText from '../../components/ButtonText/ButtonText';
@@ -13,15 +12,12 @@ import ButtonText from '../../components/ButtonText/ButtonText';
 const Visitadores = () => {
     const [nombre, setNombre] = useState('');
     const [apellido, setApellido] = useState('');
-    const [fecha, setFecha] = useState(null);
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState('');
     const [telefono, setTelefono] = useState('');
     const [proveedor, setProveedor] = useState('');
-    const [direccion, setDireccion] = useState('');
-    const [emailProveedor, setEmailProveedor] = useState('');
-    const [telefonoProveedor, setTelefonoProveedor] = useState('');
+    const [documentos, setDocumentos] = useState([]);
     const [error, setError] = useState('');
     const [message, setMessage] = useState('');
     const navigate = useNavigate();
@@ -30,38 +26,40 @@ const Visitadores = () => {
         setShowPassword(!showPassword);
     };
 
+    const handleFileChange = (e) => {
+        const files = Array.from(e.target.files);
+        const pdfFiles = files.filter(file => file.type === 'application/pdf');
+        
+        if (pdfFiles.length !== files.length) {
+            setError('Solo se permiten archivos PDF');
+            return;
+        }
+        
+        setDocumentos(pdfFiles);
+        setError('');
+    };
+
     const handleSubmit = async () => {
         setError('');
         setMessage('');
 
-        let fechaFormateada = null;
-        if (fecha instanceof Date && !isNaN(fecha)) {
-            const year = fecha.getFullYear();
-            const month = String(fecha.getMonth() + 1).padStart(2, '0');
-            const day = String(fecha.getDate()).padStart(2, '0');
-            fechaFormateada = `${year}-${month}-${day}`;
-        }
-
-        const data = {
-            nombre,
-            apellido,
-            fechaNacimiento: fechaFormateada,
-            password,
-            email,
-            telefono,
-            proveedor,
-            direccion,
-            emailProveedor,
-            telefonoProveedor,
-        };
+        const formData = new FormData();
+        formData.append('nombre', nombre);
+        formData.append('apellido', apellido);
+        formData.append('password', password);
+        formData.append('email', email);
+        formData.append('telefono', telefono);
+        formData.append('proveedor', proveedor);
+        
+        // Agregar documentos
+        documentos.forEach((doc, index) => {
+            formData.append(`documentos`, doc);
+        });
 
         try {
             const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/register-visitador`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
+                body: formData,
             });
 
             if (!response.ok) {
@@ -111,7 +109,7 @@ const Visitadores = () => {
                 </div>
 
                 <h2 style={{ color: '#5a60a5', fontFamily: 'Segoe UI', fontWeight: 'bold', marginBottom: '10px', fontSize: '20px' }}>
-                    Datos del visitador
+                    Datos
                 </h2>
 
                 {/* Inputs */}
@@ -128,12 +126,6 @@ const Visitadores = () => {
                     value={apellido}
                     onChange={(e) => setApellido(e.target.value)}
                     name="apellido"
-                />
-                <InputDates
-                    icono={faCalendar}
-                    placeholder="Fecha de Nacimiento"
-                    selected={fecha}
-                    onChange={(date) => setFecha(date)}
                 />
                 <InputPassword
                     showPassword={showPassword}
@@ -158,39 +150,62 @@ const Visitadores = () => {
                     onChange={(e) => setTelefono(e.target.value)}
                     name="telefono"
                 />
-
-                <h2 style={{ color: '#5a60a5', fontFamily: 'Segoe UI', fontWeight: 'bold', margin: '25px 0 10px 0', fontSize: '20px', alignSelf: 'flex-middle' }}>
-                    Datos del proveedor
-                </h2>
-
                 <IconoInput
-                    icono={faNotesMedical}
+                    icono={faUser}
                     placeholder="Nombre del Proveedor"
                     value={proveedor}
                     onChange={(e) => setProveedor(e.target.value)}
                     name="proveedor"
                 />
-                <IconoInput
-                    icono={faLocationDot}
-                    placeholder="Dirección"
-                    value={direccion}
-                    onChange={(e) => setDireccion(e.target.value)}
-                    name="direccion"
-                />
-                <IconoInput
-                    icono={faEnvelope}
-                    placeholder="Correo del Proveedor"
-                    value={emailProveedor}
-                    onChange={(e) => setEmailProveedor(e.target.value)}
-                    name="emailProveedor"
-                />
-                <IconoInput
-                    icono={faPhone}
-                    placeholder="Teléfono del Proveedor"
-                    value={telefonoProveedor}
-                    onChange={(e) => setTelefonoProveedor(e.target.value)}
-                    name="telefonoProveedor"
-                />
+
+                {/* Input para subir documentos PDF */}
+                <div style={{ 
+                    width: '100%', 
+                    maxWidth: '400px', 
+                    marginBottom: '20px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center'
+                }}>
+                    <label style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        color: '#5a60a5',
+                        fontFamily: 'Segoe UI',
+                        fontWeight: 'bold',
+                        marginBottom: '10px',
+                        cursor: 'pointer'
+                    }}>
+                        <FontAwesomeIcon icon={faFilePdf} style={{ color: '#5a60a5' }} />
+                        Subir Documentos (PDF)
+                    </label>
+                    <input
+                        type="file"
+                        multiple
+                        accept=".pdf"
+                        onChange={handleFileChange}
+                        style={{
+                            width: '100%',
+                            padding: '10px',
+                            border: '2px dashed #5a60a5',
+                            borderRadius: '8px',
+                            backgroundColor: 'transparent',
+                            color: '#5a60a5',
+                            cursor: 'pointer'
+                        }}
+                    />
+                    {documentos.length > 0 && (
+                        <div style={{ 
+                            marginTop: '10px', 
+                            fontSize: '12px', 
+                            color: '#5a60a5',
+                            textAlign: 'center'
+                        }}>
+                            {documentos.length} archivo(s) seleccionado(s)
+                        </div>
+                    )}
+                </div>
 
                 {/* Botón de enviar */}
                 <ButtonForm text="Enviar solicitud para crear cuenta" onClick={handleSubmit} />
