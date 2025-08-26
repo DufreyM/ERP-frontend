@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMagnifyingGlassDollar,faFilter, faGear, faUser,faArrowUpAZ,faArrowDownZA,faFilterCircleXmark, faCalendar, faDollar, faBriefcaseMedical} from '@fortawesome/free-solid-svg-icons';
+import { faMagnifyingGlassDollar,faFilter, faGear, faUser,faFilterCircleXmark, faCalendar, faDollar, faBriefcaseMedical} from '@fortawesome/free-solid-svg-icons';
 import styles from "./Filters.module.css";
 import { useState, useRef, useEffect } from "react";
 import InputSelects from "../Inputs/InputSelects";
@@ -8,6 +8,8 @@ import IconoInput from "../Inputs/InputIcono";
 import ButtonDisplay from "../ButtonDisplay/ButtonDisplay";
 import DatePicker from "react-datepicker";
 import OptionFilter from "./OptionsFilter/OptionFilter";
+import "../Inputs/datepicker-custom.css"
+import LittleOptions from "./LittleOptions/LittleOptions";
 
 const Filters = ({
 
@@ -17,8 +19,7 @@ const Filters = ({
     opciones,
     mostrarFiltros,
     onResetFiltros,
-    ordenAscendente,
-    setOrdenAscendente,
+    
 
 
     
@@ -26,8 +27,7 @@ const Filters = ({
 
     onFechaInicioChange,
     onFechaFinChange,
-    fechaInicio,
-    fechaFin,
+    
 
 
     // mamadas que necesito:
@@ -43,6 +43,18 @@ const Filters = ({
     mostrarUsuario = true,
     mostrarMedicamento = true,
 
+    //atributos para rango de precio
+    precioMin,
+    setPrecioMin,
+    precioMax,
+    setPrecioMax,
+
+    //atributos para rango de fecha
+    fechaInicio, 
+    setFechaInicio,
+    fechaFin, 
+    setFechaFin,
+
 
 }) => {
 
@@ -52,6 +64,35 @@ const Filters = ({
   const [isOpendPrice, setIsOpendPrice] = useState(false);
   const [isOpendMedic, setIsOpendMedic] = useState(false);
 
+
+  const handleRangoFechaRapida = (opcion) => {
+  const hoy = new Date();
+  const ayer = new Date();
+  ayer.setDate(hoy.getDate() - 1);
+
+  switch(opcion) {
+    case "Hoy":
+      setFechaInicio(new Date(hoy.setHours(0,0,0,0)));
+      setFechaFin(new Date(hoy.setHours(23,59,59,999)));
+      break;
+
+    case "Ayer":
+      setFechaInicio(new Date(ayer.setHours(0,0,0,0)));
+      setFechaFin(new Date(ayer.setHours(23,59,59,999)));
+      break;
+
+    case "Este mes":
+      const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+      const finMes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
+      setFechaInicio(inicioMes);
+      setFechaFin(finMes);
+      break;
+
+    // Agregar más casos...
+    }
+  };
+
+  
 
   const [fechaSeleccionada, setFechaSeleccionada] = useState(null);
 
@@ -76,14 +117,73 @@ const Filters = ({
                 changeOpen={() => setIsOpendDate(prev => !prev)}
 
               >
-                <p>Fecha elegida: {fechaSeleccionada?.toLocaleDateString()}</p>
 
-                <DatePicker inline
-                  selected={fechaSeleccionada}
-                  onChange={(date) => setFechaSeleccionada(date)}
-                ></DatePicker>
+                <LittleOptions 
+                  title={"Hoy"}
+                  onClick={() => handleRangoFechaRapida("Hoy")}
+                />
+                <LittleOptions 
+                  title={"Ayer"}
+                  onClick={() => handleRangoFechaRapida("Ayer")}
+                />
+                <LittleOptions title={"Esta semana"}></LittleOptions>
+                <LittleOptions title={"Semana pasada"}></LittleOptions>
+                <LittleOptions 
+                  title={"Este mes"}
+                  onClick={() => handleRangoFechaRapida("Este mes")}
+                />
+                <LittleOptions title={"Mes pasado"}></LittleOptions>
+                <LittleOptions title={"Este año"}></LittleOptions>
+                <LittleOptions title={"Año Pasado"}></LittleOptions>
+              
+                <div className={styles.contenedorFiltroFechas}>
 
-                <DatePicker inline></DatePicker>
+                 
+                  <div className={styles.contenedorfechaCalendario}>
+                    <IconoInput
+                    icono = {faCalendar}
+                    value={fechaInicio?.toLocaleDateString()}
+                    
+                    ></IconoInput>
+
+                    
+
+                    <DatePicker 
+                      inline
+                      selected={fechaInicio}
+                      onChange={(date) => setFechaInicio(date)}
+                      startDate={fechaInicio}
+                      endDate={fechaFin}
+                      selectsStart
+                      calendarClassName="calendario-pequeno"
+                    ></DatePicker>
+
+                  </div>  
+
+                  <div className={styles.contenedorfechaCalendario}>
+
+                    <IconoInput
+                      icono = {faCalendar}
+                      value={fechaFin?.toLocaleDateString()}
+                      ></IconoInput>
+
+
+                    <DatePicker
+                      inline
+                      selected={fechaFin}
+                      onChange={(date) => setFechaFin(date)}
+                      startDate={fechaInicio}
+                      endDate={fechaFin}
+                      selectsEnd
+                      minDate={fechaInicio}
+                      calendarClassName="calendario-pequeno"
+                    ></DatePicker>
+
+                 </div>
+
+            
+                </div>
+                
 
               </OptionFilter>
 
@@ -120,7 +220,7 @@ const Filters = ({
                   value={formData.usuarios}
                   onChange={handleChange}
                   name="usuarios"
-                  opcions={opciones.usuarios}
+                 opcions={opciones.usuarios}
                 />
                 
 
@@ -144,7 +244,26 @@ const Filters = ({
                 changeOpen={() => setIsOpendPrice(prev => !prev)}
 
               >
+                <div className={styles.contenedorFiltroPrecio}>
+                  <IconoInput
+                    icono = {faDollar}
+                    type={"number"}
+                    placeholder={"Precio mínimo"}
+                    value = {precioMin}
+                    onChange={(e) => setPrecioMin(e.target.value)}
+                  
+                  ></IconoInput>
+
+                  <IconoInput
+                    icono = {faDollar}
+                    type={"number"}
+                    placeholder={"Precio maximo"}
+                    value = {precioMax}
+                    onChange={(e) => setPrecioMax(e.target.value)}
+                  ></IconoInput>
+                </div>
                 
+              
 
               </OptionFilter>
 
@@ -257,18 +376,7 @@ const Filters = ({
             <h3 className={styles.titleFilters}>Ordenar datos</h3>
 
             <div className={styles.ordenButtons}>
-              <FontAwesomeIcon
-                icon={faArrowUpAZ}
-                title="Ordenar A-Z"
-                onClick={() => setOrdenAscendente(true)}
-                className={`${styles.IconStyle} ${ordenAscendente ? styles.activo : ''}`}
-              />
-              <FontAwesomeIcon
-                icon={faArrowDownZA}
-                title="Ordenar Z-A"
-                onClick={() => setOrdenAscendente(false)}
-                className={`${styles.IconStyle} ${!ordenAscendente ? styles.activo : ''}`}
-              />
+              
               <FontAwesomeIcon
                 icon={faFilterCircleXmark}
                 title="Eliminar filtros"

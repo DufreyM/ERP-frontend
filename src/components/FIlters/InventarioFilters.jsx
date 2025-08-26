@@ -2,13 +2,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { 
   faFilter, 
   faGear, 
-  faArrowUpAZ, 
-  faArrowDownZA, 
+
   faFilterCircleXmark,
-  faSortAmountUp,
-  faSortAmountDown,
-  faSortAlphaDown,
-  faSortAlphaUp
+  
 } from '@fortawesome/free-solid-svg-icons';
 import styles from "./Filters.module.css";
 import { useState, useRef, useEffect } from "react";
@@ -20,7 +16,7 @@ const InventarioFilters = ({
   opciones,
   mostrarFiltros,
   onResetFiltros,
-  ordenAscendente,
+ ordenAscendente,
   setOrdenAscendente
 }) => {
   const [abierto, setAbierto] = useState(false);
@@ -63,43 +59,12 @@ const InventarioFilters = ({
             />
           )}
 
-          {mostrarFiltros?.ordenPrecio && (
-            <InputSelects
-              icono={faSortAmountUp}
-              placeholder="Ordenar por precio"
-              value={formData.ordenPrecio}
-              onChange={handleChange}
-              name="ordenPrecio"
-              opcions={opciones.ordenPrecio}
-            />
-          )}
-
-          {mostrarFiltros?.ordenStock && (
-            <InputSelects
-              icono={faSortAmountDown}
-              placeholder="Ordenar por stock"
-              value={formData.ordenStock}
-              onChange={handleChange}
-              name="ordenStock"
-              opcions={opciones.ordenStock}
-            />
-          )}
+       
 
           <h3 className={styles.titleFilters}>Ordenar datos</h3>
 
           <div className={styles.ordenButtons}>
-            <FontAwesomeIcon
-              icon={faArrowUpAZ}
-              title="Ordenar A-Z"
-              onClick={() => setOrdenAscendente(true)}
-              className={styles.IconStyle}
-            />
-            <FontAwesomeIcon
-              icon={faArrowDownZA}
-              title="Ordenar Z-A"
-              onClick={() => setOrdenAscendente(false)}
-              className={styles.IconStyle}
-            />
+           
             <FontAwesomeIcon
               icon={faFilterCircleXmark}
               title="Eliminar filtros"

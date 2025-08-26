@@ -2,12 +2,42 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    align-items: center;
+    color: #5a60A5;
+    padding: 0px 2px;
+    /* background-color: brown; */
    
 }
 
 .tituloIconoOptionFIlter {
     display: flex;
     flex-direction: row;
-    gap: 15px;
+    gap: 10px;
     align-items: center;
+}
+.titulosOpciones{
+    /* background-color: cadetblue; */
+    margin: 10px;
+
+}
+
+.BotonDesplegarFitltro{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background-color: transparent;
+    color: #5a60A5;
+    height: 30px;
+    margin-top: 5px;
+    /* background-color: bisque; */
+}
+
+.chevronIcon {
+    font-size: 15px;
+  transition: transform 0.3s ease;
+}
+
+.rotateDown {
+  transform: rotate(90deg);
 }

@@ -19,6 +19,8 @@ import InputDates from "../../components/Inputs/InputDates";
 import { getToken } from '../../services/authService';
 import ButtonDisplay from "../../components/ButtonDisplay/ButtonDisplay";
 import OrderBy from "../../components/OrderBy/OrderBy";
+import { useOrderBy } from "../../hooks/useOrderBy";
+import { useFiltroGeneral } from "../../hooks/useFiltroGeneral";
 
 
 const ArchivosScreen = () => {
@@ -328,12 +330,12 @@ const ArchivosScreen = () => {
     }
   };
 
-
-
-
-
   
-  
+
+
+
+
+
 
   //Mostrar datos
   const datosFiltrados = (data?.filter(doc => {
@@ -348,9 +350,43 @@ const ArchivosScreen = () => {
       : nombreB.localeCompare(nombreA);
   });
 
+  //Funciones necesarias para el funcionamiento de filter
+  const [fechaInicio, setFechaInicio] = useState(null);
+  const [fechaFin, setFechaFin] = useState(null);
+
+  
+  const filterKeyMap={
+    RANGO_FECHA: "creacion",
+  }
+
+
+
+  const {dataFiltrada} = useFiltroGeneral({
+    data: data, 
+    filterKeyMap: filterKeyMap, 
+    fechaInicio: fechaInicio,
+    fechaFin: fechaFin
+   });
+
   
 
-    return(
+
+  //Funciones necesarias para el funcionamiento de Order By
+  //Constante que almacena los nombres o key de los datos a filtrar
+  const sortKeyMap={
+      AZ: "nombre",
+      ZA: "nombre",
+  }
+
+  //LLamar useOrdeyBy desde hooks/useOrderBy.js
+  //se manda las claves que se utilizará en el filtrado y los datos ya filtrados
+  //para que se ordene luego de filtrar.
+  //sortedData es la data que se mostrará en pantalla
+  //sortOption debe de ir en el componente de Ordeyby al igual que setSortOption
+  const {sortedData, sortOption, setSortOption} = useOrderBy({data: dataFiltrada, sortKeyMap});
+  
+
+  return(
     <div className={styles.contenedorGeneral}>
       <div className={styles.contenedorEncabezado}>
         <div className={styles.contenedorTitle}>
@@ -376,10 +412,30 @@ const ArchivosScreen = () => {
             setOrdenAscendente(true);
           }}
 
-          ordenAscendente={ordenAscendente}
-          setOrdenAscendente={setOrdenAscendente}
+
+          title = {"Archivos"}
+          mostrarRangoFecha = {true}
+          mostrarRangoPrecio = {false}
+          mostrarUsuario = {true}
+          mostrarMedicamento = {false}
+
+          fechaInicio = {fechaInicio}
+          setFechaInicio = {setFechaInicio}
+          fechaFin = {fechaFin}
+          setFechaFin = {setFechaFin}
+
+
+         
         />
-        <OrderBy></OrderBy>
+
+        <OrderBy
+          FAbecedario={true}
+          FExistencias={false}
+          FPrecio={false}
+          FFecha={false}
+          selectedOption={sortOption}
+          onChange={setSortOption}
+        ></OrderBy>
 
         <ButtonHeaders 
           text= 'Subir +'
@@ -486,7 +542,7 @@ const ArchivosScreen = () => {
           <div className={styles.contenedorTablaArchivos}>
             <Table
               nameColumns={columnas}
-              data={datosFiltrados}
+              data={sortedData}
               onEliminarClick={(item) =>{ 
                 setDocumentoAEliminar(item);
                 setAdvertencia(true);

@@ -9,6 +9,10 @@ import InventarioFilters from '../../components/FIlters/InventarioFilters';
 import { useOutletContext } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import OrderBy from '../../components/OrderBy/OrderBy.jsx';
+import { useOrderBy } from '../../hooks/useOrderBy.js';
+import { useFiltroGeneral } from '../../hooks/useFiltroGeneral.js';
+import Filters from '../../components/FIlters/Filters.jsx';
 
 const InventarioScreen = () => {
   const { selectedLocal } = useOutletContext();
@@ -120,21 +124,7 @@ const InventarioScreen = () => {
     }
   };
 
-  // Función para manejar el orden alfabético con los iconos
-  const handleOrdenAlfabetico = (ascendente) => {
-    setOrdenAscendente(ascendente);
-    let productosOrdenados = [...productos];
-    
-    productosOrdenados.sort((a, b) => {
-      const nombreA = a.nombre.toLowerCase();
-      const nombreB = b.nombre.toLowerCase();
-      return ascendente 
-        ? nombreA.localeCompare(nombreB)
-        : nombreB.localeCompare(nombreA);
-    });
-    
-    setProductos(productosOrdenados);
-  };
+
 
   // Aplicar filtros cuando cambien
   useEffect(() => {
@@ -180,6 +170,62 @@ const InventarioScreen = () => {
     }
   };
 
+
+  function convertirDatos(data) {
+    return data.map(item => ({
+      ...item,
+      stock_actual: parseFloat(item.stock_actual),
+      precioventa: parseFloat(item.precioventa),
+      preciocosto: parseFloat(item.preciocosto), // opcional si lo querés también
+    }));
+  }
+
+   
+
+
+    console.log(productos);
+    const productosConvertidos = convertirDatos(productos);
+    console.log(productosConvertidos);
+
+    //intentofiltros
+    const [precioMin, setPrecioMin] = useState('');
+    const [precioMax, setPrecioMax] = useState('');
+   
+
+
+     const filterKeyMap={
+        RANGO_PRECIO: "precioventa",
+   
+    }
+
+
+
+    const {dataFiltrada} = useFiltroGeneral({
+      data: productosConvertidos, 
+      filterKeyMap: filterKeyMap, 
+      precioMin: precioMin, 
+      precioMax: precioMax});
+    //Funciones necesarias para el funcionamiento de Order By
+    //Constante que almacena los nombres o key de los datos a filtrar
+    const sortKeyMap={
+        AZ: "nombre",
+        ZA: "nombre",
+        STOCK_HIGH: "stock_actual",
+        STOCK_LOW: "stock_actual",
+        PRICE_HIGH: "precioventa",
+        PRICE_LOW: "precioventa",
+   
+    }
+   
+  
+    //LLamar useOrdeyBy desde hooks/useOrderBy.js
+    //se manda las claves que se utilizará en el filtrado y los datos ya filtrados
+    //para que se ordene luego de filtrar.
+    //sortedData es la data que se mostrará en pantalla
+    //sortOption debe de ir en el componente de Ordeyby al igual que setSortOption
+    const {sortedData, sortOption, setSortOption} = useOrderBy({data: dataFiltrada, sortKeyMap});
+    
+
   return (
     <div className={styles.inventarioContainer}>
       <SimpleTitle text="Inventario" />
@@ -201,16 +247,37 @@ const InventarioScreen = () => {
           opciones={opciones}
           mostrarFiltros={mostrarFiltros}
           onResetFiltros={onResetFiltros}
-          ordenAscendente={ordenAscendente}
-          setOrdenAscendente={handleOrdenAlfabetico}
+          
         />
+
+        <Filters
+          title = {"Inventario"}
+          mostrarRangoFecha ={false}
+          mostrarRangoPrecio = {true}
+          mostrarUsuario = {false}
+          mostrarMedicamento = {false}
+          precioMin = {precioMin}
+          setPrecioMin = {setPrecioMin}
+          precioMax = {precioMax}
+          setPrecioMax = {setPrecioMax}
+
+        ></Filters>
+
+        <OrderBy
+          FAbecedario={true}
+          FExistencias={true}
+          FPrecio={true}
+          FFecha={false}
+          selectedOption={sortOption}
+          onChange={setSortOption}
+        ></OrderBy>
       </div>
 
       {loading && <div className={styles.loading}>Cargando productos...</div>}
       {error && <div className={styles.error}>{error}</div>}
       
       <div className={styles.productosGrid}>
-        {productos.map(producto => (
+        {sortedData.map(producto => (
           <div
             key={producto.codigo}
             className={styles.productoCard}
