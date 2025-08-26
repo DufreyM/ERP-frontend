@@ -13,6 +13,33 @@
   /* background-color: cadetblue; */
 }
 
+.calendario-pequeno .react-datepicker__day--in-range{
+  background-color: #d3d3f7;
+  color: rgb(46, 16, 122);
+}
+
+.calendario-pequeno .react-datepicker__day--range-start{
+  background-color: #5b5bb0;
+  color: white;
+  font-weight: bold;
+  padding: 1px;
+}
+
+.calendario-pequeno .react-datepicker__day--keyboard-selected{
+  background-color: white;
+  color: rgb(0, 0, 0);
+} 
+
+.calendario-pequeno .react-datepicker__day--range-end{
+  background-color: #5b5bb0;
+  color: white;
+  font-weight: bold;
+  padding: 1px;
+}
+
+
+
+
 .calendario-pequeno .react-datepicker__month-container{
   width: 100%;
   /* background-color: chartreuse; */

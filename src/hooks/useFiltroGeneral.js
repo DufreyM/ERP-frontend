@@ -1,5 +1,5 @@
 // hooks/useFiltroGeneral.js
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 
 // const sortKeyMap = {
 //     FECHA: "nombreProducto",
@@ -12,12 +12,22 @@ import { useState, useMemo } from "react";
 export const useFiltroGeneral = ({ 
     data,
     filterKeyMap,
+    //datos para usar rango de precio
     precioMin,
     precioMax,
+    //datos para usar rango de fecha
     fechaInicio,
     fechaFin,
+    //datos para usar fultrado por usuario
+    usuarioId,
+    rolId,
+
 
 }) => {
+    const getNestedValue = (obj, path) => {
+        return path.split('.').reduce((acc, part) => acc?.[part], obj);
+    };
+
 
 
     const dataFiltrada = useMemo(() => {
@@ -26,6 +36,8 @@ export const useFiltroGeneral = ({
         // Obtenemos la clave del campo que se usará para el filtro de precio
         const keyPrecio = filterKeyMap["RANGO_PRECIO"];
         const keyFecha = filterKeyMap["RANGO_FECHA"];
+        const keyUsuario = filterKeyMap["USUARIO"];
+        const keyRol = filterKeyMap["ROL"];
 
         return data.filter(item => {
         // ---- Filtro por precio ----
@@ -46,19 +58,28 @@ export const useFiltroGeneral = ({
             (!fechaFin || fechaItem <= fechaFin);
         }
 
+                // --- Rol ---
+        let cumpleRol = true;
+        if (keyRol && rolId) {
+            const rolItem = getNestedValue(item, keyRol);
+            cumpleRol = String(rolItem) === String(rolId);
+        }
+
+        // --- Usuario ---
+        let cumpleUsuario = true;
+        if (keyUsuario && usuarioId) {
+            const usuarioItem = getNestedValue(item, keyUsuario);
+            cumpleUsuario = String(usuarioItem) === String(usuarioId);
+        }
 
 
-            return cumplePrecio && cumpleFecha;
+
+        return cumplePrecio && cumpleFecha && cumpleRol && cumpleUsuario;
         });
     }, [data, precioMin, precioMax, filterKeyMap, fechaInicio,
-    fechaFin,]);
+    fechaFin, usuarioId, rolId]);
 
     
-
-
-
-
-
 
   return {
     dataFiltrada

@@ -2,7 +2,7 @@
 //Aun falta implementar las funciones reales que consultan a la BD, actualmente solo están comentadas como se pretende sea su funcionamiento
 //Renato Rojas. 28/05/2025
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useMemo } from "react"
 import { useOutletContext } from 'react-router-dom';
 import { getOptions } from '../../utils/selects';
 import styles from "./Archivos.module.css"
@@ -21,6 +21,7 @@ import ButtonDisplay from "../../components/ButtonDisplay/ButtonDisplay";
 import OrderBy from "../../components/OrderBy/OrderBy";
 import { useOrderBy } from "../../hooks/useOrderBy";
 import { useFiltroGeneral } from "../../hooks/useFiltroGeneral";
+import { useOpcionesUsuarioDinamicos } from "../../hooks/useOpcionesUsuariosDinamico";
 
 
 const ArchivosScreen = () => {
@@ -49,12 +50,7 @@ const ArchivosScreen = () => {
     
   ]
 
- 
-  //Estados de filtros
-  const [opcionsRoles, setOpcionsRoles] = useState([]);
-  const [opcionsUsers, setOpcionsUsers] = useState([]);
-  const [usuariosFiltrados, setUsuariosFiltrados] = useState([]);
-  const [ordenAscendente, setOrdenAscendente] = useState(true);
+
 
   //datos
   const [errorMessage, setErrorMessage] = useState('');
@@ -65,12 +61,8 @@ const ArchivosScreen = () => {
 
   //Editar un archivo
   const [documentoAEliminar, setDocumentoAEliminar] = useState(null);
-  const [mostrarModal, setMostrarModal] = useState(false);
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [file, setFile] = useState('');
-  const [nameFile, setNameFile] = useState('');
-  const openPopup = () => setIsPopupOpen(true);
-  const closePopup = () => setIsPopupOpen(false);
+  
 
   //Nuevo archivo
   const [popupNuevo, setPopupNuevo] = useState(false);
@@ -172,81 +164,6 @@ const ArchivosScreen = () => {
       }
     };
 
-
-
-
-
-
-
-
-
-
- 
-
-  //Opciones de filtrado por Rol
-  useEffect(() => {
-    getOptions("http://localhost:3000/api/roles", item => ({
-        value: item.id,
-        label: item.nombre,
-    })).then((opciones) => {
-      //const data = dataExtendida;
-
-
-      const rolIdEnUso = [...new Set(data.map(doc => doc.usuario?.rol_id))];
-      const rolesUsados = opciones.filter(rol => rolIdEnUso.includes(rol.value));
-      setOpcionsRoles(rolesUsados);
-
-      const mapaUsuarios = new Map();
-
-      data.forEach(doc => {
-        const usuario = doc.usuario;
-        if (!usuario) return;
-
-        if (!mapaUsuarios.has(usuario.id)) {
-          mapaUsuarios.set(usuario.id, {
-            value: usuario.id,
-            label: `${usuario.nombre} ${usuario.apellidos}`,
-            rol_id: usuario.rol_id,
-          });
-        }
-      });
-
-      const opcionesUsuarios = Array.from(mapaUsuarios.values());
-      setOpcionsUsers(opcionesUsuarios);
-
-
-    });
-
-  }, [data]);
-
-
-  const [formData, setFormData] = useState({
-      rol: "",
-      usuarios: "",
-      eliminado: "",
-    })
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ 
-      ...prev, 
-      [name]: value,
-
-      ...(name ==="rol" && {usuarios:""})
-     }));
-
-     if (name === "rol") {
-      const rolSeleccionado = parseInt(value);
-
-      if (isNaN(rolSeleccionado)) {
-        setUsuariosFiltrados(opcionsUsers); // todos los usuarios
-      } else {
-        const filtrados = opcionsUsers.filter(usuario => usuario.rol_id === rolSeleccionado);
-        setUsuariosFiltrados(filtrados);
-      }
-    }
-  };
-
   const eliminarDocumento = async (id) => {
     try {
       const response = await fetch(`http://localhost:3000/documentos-locales/${id}`, {
@@ -332,31 +249,64 @@ const ArchivosScreen = () => {
 
   
 
-
-
-
-
-
+  //Funciones necesarias para el funcionamiento de filter
   //Mostrar datos
-  const datosFiltrados = (data?.filter(doc => {
-    const coincideRol = formData.rol ? String(doc.usuario?.rol_id) === formData.rol : true;
-    const coincideUsuario = formData.usuarios ? String(doc.usuario?.id) === formData.usuarios : true;
-    return coincideRol && coincideUsuario;
-  }) || []).sort((a, b) => {
-    const nombreA = a.nombre?.toLowerCase() || '';
-    const nombreB = b.nombre?.toLowerCase() || '';
-    return ordenAscendente
-      ? nombreA.localeCompare(nombreB)
-      : nombreB.localeCompare(nombreA);
+
+  const [opcionsRoles, setOpcionsRoles] = useState([]);
+  const [opcionsUsers, setOpcionsUsers] = useState([]);
+  
+
+  const tipoUserKeyMap = useMemo(() => ({
+    ROL: "usuario.rol_id",
+    USUARIO: "usuario",
+  }), []);
+
+  
+  //llamo a un hook
+  useOpcionesUsuarioDinamicos({
+    data: data,
+    tipoUserKeyMap: tipoUserKeyMap,
+    setOpcionsRoles: setOpcionsRoles,
+    setOpcionsUsers: setOpcionsUsers
   });
 
-  //Funciones necesarias para el funcionamiento de filter
+  const [rolSeleccionado, setRolSeleccionado] = useState("");
+  const [usuariosFiltrados, setUsuariosFiltrados] = useState([]);
+  const [usuarioSeleccionado, setUsuarioSeleccionado] = useState("");
+
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    if (name === "rol") {
+      const numValue = parseInt(value);
+      setRolSeleccionado(isNaN(numValue) ? "" : numValue);
+      setUsuarioSeleccionado(""); // Reinicia usuario si cambia el rol
+
+      const rolSeleccionadoNum = parseInt(value);
+      if (isNaN(rolSeleccionadoNum)) {
+        setUsuariosFiltrados(opcionsUsers); // todos los usuarios
+      } else {
+        const filtrados = opcionsUsers.filter(usuario => usuario.rol_id === rolSeleccionadoNum);
+        setUsuariosFiltrados(filtrados);
+      }
+    }
+
+    if (name === "usuarios") {
+      setUsuarioSeleccionado(value);
+    }
+  };
+
+
   const [fechaInicio, setFechaInicio] = useState(null);
   const [fechaFin, setFechaFin] = useState(null);
 
   
   const filterKeyMap={
     RANGO_FECHA: "creacion",
+    USUARIO: "usuario.id",
+    ROL: "usuario.rol_id"
+    
   }
 
 
@@ -365,10 +315,10 @@ const ArchivosScreen = () => {
     data: data, 
     filterKeyMap: filterKeyMap, 
     fechaInicio: fechaInicio,
-    fechaFin: fechaFin
-   });
-
-  
+    fechaFin: fechaFin,
+    usuarioId: usuarioSeleccionado,
+    rolId: rolSeleccionado
+  });
 
 
   //Funciones necesarias para el funcionamiento de Order By
@@ -396,23 +346,7 @@ const ArchivosScreen = () => {
        
         
         <Filters
-          formData={formData}
-          handleChange={handleChange}
-          opciones={{
-            roles: opcionsRoles,
-            usuarios: usuariosFiltrados
-          }}
-          mostrarFiltros={{
-            rol: true,
-            usuario: true,
-          }}
-          onResetFiltros={() => {
-            setFormData({ rol: "", usuarios: "", eliminado: "" });
-            setUsuariosFiltrados(opcionsUsers);
-            setOrdenAscendente(true);
-          }}
-
-
+      
           title = {"Archivos"}
           mostrarRangoFecha = {true}
           mostrarRangoPrecio = {false}
@@ -423,6 +357,12 @@ const ArchivosScreen = () => {
           setFechaInicio = {setFechaInicio}
           fechaFin = {fechaFin}
           setFechaFin = {setFechaFin}
+
+          opcionesUsuarios = {usuariosFiltrados}
+          opcionesRoles = {opcionsRoles}
+          usuarioSeleccionado = {usuarioSeleccionado}
+          rolSeleccionado = {rolSeleccionado}
+          handleChange={handleChange}
 
 
          
@@ -447,6 +387,24 @@ const ArchivosScreen = () => {
 
         <div className = {styles.contenedorArchivos}>
 
+          <div className={styles.contenedorTablaArchivos}>
+            <Table
+              nameColumns={columnas}
+              data={sortedData}
+              onEliminarClick={(item) =>{ 
+                setDocumentoAEliminar(item);
+                setAdvertencia(true);
+              }}
+
+              onEditarClick={(item) =>
+                handleEditarArchivo(item)
+              }
+              
+            
+            />
+          </div>
+
+          
           {/* Pop up para subir un archivo */}
           {<Popup 
             isOpen={popupNuevo} 
@@ -539,22 +497,6 @@ const ArchivosScreen = () => {
           </Popup>
     
           }
-          <div className={styles.contenedorTablaArchivos}>
-            <Table
-              nameColumns={columnas}
-              data={sortedData}
-              onEliminarClick={(item) =>{ 
-                setDocumentoAEliminar(item);
-                setAdvertencia(true);
-              }}
-
-              onEditarClick={(item) =>
-                handleEditarArchivo(item)
-              }
-              
-            
-            />
-          </div>
 
           {/* Pop up para liminar un archivo */}
           {<Popup 
