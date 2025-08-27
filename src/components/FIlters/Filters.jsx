@@ -44,6 +44,10 @@ const Filters = ({
     rolSeleccionado, 
     handleChange,
 
+    //atributos para tipo medicamento
+    opcionesTipoMedicamento,
+    medicamentoSeleccionado,
+    handleChangeMedicamento
 
 }) => {
 
@@ -323,9 +327,7 @@ const Filters = ({
                     value = {precioMax}
                     onChange={(e) => setPrecioMax(e.target.value)}
                   ></IconoInput>
-                </div>
-                
-              
+                </div>        
 
               </OptionFilter>
 
@@ -347,6 +349,14 @@ const Filters = ({
                 changeOpen={() => setIsOpendMedic(prev => !prev)}
 
               >
+                 <InputSelects
+                  icono={faGear}
+                  placeholder="Filtrar por tipo de medicamento"
+                  value={medicamentoSeleccionado}
+                  onChange={handleChangeMedicamento}
+                  name="tipo"
+                  opcions={opcionesTipoMedicamento}
+                />
                 
 
               </OptionFilter>

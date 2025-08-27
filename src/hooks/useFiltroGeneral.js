@@ -22,6 +22,9 @@ export const useFiltroGeneral = ({
     usuarioId,
     rolId,
 
+    //dato para tipo de medicamento
+     tipoMedicamento
+
 
 }) => {
     const getNestedValue = (obj, path) => {
@@ -72,12 +75,19 @@ export const useFiltroGeneral = ({
             cumpleUsuario = String(usuarioItem) === String(usuarioId);
         }
 
+        // --- Tipo de medicamento ---
+        let cumpleTipo = true;
+        if (filterKeyMap["TIPO_MEDICAMENTO"] && tipoMedicamento) {
+        const tipoItem = getNestedValue(item, filterKeyMap["TIPO_MEDICAMENTO"]);
+        cumpleTipo = String(tipoItem) === String(tipoMedicamento);
+        }
 
 
-        return cumplePrecio && cumpleFecha && cumpleRol && cumpleUsuario;
+
+        return cumplePrecio && cumpleFecha && cumpleRol && cumpleUsuario && cumpleTipo;
         });
     }, [data, precioMin, precioMax, filterKeyMap, fechaInicio,
-    fechaFin, usuarioId, rolId]);
+    fechaFin, usuarioId, rolId, tipoMedicamento]);
 
     
 

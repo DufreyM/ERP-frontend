@@ -24,12 +24,9 @@ const InventarioScreen = () => {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [formData, setFormData] = useState({
-    tipo: '',
-    ordenPrecio: '',
-    ordenStock: ''
-  });
-  const [ordenAscendente, setOrdenAscendente] = useState(true);
+ 
+
+ 
 
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -66,96 +63,8 @@ const InventarioScreen = () => {
     }
   };
 
-  // Función para manejar cambios en los filtros
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
 
-  // Función para resetear filtros
-  const onResetFiltros = () => {
-    setFormData({
-      tipo: '',
-      ordenPrecio: '',
-      ordenStock: ''
-    });
-    setOrdenAscendente(true);
-    setProductos(productosOriginales);
-  };
-
-  // Función para aplicar filtros
-  const aplicarFiltros = () => {
-    let productosFiltrados = [...productosOriginales];
-
-    // Filtro por tipo
-    if (formData.tipo) {
-      productosFiltrados = productosFiltrados.filter(p => p.detalles === formData.tipo);
-    }
-
-    // Ordenar por precio
-    if (formData.ordenPrecio) {
-      productosFiltrados.sort((a, b) => {
-        const precioA = parseFloat(a.precioventa || a.precio_venta || 0);
-        const precioB = parseFloat(b.precioventa || b.precio_venta || 0);
-        return formData.ordenPrecio === 'asc' ? precioA - precioB : precioB - precioA;
-      });
-    }
-
-    // Ordenar por stock
-    if (formData.ordenStock) {
-      productosFiltrados.sort((a, b) => {
-        const stockA = parseInt(a.stock_actual || 0);
-        const stockB = parseInt(b.stock_actual || 0);
-        return formData.ordenStock === 'asc' ? stockA - stockB : stockB - stockA;
-      });
-    }
-
-    // Aplicar búsqueda sobre los productos filtrados
-    if (searchTerm.trim() === '') {
-      setProductos(productosFiltrados);
-    } else {
-      const productosFiltradosYBusqueda = productosFiltrados.filter(producto =>
-        producto.nombre.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setProductos(productosFiltradosYBusqueda);
-    }
-  };
-
-
-
-  // Aplicar filtros cuando cambien
-  useEffect(() => {
-    aplicarFiltros();
-  }, [formData, productosOriginales, searchTerm]);
-
-  // Extraer tipos únicos de los productos
-  const tiposUnicos = [...new Set(productosOriginales.map(p => p.detalles))].filter(tipo => tipo);
-
-  const opciones = {
-    tipos: tiposUnicos.map(tipo => ({
-      value: tipo,
-      label: tipo
-    })),
-    ordenPrecio: [
-      { value: 'asc', label: 'Menor a Mayor' },
-      { value: 'desc', label: 'Mayor a Menor' }
-    ],
-    ordenStock: [
-      { value: 'asc', label: 'Menor a Mayor' },
-      { value: 'desc', label: 'Mayor a Menor' }
-    ]
-  };
-
-  const mostrarFiltros = {
-    tipo: true,
-    ordenPrecio: true,
-    ordenStock: true
-  };
-
-  const handleDelete = async () => {
+   const handleDelete = async () => {
     if (!productoSeleccionado) return;
     setDeleting(true);
     try {
@@ -171,23 +80,42 @@ const InventarioScreen = () => {
   };
 
 
+ // Función para manejar cambios en los filtros
+  const [opcionesTipoMedicamento, setOpcionesTipoMedicamento] = useState([ ]);
+  const [medicamentoSeleccionado, setMedicamentoSeleccionado] = useState('')
+
+
+  // Extraer tipos únicos de los productos
+  useEffect(() => {
+  const tiposUnicos = [...new Set(productosOriginales.map(p => p.detalles))].filter(tipo => tipo);
+  const opcionesTipos = tiposUnicos.map(tipo => ({
+    value: tipo,
+    label: tipo
+  }));
+  setOpcionesTipoMedicamento(opcionesTipos);
+}, [productosOriginales]);
+
+
   function convertirDatos(data) {
     return data.map(item => ({
       ...item,
       stock_actual: parseFloat(item.stock_actual),
       precioventa: parseFloat(item.precioventa),
-      preciocosto: parseFloat(item.preciocosto), // opcional si lo querés también
+      preciocosto: parseFloat(item.preciocosto),
     }));
   }
 
-   
 
 
-    console.log(productos);
+ 
     const productosConvertidos = convertirDatos(productos);
     console.log(productosConvertidos);
 
     //intentofiltros
+    const handleMedicamentoChange = (e) => {
+      setMedicamentoSeleccionado(e.target.value);
+    };
+
     const [precioMin, setPrecioMin] = useState('');
     const [precioMax, setPrecioMax] = useState('');
    
@@ -195,6 +123,7 @@ const InventarioScreen = () => {
 
      const filterKeyMap={
         RANGO_PRECIO: "precioventa",
+        TIPO_MEDICAMENTO: "detalles",
    
     }
 
@@ -204,7 +133,9 @@ const InventarioScreen = () => {
       data: productosConvertidos, 
       filterKeyMap: filterKeyMap, 
       precioMin: precioMin, 
-      precioMax: precioMax});
+      precioMax: precioMax,
+      tipoMedicamento: medicamentoSeleccionado
+    });
     //Funciones necesarias para el funcionamiento de Order By
     //Constante que almacena los nombres o key de los datos a filtrar
     const sortKeyMap={
@@ -225,6 +156,7 @@ const InventarioScreen = () => {
     //sortOption debe de ir en el componente de Ordeyby al igual que setSortOption
     const {sortedData, sortOption, setSortOption} = useOrderBy({data: dataFiltrada, sortKeyMap});
     
+   
 
   return (
     <div className={styles.inventarioContainer}>
@@ -241,25 +173,23 @@ const InventarioScreen = () => {
             name="medicamento"
           />
         </div>
-        <InventarioFilters
-          formData={formData}
-          handleChange={handleChange}
-          opciones={opciones}
-          mostrarFiltros={mostrarFiltros}
-          onResetFiltros={onResetFiltros}
-          
-        />
+      
 
         <Filters
           title = {"Inventario"}
           mostrarRangoFecha ={false}
           mostrarRangoPrecio = {true}
           mostrarUsuario = {false}
-          mostrarMedicamento = {false}
+          mostrarMedicamento = {true}
+
           precioMin = {precioMin}
           setPrecioMin = {setPrecioMin}
           precioMax = {precioMax}
           setPrecioMax = {setPrecioMax}
+
+          opcionesTipoMedicamento = {opcionesTipoMedicamento}
+          medicamentoSeleccionado ={medicamentoSeleccionado}
+          handleChangeMedicamento ={handleMedicamentoChange}
 
         ></Filters>
 
