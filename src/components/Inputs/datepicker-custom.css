@@ -1,3 +1,86 @@
+
+/* Estilo del calendario emergente */
+.calendario-pequeno .react-datepicker {
+  font-size: 12px;   /* reduce tamaño general */
+  width: 110px;      /* fuerza ancho */
+
+}
+
+.calendario-pequeno .react-datepicker__day {
+  width: 1rem;
+  line-height: 1rem;
+  margin: 0.12rem;
+  /* background-color: cadetblue; */
+}
+
+.calendario-pequeno .react-datepicker__day--in-range{
+  background-color: #d3d3f7;
+  color: rgb(46, 16, 122);
+}
+
+.calendario-pequeno .react-datepicker__day--range-start{
+  background-color: #5b5bb0;
+  color: white;
+  font-weight: bold;
+  padding: 1px;
+}
+
+.calendario-pequeno .react-datepicker__day--keyboard-selected{
+  background-color: white;
+  color: rgb(0, 0, 0);
+} 
+
+.calendario-pequeno .react-datepicker__day--range-end{
+  background-color: #5b5bb0;
+  color: white;
+  font-weight: bold;
+  padding: 1px;
+}
+
+
+
+
+.calendario-pequeno .react-datepicker__month-container{
+  width: 100%;
+  /* background-color: chartreuse; */
+}
+
+.calendario-pequeno .react-datepicker__day-name {
+  width: 1rem;
+}
+
+.calendario-pequeno .react-datepicker__header {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  height: 56px;
+  /* background-color: purple; */
+}
+
+.calendario-pequeno .react-datepicker__navigation {
+  min-width: 20px;
+  font-size: 1rem;
+  /* background-color: brown; */
+}
+
+.calendario-pequeno .react-datepicker__navigation-icon{
+  transform: scale(0.8);
+  font-size: 15px;
+}
+
+/* Cambiar color del texto del mes y año */
+.calendario-pequeno .react-datepicker__current-month {
+  color: rgb(255, 255, 255);
+  padding-top: 8px;
+  font-weight: bold;
+  font-size: 0.8rem;
+  height: 19px;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+   
+}
+
+
 /* Fondo general del calendario */
 .react-datepicker {
   background-color: #f9f9ff;
@@ -5,11 +88,14 @@
   border-radius: 8px;
   font-family: Arial, sans-serif;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+ 
+  font-size: 13px;
+
 }
 
 /* Color de los días al hacer hover */
 .react-datepicker__day:hover {
-  background-color: #e1e4ff;
+  background-color: #6770bf;
   color: #000;
 }
 
@@ -26,6 +112,7 @@
   font-weight: bold;
   color: #545ba3;
 }
+
 .datepicker-popup {
   left: 50% !important;
   transform: translateX(-50%);
@@ -36,19 +123,24 @@
   height: 10px; /* Ajusta según tu preferencia */
   background-color: #5a60a5; /* O cualquier color de fondo */
   align-items: center;
+  width: 100%;
+  min-width: 100px;
+  max-width: 241px;
+  
+  
   
   
 }
-.react-datepicker-wrapper {
-  width: 99%;
-  max-width: 300px;
-}
+
 
 
 /* Cambiar color del texto del mes y año */
 .react-datepicker__current-month {
   color: white;
   font-weight: bold;
+  font-size: 1rem;
+  background-color: #545ba3;
+   
 }
 
 /* Encabezado del mes */
@@ -56,17 +148,27 @@
   background-color: #5a60a5;
   color: white;
   border-bottom: none;
+ 
 
 }
 
-/* Nombres de los días (Lu, Ma, etc.) */
+/* Nombres de los días (Lu, Ma, etc.) #*/
 .react-datepicker__day-names {
   background-color: #d3d3f7;
+  display: flex;
+  justify-content: space-between;  /* Ajustar espacio entre días */
+
+  
+ 
 }
+
+
 
 /* Flechas para cambiar de mes */
 .react-datepicker__navigation-icon::before {
   border-color: white;
 }
+
+
 
 

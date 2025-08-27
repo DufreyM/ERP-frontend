@@ -9,7 +9,6 @@ Autor: Melisa
 Ultima modificación: 7/5/2025 
 */
 
-import react from "react";
 import styles from './ButtonText.module.css';
 
 const ButtonText = ({

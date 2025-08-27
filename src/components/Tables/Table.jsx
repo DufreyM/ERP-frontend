@@ -1,3 +1,19 @@
+/*Table
+Es una tabla dinámica reutilizable que permite mostrar datos con diferentes columnas y acciones específicas (editar, eliminar, ver PDF, descargar).
+Generalmente se utiliza para mostrar listas de documentos u objetos con múltiples propiedades.
+El estilo se encuentra en el archivo Table.module.css.
+Depende de los siguientes archivos y librerías:
+  - FontAwesomeIcon (para íconos)
+  - Table.module.css (estilos personalizados)
+  - faFile, faTrash, faPen (íconos de FontAwesome)
+Atributos:
+  - nameColumns: Array con los nombres y claves de las columnas a mostrar.
+  - data: Array de objetos que representan las filas de la tabla.
+  - onEliminarClick: Función que se ejecuta al hacer clic en el ícono de eliminar.
+  - onEditarClick: Función que se ejecuta al hacer clic en el ícono de editar.
+Autor: Melisa 
+Última modificación: 17/8/2025 
+*/
 
 import styles from "./Table.module.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

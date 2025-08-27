@@ -283,6 +283,8 @@ const Ventas = () => {
 
     console.log(datosFiltrados);
 
+    
+
 
 
 
@@ -303,6 +305,7 @@ const Ventas = () => {
                         formData={datosTransformados}
                         mostrarRangoFecha = {true}
                         mostrarRangoMonto = {true}
+                        mostrarUsuario = {false}
             
                         mostrarFiltros={{
                             rol: false,

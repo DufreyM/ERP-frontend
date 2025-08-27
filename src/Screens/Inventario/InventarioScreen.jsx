@@ -9,6 +9,10 @@ import InventarioFilters from '../../components/FIlters/InventarioFilters';
 import { useOutletContext } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import OrderBy from '../../components/OrderBy/OrderBy.jsx';
+import { useOrderBy } from '../../hooks/useOrderBy.js';
+import { useFiltroGeneral } from '../../hooks/useFiltroGeneral.js';
+import Filters from '../../components/FIlters/Filters.jsx';
 
 const InventarioScreen = () => {
   const { selectedLocal } = useOutletContext();
@@ -20,12 +24,9 @@ const InventarioScreen = () => {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [formData, setFormData] = useState({
-    tipo: '',
-    ordenPrecio: '',
-    ordenStock: ''
-  });
-  const [ordenAscendente, setOrdenAscendente] = useState(true);
+ 
+
+ 
 
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -62,110 +63,8 @@ const InventarioScreen = () => {
     }
   };
 
-  // Función para manejar cambios en los filtros
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
 
-  // Función para resetear filtros
-  const onResetFiltros = () => {
-    setFormData({
-      tipo: '',
-      ordenPrecio: '',
-      ordenStock: ''
-    });
-    setOrdenAscendente(true);
-    setProductos(productosOriginales);
-  };
-
-  // Función para aplicar filtros
-  const aplicarFiltros = () => {
-    let productosFiltrados = [...productosOriginales];
-
-    // Filtro por tipo
-    if (formData.tipo) {
-      productosFiltrados = productosFiltrados.filter(p => p.detalles === formData.tipo);
-    }
-
-    // Ordenar por precio
-    if (formData.ordenPrecio) {
-      productosFiltrados.sort((a, b) => {
-        const precioA = parseFloat(a.precioventa || a.precio_venta || 0);
-        const precioB = parseFloat(b.precioventa || b.precio_venta || 0);
-        return formData.ordenPrecio === 'asc' ? precioA - precioB : precioB - precioA;
-      });
-    }
-
-    // Ordenar por stock
-    if (formData.ordenStock) {
-      productosFiltrados.sort((a, b) => {
-        const stockA = parseInt(a.stock_actual || 0);
-        const stockB = parseInt(b.stock_actual || 0);
-        return formData.ordenStock === 'asc' ? stockA - stockB : stockB - stockA;
-      });
-    }
-
-    // Aplicar búsqueda sobre los productos filtrados
-    if (searchTerm.trim() === '') {
-      setProductos(productosFiltrados);
-    } else {
-      const productosFiltradosYBusqueda = productosFiltrados.filter(producto =>
-        producto.nombre.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setProductos(productosFiltradosYBusqueda);
-    }
-  };
-
-  // Función para manejar el orden alfabético con los iconos
-  const handleOrdenAlfabetico = (ascendente) => {
-    setOrdenAscendente(ascendente);
-    let productosOrdenados = [...productos];
-    
-    productosOrdenados.sort((a, b) => {
-      const nombreA = a.nombre.toLowerCase();
-      const nombreB = b.nombre.toLowerCase();
-      return ascendente 
-        ? nombreA.localeCompare(nombreB)
-        : nombreB.localeCompare(nombreA);
-    });
-    
-    setProductos(productosOrdenados);
-  };
-
-  // Aplicar filtros cuando cambien
-  useEffect(() => {
-    aplicarFiltros();
-  }, [formData, productosOriginales, searchTerm]);
-
-  // Extraer tipos únicos de los productos
-  const tiposUnicos = [...new Set(productosOriginales.map(p => p.detalles))].filter(tipo => tipo);
-
-  const opciones = {
-    tipos: tiposUnicos.map(tipo => ({
-      value: tipo,
-      label: tipo
-    })),
-    ordenPrecio: [
-      { value: 'asc', label: 'Menor a Mayor' },
-      { value: 'desc', label: 'Mayor a Menor' }
-    ],
-    ordenStock: [
-      { value: 'asc', label: 'Menor a Mayor' },
-      { value: 'desc', label: 'Mayor a Menor' }
-    ]
-  };
-
-  const mostrarFiltros = {
-    tipo: true,
-    ordenPrecio: true,
-    ordenStock: true
-  };
-
-  const handleDelete = async () => {
+   const handleDelete = async () => {
     if (!productoSeleccionado) return;
     setDeleting(true);
     try {
@@ -179,6 +78,85 @@ const InventarioScreen = () => {
       setDeleting(false);
     }
   };
+
+
+ // Función para manejar cambios en los filtros
+  const [opcionesTipoMedicamento, setOpcionesTipoMedicamento] = useState([ ]);
+  const [medicamentoSeleccionado, setMedicamentoSeleccionado] = useState('')
+
+
+  // Extraer tipos únicos de los productos
+  useEffect(() => {
+  const tiposUnicos = [...new Set(productosOriginales.map(p => p.detalles))].filter(tipo => tipo);
+  const opcionesTipos = tiposUnicos.map(tipo => ({
+    value: tipo,
+    label: tipo
+  }));
+  setOpcionesTipoMedicamento(opcionesTipos);
+}, [productosOriginales]);
+
+
+  function convertirDatos(data) {
+    return data.map(item => ({
+      ...item,
+      stock_actual: parseFloat(item.stock_actual),
+      precioventa: parseFloat(item.precioventa),
+      preciocosto: parseFloat(item.preciocosto),
+    }));
+  }
+
+
+
+ 
+    const productosConvertidos = convertirDatos(productos);
+    console.log(productosConvertidos);
+
+    //intentofiltros
+    const handleMedicamentoChange = (e) => {
+      setMedicamentoSeleccionado(e.target.value);
+    };
+
+    const [precioMin, setPrecioMin] = useState('');
+    const [precioMax, setPrecioMax] = useState('');
+   
+
+
+     const filterKeyMap={
+        RANGO_PRECIO: "precioventa",
+        TIPO_MEDICAMENTO: "detalles",
+   
+    }
+
+
+
+    const {dataFiltrada} = useFiltroGeneral({
+      data: productosConvertidos, 
+      filterKeyMap: filterKeyMap, 
+      precioMin: precioMin, 
+      precioMax: precioMax,
+      tipoMedicamento: medicamentoSeleccionado
+    });
+    //Funciones necesarias para el funcionamiento de Order By
+    //Constante que almacena los nombres o key de los datos a filtrar
+    const sortKeyMap={
+        AZ: "nombre",
+        ZA: "nombre",
+        STOCK_HIGH: "stock_actual",
+        STOCK_LOW: "stock_actual",
+        PRICE_HIGH: "precioventa",
+        PRICE_LOW: "precioventa",
+   
+    }
+   
+  
+    //LLamar useOrdeyBy desde hooks/useOrderBy.js
+    //se manda las claves que se utilizará en el filtrado y los datos ya filtrados
+    //para que se ordene luego de filtrar.
+    //sortedData es la data que se mostrará en pantalla
+    //sortOption debe de ir en el componente de Ordeyby al igual que setSortOption
+    const {sortedData, sortOption, setSortOption} = useOrderBy({data: dataFiltrada, sortKeyMap});
+    
+   
 
   return (
     <div className={styles.inventarioContainer}>
@@ -195,22 +173,41 @@ const InventarioScreen = () => {
             name="medicamento"
           />
         </div>
-        <InventarioFilters
-          formData={formData}
-          handleChange={handleChange}
-          opciones={opciones}
-          mostrarFiltros={mostrarFiltros}
-          onResetFiltros={onResetFiltros}
-          ordenAscendente={ordenAscendente}
-          setOrdenAscendente={handleOrdenAlfabetico}
-        />
+      
+
+        <Filters
+          title = {"Inventario"}
+          mostrarRangoFecha ={false}
+          mostrarRangoPrecio = {true}
+          mostrarUsuario = {false}
+          mostrarMedicamento = {true}
+
+          precioMin = {precioMin}
+          setPrecioMin = {setPrecioMin}
+          precioMax = {precioMax}
+          setPrecioMax = {setPrecioMax}
+
+          opcionesTipoMedicamento = {opcionesTipoMedicamento}
+          medicamentoSeleccionado ={medicamentoSeleccionado}
+          handleChangeMedicamento ={handleMedicamentoChange}
+
+        ></Filters>
+
+        <OrderBy
+          FAbecedario={true}
+          FExistencias={true}
+          FPrecio={true}
+          FFecha={false}
+          selectedOption={sortOption}
+          onChange={setSortOption}
+        ></OrderBy>
       </div>
 
       {loading && <div className={styles.loading}>Cargando productos...</div>}
       {error && <div className={styles.error}>{error}</div>}
       
       <div className={styles.productosGrid}>
-        {productos.map(producto => (
+        {sortedData.map(producto => (
           <div
             key={producto.codigo}
             className={styles.productoCard}
