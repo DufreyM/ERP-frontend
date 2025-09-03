@@ -8,11 +8,13 @@ import SimpleTitle from "../../components/Titles/SimpleTitle";
 import { removeToken, getToken } from "../../services/authService";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from "react-router-dom";
 
 import { faUser, faEnvelope, faBirthdayCake } from '@fortawesome/free-solid-svg-icons';
 import styles from './MiPerfil.module.css';
 
 const MiPerfil = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     nombre: "",
     apellidos: "",
@@ -327,6 +329,10 @@ const MiPerfil = () => {
     window.location.href = '/';
   };
 
+  const handleChangePassword = () => {
+    navigate('/admin/cambiar-contraseña');
+  };
+
   const nombreCompleto = `${formData.nombre} ${formData.apellidos}`.trim() || "Nombre de usuario";
 
   return (
@@ -403,6 +409,14 @@ const MiPerfil = () => {
           text={saving ? "Actualizando..." : "Actualizar perfil"}
           onClick={handleSubmit}
           disabled={saving}
+        />
+      </div>
+
+      <div className={styles.changePasswordContainer}>
+        <ButtonText
+          texto="¿Deseas cambiar tu contraseña?"
+          textoButton="Cambiar contraseña"
+          accion={handleChangePassword}
         />
       </div>
 

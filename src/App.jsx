@@ -7,6 +7,7 @@ import Visitadores from './Screens/Visitadores/Visitadores.jsx';
 import AdminLayout from './layouts/AdminLayout.jsx';
 import AdminDashboard from './Screens/dashboard/admin/Dashboard.jsx'
 import MiPerfil from './Screens/MiPerfil/MiPerfil.jsx'; 
+import ChangePassword from './Screens/ChangePassword/ChangePassword.jsx';
 import ArchivosScreen from './Screens/Archivos/Archivos.jsx';
 import { CalendarScreen } from './Screens/Calendar/CalendarScreen.jsx';
 import NewPassword from './Screens/ResetPassword/NewPassword.jsx';
@@ -62,6 +63,7 @@ function App() {
                 <Route index element={<PrivateRoute><AdminDashboard /></PrivateRoute>} />
                 <Route path="dashboard" element={<AdminDashboard />} />
                 <Route path="mi-perfil" element={<MiPerfil />} />
+                <Route path="cambiar-contraseña" element={<ChangePassword />} />
                 <Route path="archivos" element={<ArchivosScreen />} />
                 <Route path="calendario" element={<CalendarScreen />} />
                 <Route path="visitadores-medicos" element={<VisitadoresAdmin />} />

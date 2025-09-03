@@ -100,6 +100,12 @@
   margin-bottom: 1rem;
 }
 
+.changePasswordContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
 .logoutContainer {
   display: flex;
   justify-content: center;
