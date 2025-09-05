@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import BackgroundCross from '../../components/BackgroundCross/BackgroundCross';
 import IconoInput from '../../components/Inputs/InputIcono';
 import InputPassword from '../../components/Inputs/InputPassword';
@@ -15,15 +15,35 @@ const Visitadores = () => {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState('');
-    const [telefono, setTelefono] = useState('');
+    const [telefonos, setTelefonos] = useState([{ numero: '', tipo: 'móvil' }]);
     const [proveedor, setProveedor] = useState('');
+    const [fechaNacimiento, setFechaNacimiento] = useState('');
     const [documentos, setDocumentos] = useState([]);
     const [error, setError] = useState('');
     const [message, setMessage] = useState('');
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
+    };
+
+    // Funciones para manejar teléfonos
+    const addTelefono = () => {
+        setTelefonos([...telefonos, { numero: '', tipo: 'móvil' }]);
+    };
+
+    const removeTelefono = (index) => {
+        if (telefonos.length > 1) {
+            setTelefonos(telefonos.filter((_, i) => i !== index));
+        }
+    };
+
+    const updateTelefono = (index, field, value) => {
+        const updatedTelefonos = telefonos.map((telefono, i) => 
+            i === index ? { ...telefono, [field]: value } : telefono
+        );
+        setTelefonos(updatedTelefonos);
     };
 
     const handleFileChange = (e) => {
@@ -42,35 +62,113 @@ const Visitadores = () => {
     const handleSubmit = async () => {
         setError('');
         setMessage('');
+        setLoading(true);
 
-        const formData = new FormData();
-        formData.append('nombre', nombre);
-        formData.append('apellido', apellido);
-        formData.append('password', password);
-        formData.append('email', email);
-        formData.append('telefono', telefono);
-        formData.append('proveedor', proveedor);
-        
-        // Agregar documentos
-        documentos.forEach((doc, index) => {
-            formData.append(`documentos`, doc);
-        });
+        // Validar campos requeridos
+        if (!nombre.trim() || !apellido.trim() || !email.trim() || !proveedor.trim() || !fechaNacimiento) {
+            setError('Por favor, completa todos los campos requeridos.');
+            setLoading(false);
+            return;
+        }
+
+        // Validar que al menos un teléfono esté completo
+        const telefonosCompletos = telefonos.filter(t => t.numero.trim() && t.tipo);
+        if (telefonosCompletos.length === 0) {
+            setError('Por favor, ingresa al menos un número de teléfono.');
+            setLoading(false);
+            return;
+        }
+
+        // Validar formato de email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            setError('Por favor, ingresa un correo electrónico válido.');
+            setLoading(false);
+            return;
+        }
 
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/register-visitador`, {
+            // Preparar datos según la estructura esperada por el backend
+            // El backend usará insertGraph para crear las relaciones
+            const visitadorData = {
+                proveedor_id: 1, // ID temporal, el backend debería manejar esto
+                usuario: {
+                    nombre: nombre.trim(),
+                    apellidos: apellido.trim(),
+                    rol_id: 3, // Asumimos que 3 es el rol de visitador médico
+                    email: email.trim(),
+                    status: 'inactivo', // Inicialmente inactivo hasta aprobación
+                    contrasena: password, // El backend debería manejar el hash
+                    fechanacimiento: fechaNacimiento
+                },
+                telefonos: telefonosCompletos.map(t => ({
+                    numero: t.numero.trim(),
+                    tipo: t.tipo
+                })) // Array de objetos con numero y tipo
+            };
+
+            // Prueba con estructura más simple para debug
+            const testData = {
+                proveedor_id: 1, // ID temporal para prueba
+                usuario_id: 1,   // ID temporal para prueba
+                telefonos: telefonosCompletos.map(t => `${t.numero.trim()} (${t.tipo})`)
+            };
+
+            console.log('Enviando datos del visitador:', visitadorData);
+            console.log('JSON stringificado:', JSON.stringify(visitadorData, null, 2));
+            console.log('Datos de prueba:', testData);
+
+            const response = await fetch(`http://localhost:3000/visitadores`, {
                 method: 'POST',
-                body: formData,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(testData) // Usando datos de prueba temporalmente
+            });
+
+            let responseData;
+            try {
+                responseData = await response.json();
+            } catch (jsonError) {
+                console.error('Error al parsear JSON de respuesta:', jsonError);
+                const responseText = await response.text();
+                console.error('Respuesta como texto:', responseText);
+                throw new Error('Error al procesar respuesta del servidor');
+            }
+            
+            console.log('Respuesta del servidor:', { 
+                status: response.status, 
+                statusText: response.statusText,
+                data: responseData 
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Error al registrar al visitador');
+                console.error('Error completo:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    responseData,
+                    requestData: visitadorData
+                });
+                throw new Error(responseData.error || responseData.message || `Error al registrar al visitador: ${response.status} ${response.statusText}`);
             }
 
-            setMessage('Solicitud enviada correctamente. Revisa tu correo.');
+            setMessage('Solicitud enviada correctamente. El administrador revisará tu solicitud.');
+            
+            // Limpiar formulario después del éxito
+            setNombre('');
+            setApellido('');
+            setPassword('');
+            setEmail('');
+            setTelefonos([{ numero: '', tipo: 'móvil' }]);
+            setProveedor('');
+            setFechaNacimiento('');
+            setDocumentos([]);
+
         } catch (err) {
             console.error('Error al enviar solicitud de registro:', err);
-            setError('No se pudo enviar la solicitud. Verifica los datos e intenta nuevamente.');
+            setError(err.message || 'No se pudo enviar la solicitud. Verifica los datos e intenta nuevamente.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -143,12 +241,90 @@ const Visitadores = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     name="email"
                 />
+                {/* Sección de Teléfonos */}
+                <div style={{ width: '100%', maxWidth: '400px', marginBottom: '16px' }}>
+                    <label style={{ 
+                        color: '#5a60a5', 
+                        fontWeight: 500, 
+                        marginBottom: '8px', 
+                        display: 'block',
+                        fontSize: '14px'
+                    }}>
+                        Teléfonos
+                    </label>
+                    {telefonos.map((telefono, index) => (
+                        <div key={index} style={{ 
+                            display: 'flex', 
+                            gap: '8px', 
+                            marginBottom: '8px',
+                            alignItems: 'center'
+                        }}>
+                            <IconoInput
+                                icono={faPhone}
+                                placeholder="Número de teléfono"
+                                value={telefono.numero}
+                                onChange={(e) => updateTelefono(index, 'numero', e.target.value)}
+                                name={`telefono_${index}`}
+                            />
+                            <select
+                                value={telefono.tipo}
+                                onChange={(e) => updateTelefono(index, 'tipo', e.target.value)}
+                                style={{
+                                    padding: '8px 12px',
+                                    border: '2px solid #cccccc8e',
+                                    borderRadius: '4px',
+                                    backgroundColor: '#ffffff',
+                                    color: '#5a60a5',
+                                    fontSize: '14px',
+                                    minWidth: '100px'
+                                }}
+                            >
+                                <option value="móvil">Móvil</option>
+                                <option value="fijo">Fijo</option>
+                            </select>
+                            {telefonos.length > 1 && (
+                                <button
+                                    type="button"
+                                    onClick={() => removeTelefono(index)}
+                                    style={{
+                                        background: '#e74c3c',
+                                        border: 'none',
+                                        borderRadius: '4px',
+                                        color: 'white',
+                                        padding: '8px 12px',
+                                        cursor: 'pointer',
+                                        fontSize: '12px'
+                                    }}
+                                >
+                                    ✕
+                                </button>
+                            )}
+                        </div>
+                    ))}
+                    <button
+                        type="button"
+                        onClick={addTelefono}
+                        style={{
+                            background: '#5a60a5',
+                            border: 'none',
+                            borderRadius: '4px',
+                            color: 'white',
+                            padding: '8px 16px',
+                            cursor: 'pointer',
+                            fontSize: '12px',
+                            marginTop: '8px'
+                        }}
+                    >
+                        + Agregar Teléfono
+                    </button>
+                </div>
                 <IconoInput
-                    icono={faPhone}
-                    placeholder="Teléfono"
-                    value={telefono}
-                    onChange={(e) => setTelefono(e.target.value)}
-                    name="telefono"
+                    icono={faUser}
+                    placeholder="Fecha de Nacimiento (YYYY-MM-DD)"
+                    value={fechaNacimiento}
+                    onChange={(e) => setFechaNacimiento(e.target.value)}
+                    name="fechaNacimiento"
+                    type="date"
                 />
                 <IconoInput
                     icono={faUser}
@@ -157,6 +333,7 @@ const Visitadores = () => {
                     onChange={(e) => setProveedor(e.target.value)}
                     name="proveedor"
                 />
+                
 
                 {/* Input para subir documentos PDF */}
                 <div style={{ 
@@ -208,7 +385,11 @@ const Visitadores = () => {
                 </div>
 
                 {/* Botón de enviar */}
-                <ButtonForm text="Enviar solicitud para crear cuenta" onClick={handleSubmit} />
+                <ButtonForm 
+                    text={loading ? "Enviando..." : "Enviar solicitud para crear cuenta"} 
+                    onClick={handleSubmit}
+                    disabled={loading}
+                />
 
                 <ButtonText
                 texto="¿Ya tienes una cuenta?"

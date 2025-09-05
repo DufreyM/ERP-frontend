@@ -51,6 +51,23 @@
     color: black;
 }
 
+.inputStyle::placeholder {
+    color: #767272;
+}
+
+.inputStyle::-webkit-input-placeholder {
+    color: #767272;
+}
+
+.inputStyle::-moz-placeholder {
+    color: #767272;
+    opacity: 1;
+}
+
+.inputStyle:-ms-input-placeholder {
+    color: #767272;
+}
+
 
 .contenedorInputDate {
     position: relative;

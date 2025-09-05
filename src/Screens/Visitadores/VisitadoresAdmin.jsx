@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import SimpleTitle from '../../components/Titles/SimpleTitle.jsx';
 import IconoInput from '../../components/Inputs/InputIcono.jsx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faPen, faTrash, faFilePdf } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faPen, faTrash, faFilePdf, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 const VisitadoresAdmin = () => {
   const [nombre, setNombre] = useState('');
@@ -11,6 +11,11 @@ const VisitadoresAdmin = () => {
   const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  
+  // Estados para edición inline
+  const [editingField, setEditingField] = useState(null); // { rowId, fieldName }
+  const [editingValue, setEditingValue] = useState('');
+  const [saving, setSaving] = useState(false);
 
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -104,6 +109,201 @@ const VisitadoresAdmin = () => {
     }
   };
 
+  // Funciones para edición inline
+  const startEditing = (rowId, fieldName, currentValue) => {
+    setEditingField({ rowId, fieldName });
+    setEditingValue(currentValue);
+  };
+
+  const cancelEditing = () => {
+    setEditingField(null);
+    setEditingValue('');
+  };
+
+  const saveField = async () => {
+    if (!editingField || saving) return;
+    
+    setSaving(true);
+    try {
+      const { rowId, fieldName } = editingField;
+      const visitador = data.find(d => d.id === rowId);
+      if (!visitador) throw new Error('Visitador no encontrado');
+
+      // Preparar datos para actualizar según el campo
+      // El backend del visitador médico no maneja actualizaciones anidadas del usuario
+      // Necesitamos actualizar el usuario directamente
+      let updateData = {};
+      if (fieldName === 'nombre') {
+        // Separar nombre y apellidos
+        const parts = editingValue.trim().split(' ');
+        const nombre = parts[0] || '';
+        const apellidos = parts.slice(1).join(' ') || '';
+        updateData = {
+          nombre,
+          apellidos
+        };
+      } else if (fieldName === 'correo') {
+        updateData = {
+          correo: editingValue
+        };
+      } else if (fieldName === 'telefono') {
+        updateData = {
+          telefono: editingValue
+        };
+      }
+
+      // Si no hay datos para actualizar, no proceder
+      if (Object.keys(updateData).length === 0) {
+        throw new Error('No hay datos para actualizar');
+      }
+
+      // Obtener el ID del usuario del visitador
+      const usuarioId = visitador.raw?.usuario_id || visitador.raw?.usuario?.id;
+      if (!usuarioId) {
+        throw new Error('No se encontró el ID del usuario');
+      }
+      
+      console.log('Enviando datos de actualización:', {
+        rowId,
+        fieldName,
+        updateData,
+        usuarioId,
+        url: `${API_BASE_URL}/api/usuarios/${usuarioId}`
+      });
+
+      // Obtener token de autenticación
+      const token = localStorage.getItem('token');
+      
+      // Actualizar directamente el usuario usando el endpoint de usuarios
+      const res = await fetch(`${API_BASE_URL}/api/usuarios/${usuarioId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(updateData)
+      });
+
+      const responseData = await res.json().catch(() => ({}));
+      console.log('Respuesta del servidor:', { status: res.status, data: responseData });
+
+      if (!res.ok) {
+        console.error('Error response:', responseData);
+        throw new Error(`Error al actualizar: ${res.status} - ${responseData.error || responseData.message || 'Error desconocido'}`);
+      }
+
+      // Actualizar datos locales
+      const updatedData = data.map(item => {
+        if (item.id === rowId) {
+          const updated = { ...item };
+          if (fieldName === 'nombre') {
+            updated.nombre = editingValue;
+          } else if (fieldName === 'correo') {
+            updated.correo = editingValue;
+          } else if (fieldName === 'telefono') {
+            updated.telefono = editingValue;
+          }
+          return updated;
+        }
+        return item;
+      });
+
+      setData(updatedData);
+      setEditingField(null);
+      setEditingValue('');
+    } catch (e) {
+      alert('Error al guardar cambios: ' + e.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      saveField();
+    } else if (e.key === 'Escape') {
+      cancelEditing();
+    }
+  };
+
+  // Componente para campos editables
+  const EditableField = ({ rowId, fieldName, value, onEdit }) => {
+    const isEditing = editingField?.rowId === rowId && editingField?.fieldName === fieldName;
+    
+    if (isEditing) {
+      return (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <input
+            type="text"
+            value={editingValue}
+            onChange={(e) => setEditingValue(e.target.value)}
+            onKeyDown={handleKeyPress}
+            style={{
+              padding: '4px 8px',
+              border: '1px solid #5a60a5',
+              borderRadius: '4px',
+              fontSize: '14px',
+              minWidth: '120px'
+            }}
+            autoFocus
+            disabled={saving}
+          />
+          <button
+            onClick={saveField}
+            disabled={saving}
+            style={{
+              background: '#1bbf5c',
+              border: 'none',
+              borderRadius: '4px',
+              color: 'white',
+              padding: '4px 8px',
+              cursor: saving ? 'not-allowed' : 'pointer',
+              opacity: saving ? 0.6 : 1
+            }}
+            title="Guardar"
+          >
+            <FontAwesomeIcon icon={faCheck} size="sm" />
+          </button>
+          <button
+            onClick={cancelEditing}
+            disabled={saving}
+            style={{
+              background: '#e74c3c',
+              border: 'none',
+              borderRadius: '4px',
+              color: 'white',
+              padding: '4px 8px',
+              cursor: saving ? 'not-allowed' : 'pointer',
+              opacity: saving ? 0.6 : 1
+            }}
+            title="Cancelar"
+          >
+            <FontAwesomeIcon icon={faTimes} size="sm" />
+          </button>
+        </div>
+      );
+    }
+
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <span>{value}</span>
+        <button
+          onClick={() => onEdit(rowId, fieldName, value)}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            color: '#5a60a5',
+            padding: '2px'
+          }}
+          title="Editar"
+        >
+          <FontAwesomeIcon icon={faPen} size="sm" />
+        </button>
+      </div>
+    );
+  };
+
   return (
     <div style={{ padding: '32px 24px 0 24px', maxWidth: '1200px', margin: '0 auto' }}>
       <div style={{ marginBottom: '16px' }}>
@@ -153,9 +353,30 @@ const VisitadoresAdmin = () => {
           <tbody>
             {filtered.map((item, idx) => (
               <tr key={item.id ?? item.nombre} style={{ borderBottom: '1px solid #e0e0e0' }}>
-                <td style={{ padding: '10px 8px' }}>{item.nombre}</td>
-                <td style={{ padding: '10px 8px' }}>{item.correo}</td>
-                <td style={{ padding: '10px 8px' }}>{item.telefono}</td>
+                <td style={{ padding: '10px 8px' }}>
+                  <EditableField
+                    rowId={item.id}
+                    fieldName="nombre"
+                    value={item.nombre}
+                    onEdit={startEditing}
+                  />
+                </td>
+                <td style={{ padding: '10px 8px' }}>
+                  <EditableField
+                    rowId={item.id}
+                    fieldName="correo"
+                    value={item.correo}
+                    onEdit={startEditing}
+                  />
+                </td>
+                <td style={{ padding: '10px 8px' }}>
+                  <EditableField
+                    rowId={item.id}
+                    fieldName="telefono"
+                    value={item.telefono}
+                    onEdit={startEditing}
+                  />
+                </td>
                 <td style={{ padding: '10px 8px' }}>{item.proveedor}</td>
                 <td style={{ padding: '10px 8px' }}>
                   {item.documentos ? (
@@ -186,9 +407,6 @@ const VisitadoresAdmin = () => {
                   </span>
                 </td>
                 <td style={{ padding: '10px 8px', display: 'flex', gap: 12 }}>
-                  <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#5a60a5' }} title="Editar">
-                    <FontAwesomeIcon icon={faPen} />
-                  </button>
                   <button onClick={() => handleDelete(item.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#e74c3c' }} title="Eliminar">
                     <FontAwesomeIcon icon={faTrash} />
                   </button>

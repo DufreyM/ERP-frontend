@@ -13,14 +13,15 @@ import styles from './ButtonForm.module.css';
 
 const ButtonForm = ({
   text,
-  onClick
-
+  onClick,
+  disabled = false
 }) => {
     
     return(
         <button 
         className= {styles.divButtonForm}
         onClick={onClick}
+        disabled={disabled}
         >
            {text}
         </button>
