@@ -7,7 +7,7 @@ import ButtonText from "../../components/ButtonText/ButtonText";
 import SimpleTitle from "../../components/Titles/SimpleTitle";
 import { removeToken, getToken } from "../../services/authService";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCamera } from "@fortawesome/free-solid-svg-icons";
+import { faCamera, faPencil, faTimes, faCheck, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 
 import { faUser, faEnvelope, faBirthdayCake } from '@fortawesome/free-solid-svg-icons';
@@ -30,6 +30,7 @@ const MiPerfil = () => {
   const [success, setSuccess] = useState("");
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const fileInputRef = useRef(null);
 
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -333,11 +334,39 @@ const MiPerfil = () => {
     navigate('/admin/cambiar-contraseña');
   };
 
+  const handleEditProfile = () => {
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    // Restaurar datos originales
+    if (originalData) {
+      setFormData({
+        nombre: originalData.nombre || "",
+        apellidos: originalData.apellidos || "",
+        email: originalData.email || "",
+        fechanacimiento: originalData.fechanacimiento ? new Date(originalData.fechanacimiento) : null,
+      });
+    }
+  };
+
+  const handleSaveProfile = async () => {
+    await handleSubmit();
+    setIsEditing(false);
+  };
+
   const nombreCompleto = `${formData.nombre} ${formData.apellidos}`.trim() || "Nombre de usuario";
 
   return (
     <div className={styles.container}>
-      <SimpleTitle text="Mi Perfil" />
+      <div className={styles.header}>
+        <SimpleTitle text="Mi Perfil" />
+        <button className={styles.logoutButton} onClick={handleLogout}>
+          <FontAwesomeIcon icon={faSignOutAlt} />
+          Cerrar sesión
+        </button>
+      </div>
       
       {loading && <div style={{ color: '#5a60a5', fontWeight: 600, marginBottom: 12 }}>Cargando perfil...</div>}
       {error && <div style={{ color: '#e74c3c', fontWeight: 600, marginBottom: 12 }}>{error}</div>}
@@ -366,50 +395,91 @@ const MiPerfil = () => {
           />
         </div>
         
-        <h2 className={styles.nombre}>{nombreCompleto}</h2>
-        <p className={styles.puesto}>{userRole}</p>
-      </div>
+        <div className={styles.profileInfo}>
+          <div className={styles.infoItem}>
+            <label className={styles.infoLabel}>Nombre:</label>
+            {isEditing ? (
+              <IconoInput
+                icono={faUser}
+                placeholder="Nombre"
+                value={formData.nombre}
+                onChange={handleChange}
+                type="text"
+                name="nombre"
+              />
+            ) : (
+              <span className={styles.infoValue}>{formData.nombre || "No especificado"}</span>
+            )}
+          </div>
 
-      <IconoInput
-        icono={faUser}
-        placeholder="Nombre"
-        value={formData.nombre}
-        onChange={handleChange}
-        type="text"
-        name="nombre"
-      />
+          <div className={styles.infoItem}>
+            <label className={styles.infoLabel}>Apellido:</label>
+            {isEditing ? (
+              <IconoInput
+                icono={faUser}
+                placeholder="Apellidos"
+                value={formData.apellidos}
+                onChange={handleChange}
+                type="text"
+                name="apellidos"
+              />
+            ) : (
+              <span className={styles.infoValue}>{formData.apellidos || "No especificado"}</span>
+            )}
+          </div>
 
-      <IconoInput
-        icono={faUser}
-        placeholder="Apellidos"
-        value={formData.apellidos}
-        onChange={handleChange}
-        type="text"
-        name="apellidos"
-      />
+          <div className={styles.infoItem}>
+            <label className={styles.infoLabel}>Correo electrónico:</label>
+            {isEditing ? (
+              <IconoInput
+                icono={faEnvelope}
+                placeholder="Correo electrónico"
+                value={formData.email}
+                onChange={handleChange}
+                type="email"
+                name="email"
+              />
+            ) : (
+              <span className={styles.infoValue}>{formData.email || "No especificado"}</span>
+            )}
+          </div>
 
-      <IconoInput
-        icono={faEnvelope}
-        placeholder="Correo electrónico"
-        value={formData.email}
-        onChange={handleChange}
-        type="email"
-        name="email"
-      />
+          <div className={styles.infoItem}>
+            <label className={styles.infoLabel}>Fecha de nacimiento:</label>
+            {isEditing ? (
+              <InputDates
+                icono={faBirthdayCake}
+                placeholder="Fecha de nacimiento"
+                selected={formData.fechanacimiento}
+                onChange={handleDateChange}
+              />
+            ) : (
+              <span className={styles.infoValue}>
+                {formData.fechanacimiento ? formData.fechanacimiento.toLocaleDateString() : "No especificado"}
+              </span>
+            )}
+          </div>
 
-      <InputDates
-        icono={faBirthdayCake}
-        placeholder="Fecha de nacimiento"
-        selected={formData.fechanacimiento}
-        onChange={handleDateChange}
-      />
-
-      <div className={styles.buttonContainer}>
-        <ButtonForm
-          text={saving ? "Actualizando..." : "Actualizar perfil"}
-          onClick={handleSubmit}
-          disabled={saving}
-        />
+          <div className={styles.buttonContainer}>
+            {!isEditing ? (
+              <button className={styles.editButton} onClick={handleEditProfile}>
+                <FontAwesomeIcon icon={faPencil} />
+                Editar perfil
+              </button>
+            ) : (
+              <div className={styles.editButtons}>
+                <button className={styles.cancelButton} onClick={handleCancelEdit}>
+                  <FontAwesomeIcon icon={faTimes} />
+                  Cancelar
+                </button>
+                <button className={styles.saveButton} onClick={handleSaveProfile} disabled={saving}>
+                  <FontAwesomeIcon icon={faCheck} />
+                  {saving ? "Guardando..." : "Guardar"}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       <div className={styles.changePasswordContainer}>
@@ -417,14 +487,6 @@ const MiPerfil = () => {
           texto="¿Deseas cambiar tu contraseña?"
           textoButton="Cambiar contraseña"
           accion={handleChangePassword}
-        />
-      </div>
-
-      <div className={styles.logoutContainer}>
-        <ButtonText
-          texto="¿Deseas cerrar sesión?"
-          textoButton="Haz clic aquí"
-          accion={handleLogout}
         />
       </div>
     </div>
