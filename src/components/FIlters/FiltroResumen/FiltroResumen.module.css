@@ -1,0 +1,49 @@
+.pillContainer {
+
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  border: none;
+  
+}
+
+.pill {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+  background-color: #d1d4ed92;
+  color: #5a60A5;
+  border: none;
+
+ 
+ 
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.icon {
+  margin-right: 0.4rem;
+}
+
+.removeIcon {
+  margin-left: 0.5rem;
+  cursor: pointer;
+  color: #5a60A5;
+  transition: color 0.2s;
+}
+
+.removeIcon:hover {
+  color: #2f3574;
+}
+
+.titleoptionfill{
+    padding: 0px;
+    margin: 0px;
+
+}

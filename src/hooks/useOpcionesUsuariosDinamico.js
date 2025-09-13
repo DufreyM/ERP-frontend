@@ -8,7 +8,7 @@
 //   setOpcionsUsers
 // });
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getOptions } from "../utils/selects";
 
 
@@ -24,8 +24,12 @@ export const useOpcionesUsuarioDinamicos = ({
         return path.split('.').reduce((acc, part) => acc?.[part], obj);
     };
 
+    // Guardar versiones previas para comparar
+    const [prevRoles, setPrevRoles] = useState([]);
+    const [prevUsers, setPrevUsers] = useState([]);
+
     useEffect(() => {
-        if (!data) return;
+        if (!data || data.length === 0) return;
         //if (!data || !tipoUserKeyMap) return;
 
         getOptions("http://localhost:3000/api/roles", item => ({
@@ -63,9 +67,20 @@ export const useOpcionesUsuarioDinamicos = ({
             });
 
             const opcionesUsuarios = Array.from(mapaUsuarios.values());
-            setOpcionsUsers(opcionesUsuarios);
+             const rolesChanged = JSON.stringify(rolesUsados) !== JSON.stringify(prevRoles);
+            const usersChanged = JSON.stringify(opcionesUsuarios) !== JSON.stringify(prevUsers);
+
+            if (rolesChanged) {
+                setOpcionsRoles(rolesUsados);
+                setPrevRoles(rolesUsados);
+            }
+
+            if (usersChanged) {
+                setOpcionsUsers(opcionesUsuarios);
+                setPrevUsers(opcionesUsuarios);
+            }
         });
-        }, [data]);
+    }, [data, tipoUserKeyMap, prevRoles, prevUsers, setOpcionsRoles, setOpcionsUsers]);
 
 
 

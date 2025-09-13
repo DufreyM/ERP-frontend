@@ -20,24 +20,33 @@ const Filters = ({
     // Tipo medicamento
 
     title = "CAMBIAR",
+    panelAbierto,
+    setPanelAbierto,
     mostrarRangoFecha = true,
     mostrarRangoPrecio = true,
     mostrarUsuario = true,
     mostrarMedicamento = true,
 
     //atributos para rango de precio
+    isOpendPrice,
+    expandPrecio,
     precioMin,
     setPrecioMin,
     precioMax,
     setPrecioMax,
 
     //atributos para rango de fecha
+    isOpendDate,
+    expandFecha,
     fechaInicio, 
     setFechaInicio,
     fechaFin, 
     setFechaFin,
 
     //atributos para usuarios y roles
+    isOpendRol,
+    expandRol,
+    expandUsuario,
     opcionesUsuarios,
     opcionesRoles,
     usuarioSeleccionado,
@@ -45,84 +54,103 @@ const Filters = ({
     handleChange,
 
     //atributos para tipo medicamento
+    isOpendMedic,
+    expandMedicamento,
     opcionesTipoMedicamento,
     medicamentoSeleccionado,
-    handleChangeMedicamento
+    handleChangeMedicamento,
+    
 
 }) => {
 
   //Todos los estados de abierto y cerrado de cada filtro
-  const [isOpendDate, setIsOpendDate] = useState(false);
-  const [isOpendRol, setIsOpendRol] = useState(false);
-  const [isOpendPrice, setIsOpendPrice] = useState(false);
-  const [isOpendMedic, setIsOpendMedic] = useState(false);
+  const [selectedPreDate, setSelectedPreDate] = useState('');
+ 
+
+  const resetFiltros = () => {
+    setFechaInicio(null);
+    setFechaFin(null);
+    setSelectedPreDate('');
+
+    setPrecioMin('');
+    setPrecioMax('');
+
+    handleChange({ target: { name: 'usuarios', value: '' } });
+    handleChange({ target: { name: 'rol', value: '' } });
+
+    handleChangeMedicamento({ target: { name: 'tipo', value: '' } });
+  };
+
 
 
   const handleRangoFechaRapida = (opcion) => {
-  const hoy = new Date();
-  const ayer = new Date();
-  ayer.setDate(hoy.getDate() - 1);
+    setSelectedPreDate(opcion);
+    const hoy = new Date();
+    const ayer = new Date();
+    ayer.setDate(hoy.getDate() - 1);
 
-  const primerDiaSemana = new Date(hoy);
-  primerDiaSemana.setDate(hoy.getDate() - hoy.getDay()); // Domingo
+    const primerDiaSemana = new Date(hoy);
+    primerDiaSemana.setDate(hoy.getDate() - hoy.getDay()); // Domingo
 
-  const ultimoDiaSemana = new Date(primerDiaSemana);
-  ultimoDiaSemana.setDate(primerDiaSemana.getDate() + 6);
+    const ultimoDiaSemana = new Date(primerDiaSemana);
+    ultimoDiaSemana.setDate(primerDiaSemana.getDate() + 6);
+    
 
-  switch(opcion) {
-    case "Hoy":
-      setFechaInicio(new Date(hoy.setHours(0,0,0,0)));
-      setFechaFin(new Date(hoy.setHours(23,59,59,999)));
-      break;
+    switch(opcion) {
+      
+      case "Hoy":
+        setFechaInicio(new Date(hoy.setHours(0,0,0,0)));
+        setFechaFin(new Date(hoy.setHours(23,59,59,999)));
+        break;
 
-    case "Ayer":
-      setFechaInicio(new Date(ayer.setHours(0,0,0,0)));
-      setFechaFin(new Date(ayer.setHours(23,59,59,999)));
-      break;
+      case "Ayer":
+        setFechaInicio(new Date(ayer.setHours(0,0,0,0)));
+        setFechaFin(new Date(ayer.setHours(23,59,59,999)));
+        break;
 
-    case "Esta semana":
-      setFechaInicio(new Date(primerDiaSemana.setHours(0, 0, 0, 0)));
-      setFechaFin(new Date(ultimoDiaSemana.setHours(23, 59, 59, 999)));
-      break;
+      case "Esta semana":
+        setFechaInicio(new Date(primerDiaSemana.setHours(0, 0, 0, 0)));
+        setFechaFin(new Date(ultimoDiaSemana.setHours(23, 59, 59, 999)));
+        break;
 
-    case "Semana pasada":
-      const inicioSemanaPasada = new Date(primerDiaSemana);
-      inicioSemanaPasada.setDate(primerDiaSemana.getDate() - 7);
-      const finSemanaPasada = new Date(ultimoDiaSemana);
-      finSemanaPasada.setDate(ultimoDiaSemana.getDate() - 7);
-      setFechaInicio(new Date(inicioSemanaPasada.setHours(0, 0, 0, 0)));
-      setFechaFin(new Date(finSemanaPasada.setHours(23, 59, 59, 999)));
-      break;
+      case "Semana pasada":
+        const inicioSemanaPasada = new Date(primerDiaSemana);
+        inicioSemanaPasada.setDate(primerDiaSemana.getDate() - 7);
+        const finSemanaPasada = new Date(ultimoDiaSemana);
+        finSemanaPasada.setDate(ultimoDiaSemana.getDate() - 7);
+        setFechaInicio(new Date(inicioSemanaPasada.setHours(0, 0, 0, 0)));
+        setFechaFin(new Date(finSemanaPasada.setHours(23, 59, 59, 999)));
+        break;
 
-    case "Este mes":
-      const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-      const finMes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
-      setFechaInicio(inicioMes);
-      setFechaFin(finMes);
-      break;
+      case "Este mes":
+        const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+        const finMes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
+        setFechaInicio(inicioMes);
+        setFechaFin(finMes);
+        break;
 
-    case "Mes pasado":
-      const inicioMesPasado = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
-      const finMesPasado = new Date(hoy.getFullYear(), hoy.getMonth(), 0);
-      setFechaInicio(new Date(inicioMesPasado.setHours(0, 0, 0, 0)));
-      setFechaFin(new Date(finMesPasado.setHours(23, 59, 59, 999)));
-      break;
+      case "Mes pasado":
+        const inicioMesPasado = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
+        const finMesPasado = new Date(hoy.getFullYear(), hoy.getMonth(), 0);
+        setFechaInicio(new Date(inicioMesPasado.setHours(0, 0, 0, 0)));
+        setFechaFin(new Date(finMesPasado.setHours(23, 59, 59, 999)));
+        break;
 
-    case "Este año":
-      const inicioAno = new Date(hoy.getFullYear(), 0, 1);
-      const finAno = new Date(hoy.getFullYear(), 11, 31);
-      setFechaInicio(new Date(inicioAno.setHours(0, 0, 0, 0)));
-      setFechaFin(new Date(finAno.setHours(23, 59, 59, 999)));
-      break;
+      case "Este año":
+        const inicioAno = new Date(hoy.getFullYear(), 0, 1);
+        const finAno = new Date(hoy.getFullYear(), 11, 31);
+        setFechaInicio(new Date(inicioAno.setHours(0, 0, 0, 0)));
+        setFechaFin(new Date(finAno.setHours(23, 59, 59, 999)));
+        break;
 
-    case "Año pasado":
-      const inicioAnoPasado = new Date(hoy.getFullYear() - 1, 0, 1);
-      const finAnoPasado = new Date(hoy.getFullYear() - 1, 11, 31);
-      setFechaInicio(new Date(inicioAnoPasado.setHours(0, 0, 0, 0)));
-      setFechaFin(new Date(finAnoPasado.setHours(23, 59, 59, 999)));
-      break;
+      case "Año pasado":
+        const inicioAnoPasado = new Date(hoy.getFullYear() - 1, 0, 1);
+        const finAnoPasado = new Date(hoy.getFullYear() - 1, 11, 31);
+        setFechaInicio(new Date(inicioAnoPasado.setHours(0, 0, 0, 0)));
+        setFechaFin(new Date(finAnoPasado.setHours(23, 59, 59, 999)));
+        break;
 
-    // Agregar más casos...
+      // Agregar más casos...
     }
   };
 
@@ -148,8 +176,21 @@ const Filters = ({
         <ButtonDisplay
           icon={faFilter}
           title={"Filtros"}
+          filter = {true}
+          abierto={panelAbierto}
+          setAbierto={setPanelAbierto}
         > 
-          <h3 className={styles.titleFilters}>Filtros de {title}</h3>
+
+          <div className={styles.resetButtonContainer}>
+            <h3 className={styles.titleFilters}>Filtros de {title}</h3>
+            
+            <button 
+              className={styles.resetButton}
+              onClick={resetFiltros}
+            >
+              <FontAwesomeIcon icon={faFilterCircleXmark} /> 
+            </button>
+          </div>
 
           {/* Filtro de fecha */}
           {mostrarRangoFecha ? (
@@ -161,42 +202,50 @@ const Filters = ({
                 icon={faCalendar}
                 title={"Fecha"}
                 isOpend={isOpendDate}
-                changeOpen={() => setIsOpendDate(prev => !prev)}
+                changeOpen={expandFecha}
 
               >
 
                 <LittleOptions 
                   title={"Hoy"}
                   onClick={() => handleRangoFechaRapida("Hoy")}
+                  isActive={selectedPreDate === "Hoy"}
                 />
                 <LittleOptions 
                   title={"Ayer"}
                   onClick={() => handleRangoFechaRapida("Ayer")}
+                  isActive={selectedPreDate === "Ayer"}
                 />
                 <LittleOptions 
                   title={"Esta semana"}
                   onClick={() => handleRangoFechaRapida("Esta semana")}
+                  isActive={selectedPreDate === "Esta semana"}
                 />
                 <LittleOptions 
                   title={"Semana pasada"}
                   onClick={() => handleRangoFechaRapida("Semana pasada")}
+                  isActive={selectedPreDate === "Semana pasada"}
                 />
                 <LittleOptions 
                   title={"Este mes"}
                   onClick={() => handleRangoFechaRapida("Este mes")}
+                  isActive={selectedPreDate === "Este mes"}
                 />
                 <LittleOptions 
                   title={"Mes pasado"}
                   onClick={() => handleRangoFechaRapida("Mes pasado")}
+                  isActive={selectedPreDate === "Mes pasado"}
                 />
 
                 <LittleOptions 
                   title={"Este año"}
                   onClick={() => handleRangoFechaRapida("Este año")}
+                  isActive={selectedPreDate === "Este año"}
                 />
                 <LittleOptions 
                   title={"Año pasado"}
                   onClick={() => handleRangoFechaRapida("Año pasado")}
+                  isActive={selectedPreDate === "Año pasado"}
                 />
            
               
@@ -268,7 +317,7 @@ const Filters = ({
                 icon={faUser}
                 title={"Usuarios y tipos de usuario"}
                 isOpend={isOpendRol}
-                changeOpen={() => setIsOpendRol(prev => !prev)}
+                changeOpen={expandRol}
 
               >
                 <InputSelects
@@ -307,7 +356,7 @@ const Filters = ({
                 icon={faDollar}
                 title={"Precio"}
                 isOpend={isOpendPrice}
-                changeOpen={() => setIsOpendPrice(prev => !prev)}
+                changeOpen={expandPrecio}
 
               >
                 <div className={styles.contenedorFiltroPrecio}>
@@ -346,7 +395,7 @@ const Filters = ({
                 icon={faBriefcaseMedical}
                 title={"Tipo de medicamento"}
                 isOpend={isOpendMedic}
-                changeOpen={() => setIsOpendMedic(prev => !prev)}
+                changeOpen={expandMedicamento}
 
               >
                  <InputSelects
@@ -365,25 +414,6 @@ const Filters = ({
             </div>
           ) : <div/>}
 
-
-
-
-          {/* aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa */}
-         
-          
-         
-
-            <h3 className={styles.titleFilters}>Ordenar datos</h3>
-
-            {/* <div className={styles.ordenButtons}>
-              
-              <FontAwesomeIcon
-                icon={faFilterCircleXmark}
-                title="Eliminar filtros"
-                onClick={onResetFiltros}
-                className={styles.IconStyle}
-              />
-            </div> */}
          
         
           

@@ -4,13 +4,31 @@
     align-items: center;
     gap: 10px;
     color: #5a60A5;
+    width: 100%;
+    border: none;
+    font-size: 15px;
+    background-color: white;
+    cursor: pointer;
+    border-radius: 10px;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif ;
+
+    transition-property: background-color, transform;
+    transition-duration: 0.2s, 0.2s;
+    transition-timing-function: ease-out, ease-out;
+    transition-delay: 0s, 0s;
+    z-index: 100;
 }
 
 .contenedorOptions:hover {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
     color: #5a60A5;
-    background-color: #5a60A5;
+    background-color: #5a60a515; 
+    transform: scale(1.02);
+    
+}
+
+.contenedorOptionsActive{
+    background-color: #5a60a530;
+    font-weight: bold;
+    transform: scale(1.01);
+
 }

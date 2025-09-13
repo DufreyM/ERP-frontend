@@ -2,7 +2,7 @@
     Renato Rojas. 28/05/2025 */
 
 .contenedorGeneral {
-    height: calc(100% - 65px);
+    height: calc(100% - 85px);
     width: 100%;    
     display: flex;
     flex-direction: column;

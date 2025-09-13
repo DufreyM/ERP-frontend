@@ -2,11 +2,10 @@
 import { useState, useMemo, useEffect } from "react";
 
 // const sortKeyMap = {
-//     FECHA: "nombreProducto",
-//     USUARIO: "nombreProducto",
-//     TIPO_USUARIO: "existencias",
-//     TIPO_MEDICAMENTO: "existencias",
-//     RANGO_PRECIO: 
+//      const keyPrecio = filterKeyMap["RANGO_PRECIO"];
+        // const keyFecha = filterKeyMap["RANGO_FECHA"];
+        // const keyUsuario = filterKeyMap["USUARIO"];
+        // const keyRol = filterKeyMap["ROL"]; 
 //     };
 
 export const useFiltroGeneral = ({ 

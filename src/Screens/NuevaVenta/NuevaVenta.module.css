@@ -5,11 +5,15 @@
   text-align: center;
   width: calc(100% - 30px);
   padding: 0px 15px;
+  margin: 0px;
   color: #5a60A5;
 }
 
+
 .tituloNuevaVenta{
   width: 100%;
+  padding: 0px;
+  margin: 0px 0px;
 }
 
 .buttonVolverV{
@@ -17,30 +21,70 @@
   border: none;
   color: #5a60A5;
   cursor: pointer;
+  height: 45px;
 }
+
+
+
+
 
 .subtituloNuevaVenta{
     margin: 0px;
-    padding-bottom: 5px;
+    padding: 0px;
     color: #5a60A5;
+
 }
 
 .encabezadoNuevaVenta{
     display: flex;
     flex-direction: row;
-    gap: 20px;
-
-    width: auto;
-    
+    gap: 5px;
+   
+    margin: 0px;
+    padding: 0px;
 }
 
 .datosClienteVenta{
     display: flex;
     flex-direction: column;
-    padding: 20px 0px 20px 20px;
-    width: 50%;
+    gap: 10px;
     align-items: center;
     justify-content: center;
+
+    width: 50%;
+    padding: 10px;
+    margin: 5px;
+  
+    background-color: #f3f3f8;
+    border-radius: 20px;
+}
+
+.contenedorNitcliente{
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.contenedorRegistrado{
+  padding: 20px;
+  width: calc(100% - 40px);
+  background-color: salmon;
+}
+
+.buttonBuscarVenta{
+  background-color: #5a60A5;
+  border-radius: 10px;
+  border: none;
+  color: white;
+  font-size: 20px;
+  height: 35px;
+  cursor: pointer;
+}
+
+.contenedorCF{
+  padding: 20px;
+  width: calc(100% - 40px);
+  background-color: salmon;
 }
 
 .gridDatosCertificacion {
@@ -72,4 +116,61 @@
 .contenedorDatosVenta {
     padding: 20px;
     background-color: white;
+}
+
+
+
+
+
+
+
+/* estilo de radio button */
+.radioTipoCliente {
+
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  margin: 0;
+  border-bottom: 2px solid #ccc;
+  position: relative;
+
+ 
+}
+
+.radioTipoCliente label {
+  position: relative;
+  padding: 0.5rem 0;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 1.1rem;
+  color: #555;
+  transition: color 0.3s ease;
+}
+
+/* Ocultar el radio button nativo */
+.radioTipoCliente input[type="radio"] {
+  display: none;
+}
+
+/* Línea animada debajo */
+.radioTipoCliente label::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: #5a60A5; /* o el color que quieras */
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.3s ease;
+}
+
+/* Activar línea si está seleccionado */
+.radioTipoCliente label.selected {
+  color: #5a60A5;
+}
+
+.radioTipoCliente label.selected::after {
+  transform: scaleX(1);
 }

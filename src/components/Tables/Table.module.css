@@ -3,6 +3,7 @@
   height: 100%;
   overflow-y: auto;
   overflow-x: auto;
+  scrollbar-gutter: stable;
 }
 
 .TableStyle {
@@ -11,8 +12,73 @@
   border-collapse: collapse;
 }
 
-.IconStyle2{
+.inputCantidadWrapper{
+  display: flex;
+  flex-direction: row;
+}
 
+.InputTableFactura{
+  display: flex;
+  border: none;
+
+  background-color: #e6e7ec89;
+  min-width: 40px;
+  max-width: 40px;
+  text-align: center;
+  justify-content: center;
+  border-radius: 10px;
+  width: 100%;
+}
+
+.botonAgregar{
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  background-color: #5a60a5;
+  padding: 15px;
+  border-radius: 15px;
+  border: none;
+  color: white;
+  font-size: 15px;
+  font-weight: bold;
+  align-items: center;
+  cursor: pointer;
+}
+
+.botonAgregar:active{
+  background-color: #434a93;
+  transform: scale(0.98); 
+
+}
+.botonAgregar:disabled{
+  background-color: #6c72b3ab;
+}
+
+
+
+.InputTableFactura::-webkit-inner-spin-button,
+.InputTableFactura::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.botonCantidadFacturaVenta{
+  border: none;
+  background-color: transparent;
+  color: white;
+  padding: 5px;
+}
+.total{
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+ 
+
+}
+
+.IconStyle2{
   height: 20px;
   cursor: pointer;
   display: flex;
@@ -23,7 +89,6 @@
 }
 
 .IconStyle{
-
   height: 20px;
   cursor: pointer;
   display: flex;
@@ -31,6 +96,16 @@
   gap:5px;
   align-items: center;
   color:#5a60a5;
+}
+
+.IconPlusMin{
+  color:#5a60a5;
+  font-size: 20px;
+}
+
+.buttonDeleteTable{
+  background-color: transparent;
+  border: none;
 }
 
 
@@ -53,6 +128,14 @@
   max-width: 200px;
 }
 
+
+.theadStyleFactura .thStyleFactura {
+  position: sticky;
+  top: 0;
+  background-color: #8186c2;
+  color: white;
+
+}
 
 
 
