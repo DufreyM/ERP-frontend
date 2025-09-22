@@ -1,3 +1,26 @@
+.errorTexto{
+  padding: 0px;
+  margin: 0px;
+  padding-bottom: 12px;
+  font-weight: bold;
+  color: rgb(167, 19, 19);
+  font-size: 16px;
+ 
+  text-align: center;
+}
+
+.totalText{
+  display: flex;
+  margin: 0px;
+  padding: 0px;
+ 
+
+  color: #434a93;
+  font-size: 20px;
+ 
+
+}
+
 .divTable {
   width: 100%;
   height: 100%;
@@ -15,6 +38,8 @@
 .inputCantidadWrapper{
   display: flex;
   flex-direction: row;
+  align-items: center;    
+  gap: 5px;
 }
 
 .InputTableFactura{
@@ -23,7 +48,7 @@
 
   background-color: #e6e7ec89;
   min-width: 40px;
-  max-width: 40px;
+
   text-align: center;
   justify-content: center;
   border-radius: 10px;
@@ -74,7 +99,8 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
- 
+  padding: 10px 0px;
+
 
 }
 
@@ -134,7 +160,6 @@
   top: 0;
   background-color: #8186c2;
   color: white;
-
 }
 
 
@@ -153,6 +178,7 @@
   color: black;
   padding: 1rem 0.5rem;
   
+  
   white-space: nowrap;         /* <- Evita que el contenido se quiebre */
   overflow: hidden;            /* <- Oculta el desbordamiento */
   text-overflow: ellipsis;
@@ -165,6 +191,7 @@
   text-align: left;
   padding-left:10px;
   word-break: break-word;
+
   
 }
 
@@ -190,3 +217,55 @@ h3 {
     margin: 10px;
     width: 95%;
 }
+
+
+
+
+
+/* ESTILOS SOLO PARA LA TABLA DE VENTAS */
+.TablaVentas {
+  background-color: #f8f9fc; /* un fondo diferente para identificarla */
+  
+  border-radius: 10px;
+}
+
+.TablaVentas th,
+.TablaVentas td {
+  padding: 0.8rem 0.5rem;
+  text-align: center;
+}
+
+.TablaVentas thead {
+  background-color: #5a60a5;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.TablaVentas tbody tr:hover {
+  background-color: #dce0f3;
+}
+
+.TablaVentas select,
+.TablaVentas input {
+  font-size: 14px;
+  padding: 4px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.TablaVentas .buttonDeleteTable {
+  color: #c52e2c;
+  cursor: pointer;
+}
+
+.TablaVentas .InputTableFactura {
+  background-color: #e3e6f0;
+  max-width: 60px;
+  text-align: center;
+}
+
+
+
+

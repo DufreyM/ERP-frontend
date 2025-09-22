@@ -102,7 +102,7 @@ const InventarioScreen = () => {
 
  // Función para manejar cambios en los filtros
   const [opcionesTipoMedicamento, setOpcionesTipoMedicamento] = useState([ ]);
-  const [medicamentoSeleccionado, setMedicamentoSeleccionado] = useState('')
+  const [medicamentoSeleccionado, setMedicamentoSeleccionado] = useState([ ])
 
 
   // Extraer tipos únicos de los productos
@@ -132,14 +132,19 @@ const InventarioScreen = () => {
     console.log(productosConvertidos);
 
     //intentofiltros
-    const handleMedicamentoChange = (e) => {
-      setMedicamentoSeleccionado(e.target.value);
+    const handleMedicamentoChange = (nuevosTiposSeleccionados) => {
+      setMedicamentoSeleccionado(nuevosTiposSeleccionados);
     };
+
 
     const [precioMin, setPrecioMin] = useState('');
     const [precioMax, setPrecioMax] = useState('');
    
-
+    const handleRemoveMedicamento = (tipo) => {
+      setMedicamentoSeleccionado(prev => 
+        prev.filter(m => m.value !== tipo.value)
+      );
+    };
 
      const filterKeyMap={
         RANGO_PRECIO: "precioventa",
@@ -167,6 +172,13 @@ const InventarioScreen = () => {
         PRICE_LOW: "precioventa",
    
     }
+
+    const resetFiltros = () => {
+      setPrecioMin('');
+      setPrecioMax('');
+      setMedicamentoSeleccionado([]);
+    };
+
    
   
     //LLamar useOrdeyBy desde hooks/useOrderBy.js
@@ -217,6 +229,8 @@ const InventarioScreen = () => {
           opcionesTipoMedicamento = {opcionesTipoMedicamento}
           medicamentoSeleccionado ={medicamentoSeleccionado}
           handleChangeMedicamento ={handleMedicamentoChange}
+
+          resetFiltros = {resetFiltros}
                        
         ></Filters>
 
@@ -256,7 +270,9 @@ const InventarioScreen = () => {
           }}
           onRemoveUsuario={() => handleChange({ target: { name: 'usuarios', value: '' } })}
           onRemoveRol={() => handleChange({ target: { name: 'rol', value: '' } })}
-          onRemoveMedicamento={() => handleChangeMedicamento({ target: { name: 'tipo', value: '' } })}
+          onRemoveMedicamento={handleRemoveMedicamento}
+
+          
         />
 
       {loading && <div className={styles.loading}>Cargando productos...</div>}

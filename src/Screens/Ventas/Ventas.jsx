@@ -92,7 +92,7 @@ const Ventas = () => {
   const expandPrecio = () => {setIsOpendPrice(prev => !prev);};
   const expandRol = () => {setIsOpendRol(prev => !prev); };
   const expandUsuario = () => {setIsOpendRol(prev => !prev); };
-  const expandMedicamento = () => {setIsOpendMedic(prev => !prev); };
+  
 
   const expandFechaResume = () => {setIsOpendDate(true); setPanelAbierto(true);};
   const expandPrecioResume = () => {setIsOpendPrice(true); setPanelAbierto(true);};
@@ -186,6 +186,26 @@ const Ventas = () => {
 
   
   }
+
+  
+
+   
+
+
+  const resetFiltros = () => {
+    setFechaInicio(null);
+    setFechaFin(null);
+    
+
+    setPrecioMin('');
+    setPrecioMax('');
+
+    setRolSeleccionado('');
+    setUsuarioSeleccionado('');
+    setUsuariosFiltrados(opcionsUsers);
+
+  };
+
   
   const {sortedData, sortOption, setSortOption} = useOrderBy({data: dataFiltrada, sortKeyMap: sortKeyMap});
 
@@ -196,13 +216,8 @@ const Ventas = () => {
     }, 0);
   }, [sortedData]);
 
+ 
    
-    
-console.log('Render Ventas, datosTransformados length:', datosTransformados.length);
-console.log('sortedData length:', sortedData.length);
-console.log('sortedData datos:', sortedData);
-
-    
 
 
 
@@ -226,7 +241,7 @@ console.log('sortedData datos:', sortedData);
                       panelAbierto={panelAbierto}
                       setPanelAbierto={setPanelAbierto}
                       mostrarRangoFecha = {true}
-                      mostrarRangoMonto = {true}
+                      mostrarRangoPrecio = {true}
                       mostrarUsuario = {true}
                       mostrarMedicamento = {false}
 
@@ -255,6 +270,8 @@ console.log('sortedData datos:', sortedData);
                       fechaInicio={fechaInicio}
                       fechaFin={fechaFin}
                       setFechaFin = {setFechaFin}
+
+                      resetFiltros={resetFiltros}
                     ></Filters>
 
                     <OrderBy

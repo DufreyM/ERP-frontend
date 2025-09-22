@@ -88,14 +88,11 @@ export const TablaFactura = ({
 
   return (
     <div className={styles.divTable}>
-      {productosRestantes.length === 0 && (
-        <p className={styles.mensajeLimite}>
-          Ya se han agregado todos los productos disponibles.
-        </p>
-      )}
+      
 
       <div className={styles.total}>
-        <strong>Total: ${totalFactura.toFixed(2)}</strong>
+        <strong className={styles.totalText}>Total de venta: Q{totalFactura.toFixed(2)}</strong>
+
         <button onClick={agregarLinea} className={styles.botonAgregar} disabled={!puedeAgregarMas}>
           <FontAwesomeIcon 
             icon={faPlus}
@@ -104,15 +101,22 @@ export const TablaFactura = ({
           Agregar Producto
         </button>
       </div>
+
+      {productosRestantes.length === 0 && (
+      
+        <p className={styles.errorTexto}>
+          Ya se han agregado todos los productos disponibles.
+        </p>
+      )}
       
       
-      <table className={styles.TableStyle}>
+      <table className={`${styles.TableStyle} ${styles.TablaVentas}`}>
         <thead className={styles.theadStyleFactura}>
           <tr className={styles.thStyleFactura}>
             <th>No</th>
             <th>Producto</th>
             <th>Cantidad</th>
-            <th>Precio Unitario (Con IVA)</th>
+            <th>Precio Unitario</th>
             <th>Descuento (Q)</th>
             <th>IVA (12%)</th>
             <th>Subtotal</th>
@@ -187,12 +191,14 @@ export const TablaFactura = ({
                       className={styles.IconPlusMin}
                     ></FontAwesomeIcon>
                   </button>
+      
                 </div>
-              </td>
-              {linea.cantidad >= linea.stock_actual && (
+                {linea.cantidad >= linea.stock_actual && (
                       <small style={{ color: "red" }}>Stock máximo alcanzado</small>
                     )}
-              <td>${parseFloat(linea.precio_unitario).toFixed(2)}</td>
+              </td>
+              
+              <td>Q{parseFloat(linea.precio_unitario).toFixed(2)}</td>
               <td>
                 <input
                   className={styles.InputTableFactura}
@@ -205,13 +211,13 @@ export const TablaFactura = ({
               </td>
 
               <td>
-                  ${(
+                  Q{(
                     parseFloat(linea.precio_unitario) -
                     parseFloat(linea.precio_unitario) / 1.12
                   ).toFixed(2)}
                 </td>
                               
-              <td>${linea.subtotal.toFixed(2)}</td>
+              <td>Q{linea.subtotal.toFixed(2)}</td>
               <td>
                 <button onClick={() => eliminarLinea(i)}
                 className={styles.buttonDeleteTable}

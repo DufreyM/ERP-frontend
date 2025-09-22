@@ -14,6 +14,7 @@ const InputSelects = ({
     opcions
 }) => {
     const [abierto, setAbierto] = useState(false);
+    console.log("VALUE:", value, "Opcions:", opcions);
     
 
     return (
@@ -25,7 +26,7 @@ const InputSelects = ({
                 onBlur={() => setAbierto(false)}
                 className={styles.inputStyle}
                 type= {type}
-                value= {value}
+                value= {String(value)}
                 name = {name}
                 onChange={onChange}
             >

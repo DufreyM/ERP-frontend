@@ -8,9 +8,10 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import { TablaFactura } from "../../components/Tables/TablaFactura.jsx";
 import ButtonText from "../../components/ButtonText/ButtonText.jsx";
 import ButtonHeaders from "../../components/ButtonHeaders/ButtonHeaders.jsx";
-import { useState } from "react";
+import { useState, useEffect} from "react";
 import { useFetch } from "../../utils/useFetch.jsx";
 import { getToken } from "../../services/authService.js";
+import Popup from "../../components/Popup/Popup.jsx";
 
 
 
@@ -27,6 +28,26 @@ const NuevaVenta = () => {
   const localSeleccionado = selectedLocal + 1 ;
   const {data: productos, loading, error } = useFetch(`http://localhost:3000/api/productos/con-stock?local_id=${localSeleccionado}`);
 
+  const [notificacion, setNotificacion] = useState('');
+    useEffect(() => {
+        if (notificacion) {
+            const timer = setTimeout(() => {
+            setNotificacion('');
+            }, 2500); // se quita en 2.5 segundos
+
+            return () => clearTimeout(timer);
+        }
+    }, [notificacion]);
+
+
+  const [datosCargados, setDatosCargados] = useState(false);
+
+
+
+  
+
+
+
   const filtrarProductos = (productos) => {
     return productos.map((p) => ({
       id: parseInt(p.codigo),
@@ -41,7 +62,7 @@ const NuevaVenta = () => {
 
   const productosFiltrados = productos? filtrarProductos(productos): [];
   const [lineas, setLineas] = useState([]);
-  console.log(productosFiltrados);
+
 
   const [errorMessage, setErrorMessage] = useState("");
   const [tipoCliente, setTipoCliente] = useState("registrado"); // o "cf"
@@ -50,6 +71,35 @@ const NuevaVenta = () => {
   const [datosCliente, setDatosCliente] = useState(null);
   const [tipoPago, setTipoPago] = useState("efectivo");
   const [mostrarInputNombreManual, setMostrarInputNombreManual] = useState(false)
+  //para que no se pierdan los datos al refrescar
+  useEffect(() => {
+    if (!datosCargados) return;
+    const ventaTemp = {
+      lineas,
+      tipoCliente,
+      nitCliente,
+      nombreClienteManual,
+      tipoPago,
+    };
+    localStorage.setItem("venta-temporal", JSON.stringify(ventaTemp));
+  }, [lineas, tipoCliente, nitCliente, nombreClienteManual, tipoPago]);
+
+
+  useEffect(() => {
+    const datosGuardados = localStorage.getItem("venta-temporal");
+    if (datosGuardados) {
+      const venta = JSON.parse(datosGuardados);
+      setLineas(venta.lineas || []);
+      setTipoCliente(venta.tipoCliente || "registrado");
+      setNitCliente(venta.nitCliente || "");
+      setNombreClienteManual(venta.nombreClienteManual || "");
+      setTipoPago(venta.tipoPago || "efectivo");
+      console.log("Datos cargados de localStorage", venta);
+    }
+    
+    setDatosCargados(true);
+  }, []);
+
 
   const handleNitCliente = (e) => {
     setNitCliente(e.target.value);
@@ -58,7 +108,7 @@ const NuevaVenta = () => {
 
   const handleBuscarCliente = async () => {
     if (!nitCliente) {
-      setErrorMessage("Por favor, ingresa un NIT válido.");
+      setErrorMessage("Por favor, ingresa un NIT válido o completa los campos para registrar un cliente.");
       setDatosCliente(null);
       setMostrarInputNombreManual(true);
       return;
@@ -77,7 +127,7 @@ const NuevaVenta = () => {
       const data = await response.json();
       // Aquí verificamos si el cliente fue encontrado (según tu API, ajusta si es un array)
       if (!data || Object.keys(data).length === 0) {
-        throw new Error("Cliente no encontrado"); // Esto fuerza el catch
+        throw new Error("Cliente no encontrado, escribe el nombre para registrarlo."); // Esto fuerza el catch
       }
 
       setDatosCliente(data);
@@ -89,7 +139,7 @@ const NuevaVenta = () => {
       console.error("Error al buscar cliente:", error.message);
       setDatosCliente(null);
       setMostrarInputNombreManual(true);
-      setErrorMessage("Cliente no encontrado.");
+      setErrorMessage("Cliente no encontrado, completa el nombre para registrarlo.");
       
     }
   };
@@ -97,7 +147,8 @@ const NuevaVenta = () => {
   const handleConfirmarVenta = async () => {
     try {
       if (lineas.length === 0) {
-        alert("Debe agregar al menos un producto.");
+        setNotificacion('Debe agregar al menos un producto'); 
+       
         return;
       }
 
@@ -107,7 +158,7 @@ const NuevaVenta = () => {
       );
 
       if (algunaLineaSinProducto) {
-        alert("Por favor selecciona un producto en todas las líneas de la factura.");
+        setNotificacion("Por favor selecciona un producto en todas las líneas de la factura."); 
         return;
       }
 
@@ -133,7 +184,8 @@ const NuevaVenta = () => {
       } else {
         // Cliente manual
         if (!nitCliente || !nombreClienteManual) {
-          alert("Por favor ingresa NIT y nombre del cliente.");
+          
+          setNotificacion("Por favor ingresa NIT y nombre del cliente.");
           return;
         }
 
@@ -163,21 +215,34 @@ const NuevaVenta = () => {
 
     const result = await response.json();
     console.log("Venta registrada correctamente:", result);
-    alert("¡Venta registrada con éxito!");
+    setNotificacion("¡Venta registrada con éxito!");
+    localStorage.removeItem("venta-temporal");
+
 
     // Redirigir o resetear formulario
-    navigate(-1);
+    navigate(-1); 
   } catch (error) {
     console.error(error.message);
-    alert("Ocurrió un error al registrar la venta.");
+    setNotificacion("Ocurrió un error al registrar la venta.");
   }
 };
 
 
-  
-console.log("aaaaaaaaaaa")  
-console.log(datosCliente)
-console.log(mostrarInputNombreManual)
+//que no se pierdan los datos al refrescar
+  const [eliminarEvento, setEliminarEvento] = useState(false);
+  const openEliminarEvento = () => setEliminarEvento(true);
+  const closeEliminarEvento = () => {setErrorMessage(''); setEliminarEvento(false);};
+
+  const handleCancelarVenta = () => {
+    
+    
+      localStorage.removeItem("venta-temporal");
+      navigate(-1);
+    
+  };
+
+
+
 
 
     
@@ -185,7 +250,13 @@ console.log(mostrarInputNombreManual)
 
 
     return(
+      
         <main>
+          {notificacion && (
+              <div className={styles.toast}>
+                  {notificacion}
+              </div>
+          )}
           <div className={styles.titloNuevaVentayBoton}>
             <button className ={styles.buttonVolverV} onClick={volver}>
                <FontAwesomeIcon icon={faArrowLeft} style={{ fontSize: "25px" }}></FontAwesomeIcon>
@@ -271,45 +342,51 @@ console.log(mostrarInputNombreManual)
                       )}
 
                       {tipoCliente === "cf" && (
-                        <div className={styles.contenedorCF}>
-                          <p><strong>Cliente:</strong> Consumidor Final</p>
-                          <p><strong>NIT:</strong> CF</p>
+                        <div className={styles.gridDatosCertificacion}>
+                          <p className={styles.textoCF}><strong>Cliente:</strong></p>
+                          <p>Consumidor Final</p>
+                          <p className={styles.textoCF}><strong>NIT:</strong></p>
+                          <p>Sin NIT</p>
                         </div>
                       )}
                 </div>
 
-                {/* <div className={styles.gridDatosCertificacion}>
-                    <p>Moneda:</p>
-                    <p>GTQ</p>
-                    <p>Fecha y hora de emisión:</p>
-                    <p>17/02/2025 11:43:02</p>
+                <div className={styles.gridDatosVenta}>
+                  <h2 className={styles.subtituloNuevaVenta}>Datos de la venta</h2>
+                    <div className={styles.gridDatosCertificacion}>
+                      <p className={styles.textoCF}>Fecha:</p>
+                      <p >{new Date().toLocaleDateString()}</p>
+            
+                      
+                      <p className={styles.textoCF}>Moneda:</p>
+                      <p>GTQ</p>
+                      <p className={styles.textoCF} htmlFor="tipoPago"><strong>Tipo de Pago:</strong></p>
+                      <select
+                      id="tipoPago"
+                      value={tipoPago}
+                      onChange={(e) => setTipoPago(e.target.value)}
+                      className={styles.selectPago}
+                    >
+                      <option value="efectivo">Efectivo</option>
+                      {/* Más opciones en el futuro */}
+                    </select>
+                    </div>
+
+                    
+                  
+                    
                    
-                </div> */}
+                </div>
             </article>
 
-            <div className={styles.selectPagoWrapper}>
-               <ButtonHeaders
-                text="Confirmar venta"
-                onClick={handleConfirmarVenta}
-              />
-              <label htmlFor="tipoPago"><strong>Tipo de Pago:</strong></label>
-              <select
-                id="tipoPago"
-                value={tipoPago}
-                onChange={(e) => setTipoPago(e.target.value)}
-                className={styles.selectPago}
-              >
-                <option value="efectivo">Efectivo</option>
-                {/* Más opciones en el futuro */}
-              </select>
-            </div>
+            
 
 
 
 
             <article className={styles.contenedorDatosVenta}>
                 <div>
-                    <h2 className={styles.subtituloNuevaVenta}>Datos de la venta</h2>
+                    <h2 className={styles.subtituloNuevaVenta}>Detalles de venta</h2>
                     
 
                     <TablaFactura
@@ -324,10 +401,44 @@ console.log(mostrarInputNombreManual)
                 </div>
 
                 <div>
+                  <div className={styles.selectPagoWrapper}>
+                    <ButtonHeaders
+                      text="Subir receta"
+                      
+                    />
+                    <div className={styles.botonesVenta}> 
+                      <ButtonHeaders
+                        text="Cancelar Venta"
+                        onClick={handleCancelarVenta}
+                        red={true}
+                      />
+
+                      <ButtonHeaders
+                        text="Confirmar venta"
+                        onClick={openEliminarEvento}
+                      />
+                    </div>
+                    
+                  </div>
                     
                 </div>
 
             </article>
+
+            {
+              <Popup 
+              isOpen={eliminarEvento} title={'Eliminar un recordatorio'}
+              onClose={closeEliminarEvento} onClick={handleCancelarVenta}
+              >
+                  <div className='modalContenido'>
+                      {errorMessage && (
+                          <p style={{ color: 'red', marginTop: '10px' }}>{errorMessage}</p>
+                      )}
+                  </div>
+
+              </Popup>
+            }
+
 
         </main>
 

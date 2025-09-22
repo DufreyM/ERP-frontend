@@ -16,7 +16,7 @@ const ButtonDisplay = ({
         
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (filtroRef.current && !filtroRef.current.contains(event.target)) {
+            if (filtroRef.current && !filtroRef.current.contains(event.target)  && !event.target.closest('[data-portal-dropdown="true"]')) {
                 setAbierto(false);
             }
         };

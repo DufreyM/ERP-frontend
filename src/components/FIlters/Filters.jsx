@@ -10,9 +10,10 @@ import DatePicker from "react-datepicker";
 import OptionFilter from "./OptionsFilter/OptionFilter";
 import "../Inputs/datepicker-custom.css"
 import LittleOptions from "./LittleOptions/LittleOptions";
+import MultiSelect from "../Inputs/MultiSelect";
 
 const Filters = ({
-    // mamadas que necesito:
+   
     // Rango de fechas 
     // Tipos Usuario
        // Usuario como tal
@@ -59,6 +60,8 @@ const Filters = ({
     opcionesTipoMedicamento,
     medicamentoSeleccionado,
     handleChangeMedicamento,
+
+    resetFiltros
     
 
 }) => {
@@ -66,20 +69,6 @@ const Filters = ({
   //Todos los estados de abierto y cerrado de cada filtro
   const [selectedPreDate, setSelectedPreDate] = useState('');
  
-
-  const resetFiltros = () => {
-    setFechaInicio(null);
-    setFechaFin(null);
-    setSelectedPreDate('');
-
-    setPrecioMin('');
-    setPrecioMax('');
-
-    handleChange({ target: { name: 'usuarios', value: '' } });
-    handleChange({ target: { name: 'rol', value: '' } });
-
-    handleChangeMedicamento({ target: { name: 'tipo', value: '' } });
-  };
 
 
 
@@ -362,19 +351,27 @@ const Filters = ({
                 <div className={styles.contenedorFiltroPrecio}>
                   <IconoInput
                     icono = {faDollar}
-                    type={"number"}
+                    type={"text"}
                     placeholder={"Precio mínimo"}
                     value = {precioMin}
-                    onChange={(e) => setPrecioMin(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (/^\d*\.?\d*$/.test(val)) {
+                      setPrecioMin(val);}}
+                    }
                   
                   ></IconoInput>
 
                   <IconoInput
                     icono = {faDollar}
-                    type={"number"}
+                    type={"text"}
                     placeholder={"Precio maximo"}
                     value = {precioMax}
-                    onChange={(e) => setPrecioMax(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (/^\d*\.?\d*$/.test(val)) {
+                        setPrecioMax(val);}}
+                    }
                   ></IconoInput>
                 </div>        
 
@@ -398,14 +395,15 @@ const Filters = ({
                 changeOpen={expandMedicamento}
 
               >
-                 <InputSelects
-                  icono={faGear}
-                  placeholder="Filtrar por tipo de medicamento"
-                  value={medicamentoSeleccionado}
+                
+
+                <MultiSelect
+                  options={opcionesTipoMedicamento} // debe ser [{value, label}, ...]
+                  value={medicamentoSeleccionado} // array de seleccionados
                   onChange={handleChangeMedicamento}
-                  name="tipo"
-                  opcions={opcionesTipoMedicamento}
+                  placeholder="Buscar tipo de medicamento..."
                 />
+
                 
 
               </OptionFilter>

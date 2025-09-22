@@ -24,6 +24,7 @@ const FiltroResumen = ({
   expandMedicamento
 }) => {
   const pills = [];
+  
 
   if (fechaInicio || fechaFin) {
     const fechaTexto = `${fechaInicio?.toLocaleDateString() || "?"} - ${fechaFin?.toLocaleDateString() || "?"}`;
@@ -67,15 +68,27 @@ const FiltroResumen = ({
     });
   }
 
-  if (medicamentoSeleccionado) {
+  // if (medicamentoSeleccionado) {
+  //   pills.push({
+  //     icon: faBriefcaseMedical,
+  //     title: "TIPO DE MEDICAMENTO",
+  //     label: medicamentoSeleccionado,
+  //     onClick: expandMedicamento,
+  //     onRemove: onRemoveMedicamento
+  //   });
+  // }
+  if (Array.isArray(medicamentoSeleccionado) && medicamentoSeleccionado.length > 0) {
+  medicamentoSeleccionado.forEach((tipo, index) => {
     pills.push({
       icon: faBriefcaseMedical,
-      title: "TIPO DE MEDICAMENTO",
-      label: medicamentoSeleccionado,
+      title: index === 0 ? "TIPO DE MEDICAMENTO" : "", // Solo el primero tiene título
+      label: tipo.label,
       onClick: expandMedicamento,
-      onRemove: onRemoveMedicamento
+      onRemove: () => onRemoveMedicamento(tipo) // Necesitarás ajustar esta función
     });
-  }
+  });
+}
+
 
   if (pills.length === 0) return null;
 

@@ -26,7 +26,8 @@ const IconoInput = ({
     type,
     error = false,
     name = "",
-    disabled=false
+    disabled=false,
+    onFocus
 }) => {
     
 
@@ -41,6 +42,7 @@ const IconoInput = ({
                 onChange={onChange}
                 placeholder= {placeholder}
                 disabled = {disabled}
+                onFocus={onFocus}
             />
 
             <span className={styles.iconoStyle} >

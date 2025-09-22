@@ -352,7 +352,20 @@ const ArchivosScreen = () => {
       ZA: "nombre",
       DATE_NEW: "creacion",
       DATE_OLD:"creacion"
+
+
   }
+
+   const resetFiltros = () => {
+    setFechaInicio(null);
+    setFechaFin(null);
+  
+
+     setRolSeleccionado('');
+      setUsuarioSeleccionado('');
+      setUsuariosFiltrados(opcionsUsers);
+
+  };
 
   //LLamar useOrdeyBy desde hooks/useOrderBy.js
   //se manda las claves que se utilizará en el filtrado y los datos ya filtrados
@@ -397,6 +410,8 @@ const ArchivosScreen = () => {
           usuarioSeleccionado = {usuarioSeleccionado}
           rolSeleccionado = {rolSeleccionado}
           handleChange={handleChange}
+
+          resetFiltros={resetFiltros}
          
         />
 
