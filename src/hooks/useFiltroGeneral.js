@@ -1,12 +1,12 @@
 // hooks/useFiltroGeneral.js
 import { useState, useMemo, useEffect } from "react";
 
+
 // const sortKeyMap = {
-//     FECHA: "nombreProducto",
-//     USUARIO: "nombreProducto",
-//     TIPO_USUARIO: "existencias",
-//     TIPO_MEDICAMENTO: "existencias",
-//     RANGO_PRECIO: 
+//      const keyPrecio = filterKeyMap["RANGO_PRECIO"];
+        // const keyFecha = filterKeyMap["RANGO_FECHA"];
+        // const keyUsuario = filterKeyMap["USUARIO"];
+        // const keyRol = filterKeyMap["ROL"]; 
 //     };
 
 export const useFiltroGeneral = ({ 
@@ -76,10 +76,15 @@ export const useFiltroGeneral = ({
         }
 
         // --- Tipo de medicamento ---
+        // let cumpleTipo = true;
+        // if (filterKeyMap["TIPO_MEDICAMENTO"] && tipoMedicamento) {
+        // const tipoItem = getNestedValue(item, filterKeyMap["TIPO_MEDICAMENTO"]);
+        // cumpleTipo = String(tipoItem) === String(tipoMedicamento);
+        // }
         let cumpleTipo = true;
-        if (filterKeyMap["TIPO_MEDICAMENTO"] && tipoMedicamento) {
+        if (filterKeyMap["TIPO_MEDICAMENTO"] && tipoMedicamento?.length > 0) {
         const tipoItem = getNestedValue(item, filterKeyMap["TIPO_MEDICAMENTO"]);
-        cumpleTipo = String(tipoItem) === String(tipoMedicamento);
+        cumpleTipo = tipoMedicamento.some(tipo => tipo.value === String(tipoItem));
         }
 
 

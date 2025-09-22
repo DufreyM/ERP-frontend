@@ -4,7 +4,7 @@ import styles from "./OptionFilter.module.css";
 
 
 const OptionFilter = ({
-    icon,
+ 
     title,
     children,
     isOpend,
@@ -14,22 +14,22 @@ const OptionFilter = ({
     return(
 
         <>
-            <div className={styles.contenedorVisibleOptionFilter}>
-                <div className={styles.tituloIconoOptionFIlter}>
-                    <button onClick={changeOpen} className={styles.BotonDesplegarFitltro}>
-                        <FontAwesomeIcon icon={faChevronRight} className={`${styles.chevronIcon} ${isOpend ? styles.rotateDown : ''}`}/>
-                    </button>
-                    
-                    <p className={styles.titulosOpciones}><strong>{title}</strong></p>
+            <button onClick={changeOpen} className={styles.contenedorVisibleOptionFilter}>
+                
+                <div className={styles.BotonDesplegarFitltro}>
+                    <FontAwesomeIcon icon={faChevronRight} className={`${styles.chevronIcon} ${isOpend ? styles.rotateDown : ''}`}/>
                 </div>
                 
-            </div>
+                <p className={styles.titulosOpciones}><strong>{title}</strong></p>
+            </button>
+                
+            
 
-            {isOpend ? (
-                <div>
-                    {children}
-                </div>
-            ) : <div/>}
+            
+            <div className={`${styles.contenidoOptionFilter}  ${isOpend ? styles.contenidoOptionFilterActive : ''}`}>
+                {children}
+            </div>
+           
 
 
              {/* <div className={styles.contenedorVisibleOptionFilter}>

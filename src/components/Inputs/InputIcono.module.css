@@ -190,3 +190,78 @@
     color: black;
 }
 
+
+
+
+
+
+
+
+/* MultiSelect.module.css */
+.multiSelectContainer {
+  position: relative;
+  width: 100%;
+}
+
+.opcionesMulti{
+  display: flex;
+  flex-direction: row;  /* dirección horizontal */
+  flex-wrap: wrap;      /* permite que se agreguen filas si no hay espacio */
+  gap: 8px;    
+  padding: 5px 0px;
+}
+
+
+
+.searchInput {
+  border: none;
+  outline: none;
+  flex: 1;
+  min-width: 120px;
+}
+
+.chip {
+  background-color: #d1d4ed92;
+  border-radius: 15px;
+  padding: 5px 10px;
+  display: flex;
+  align-items: center;
+  font-size: 0.85rem;
+  color: #5a60a5;
+}
+
+.removeChip {
+  background: none;
+  border: none;
+  margin-left: 5px;
+  cursor: pointer;
+}
+
+.dropdown {
+  background: white;
+  border: 1px solid #bbbad4;
+  border-radius: 5px;
+  padding: 0.5rem;
+  max-height: 200px;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.option {
+  padding: 0.4rem;
+  cursor: pointer;
+  border-radius: 3px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 14px;
+}
+
+.option:hover {
+  background-color: #f0f0f0;
+}
+
+.noOptions {
+  padding: 0.4rem;
+  color: #999;
+}

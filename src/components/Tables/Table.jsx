@@ -116,7 +116,7 @@ export const Table = ({
 
           <tbody className={styles.tbodyStyle}>
               {data.map((item) => (
-                  <tr key = {item.id} className={styles.rowHover}>
+                  <tr key = {`${item.id}-${item.producto}`} className={styles.rowHover}>
                       {nameColumns.map((col) => (
                           <td key = {col.key} 
                             className={[

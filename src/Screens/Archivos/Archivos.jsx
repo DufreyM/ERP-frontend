@@ -22,6 +22,7 @@ import OrderBy from "../../components/OrderBy/OrderBy";
 import { useOrderBy } from "../../hooks/useOrderBy";
 import { useFiltroGeneral } from "../../hooks/useFiltroGeneral";
 import { useOpcionesUsuarioDinamicos } from "../../hooks/useOpcionesUsuariosDinamico";
+import FiltroResumen from "../../components/FIlters/FiltroResumen/FiltroResumen";
 
 
 const ArchivosScreen = () => {
@@ -250,6 +251,20 @@ const ArchivosScreen = () => {
   
 
   //Funciones necesarias para el funcionamiento de filter
+  //Filtros
+  //manejo de filtros activos
+  const [panelAbierto, setPanelAbierto] = useState(false);
+  const [isOpendDate, setIsOpendDate] = useState(false);
+  const [isOpendRol, setIsOpendRol] = useState(false);
+
+  const expandFecha = () => {setIsOpendDate(prev => !prev); };
+  const expandRol = () => {setIsOpendRol(prev => !prev); };
+  const expandUsuario = () => {setIsOpendRol(prev => !prev); };
+
+  const expandFechaResume = () => {setIsOpendDate(true); setPanelAbierto(true);};
+  const expandPrecioResume = () => {setIsOpendPrice(true); setPanelAbierto(true);};
+  const expandRolResume = () => {setIsOpendRol(true); setPanelAbierto(true);};
+  const expandMedicamentoResume = () => {setIsOpendMedic(true); setPanelAbierto(true);};
   //Mostrar datos
 
   const [opcionsRoles, setOpcionsRoles] = useState([]);
@@ -297,6 +312,15 @@ const ArchivosScreen = () => {
     }
   };
 
+    const rolSeleccionadoObj = useMemo(() => {
+    return opcionsRoles.find(r => String(r.value) === String(rolSeleccionado)) || null;
+  }, [rolSeleccionado, opcionsRoles]);
+
+  const usuarioSeleccionadoObj = useMemo(() => {
+    return opcionsUsers.find(u => String(u.value) === String(usuarioSeleccionado)) || null;
+  }, [usuarioSeleccionado, opcionsUsers]);
+
+
 
   const [fechaInicio, setFechaInicio] = useState(null);
   const [fechaFin, setFechaFin] = useState(null);
@@ -326,7 +350,22 @@ const ArchivosScreen = () => {
   const sortKeyMap={
       AZ: "nombre",
       ZA: "nombre",
+      DATE_NEW: "creacion",
+      DATE_OLD:"creacion"
+
+
   }
+
+   const resetFiltros = () => {
+    setFechaInicio(null);
+    setFechaFin(null);
+  
+
+     setRolSeleccionado('');
+      setUsuarioSeleccionado('');
+      setUsuariosFiltrados(opcionsUsers);
+
+  };
 
   //LLamar useOrdeyBy desde hooks/useOrderBy.js
   //se manda las claves que se utilizará en el filtrado y los datos ya filtrados
@@ -346,25 +385,33 @@ const ArchivosScreen = () => {
        
         
         <Filters
-      
+
           title = {"Archivos"}
+          panelAbierto={panelAbierto}
+          setPanelAbierto={setPanelAbierto}
           mostrarRangoFecha = {true}
           mostrarRangoPrecio = {false}
           mostrarUsuario = {true}
           mostrarMedicamento = {false}
 
+          isOpendDate = {isOpendDate}
+          expandFecha = {expandFecha}
           fechaInicio = {fechaInicio}
           setFechaInicio = {setFechaInicio}
           fechaFin = {fechaFin}
           setFechaFin = {setFechaFin}
 
+           //atributos para usuarios y roles
+          isOpendRol = {isOpendRol}
+          expandRol = {expandRol}
+          expandUsuario = {expandUsuario}
           opcionesUsuarios = {usuariosFiltrados}
           opcionesRoles = {opcionsRoles}
           usuarioSeleccionado = {usuarioSeleccionado}
           rolSeleccionado = {rolSeleccionado}
           handleChange={handleChange}
 
-
+          resetFiltros={resetFiltros}
          
         />
 
@@ -372,7 +419,7 @@ const ArchivosScreen = () => {
           FAbecedario={true}
           FExistencias={false}
           FPrecio={false}
-          FFecha={false}
+          FFecha={true}
           selectedOption={sortOption}
           onChange={setSortOption}
         ></OrderBy>
@@ -386,6 +433,34 @@ const ArchivosScreen = () => {
 
 
         <div className = {styles.contenedorArchivos}>
+          
+          <FiltroResumen
+            fechaInicio={fechaInicio}
+            fechaFin={fechaFin}
+            usuarioSeleccionado={usuarioSeleccionadoObj}
+            rolSeleccionado={rolSeleccionadoObj}
+
+            // funciones para abrir paneles
+            expandFecha={expandFechaResume}
+            expandPrecio={expandPrecioResume}
+            expandRol={expandRolResume}
+            expandMedicamento={expandMedicamentoResume}
+            //medicamentoSeleccionado={medicamentoSeleccionado}
+            onRemoveFecha={() => {
+              setFechaInicio(null);
+              setFechaFin(null);
+              setSelectedPreDate(""); // si lo manejas así
+            }}
+            onRemovePrecio={() => {
+              setPrecioMin('');
+              setPrecioMax('');
+            }}
+            onRemoveUsuario={() => handleChange({ target: { name: 'usuarios', value: '' } })}
+            onRemoveRol={() => handleChange({ target: { name: 'rol', value: '' } })}
+            onRemoveMedicamento={() => handleChangeMedicamento({ target: { name: 'tipo', value: '' } })}
+          />
+
+       
 
           <div className={styles.contenedorTablaArchivos}>
             <Table

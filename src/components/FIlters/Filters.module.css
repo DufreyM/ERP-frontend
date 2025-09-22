@@ -2,9 +2,10 @@
 
 
 .titleFilters {
-  width: 100%;
   text-align: center;
   color: #5a60A5;
+  width: 100%;
+  padding: 5px 0px 0px 0px;
 }
 
 
@@ -42,11 +43,46 @@
   flex-direction: row;
   gap: 10px;
   width: 100%;
+
 }
 
+.contenedorfechaCalendario{
+  display: flex;
+  flex-direction: column;
+  padding: 10px 0px;
+}
 .contenedorFiltroPrecio{
   display: flex;
   flex-direction: row;
   gap: 10px;
   width: 100%;
+}
+
+.resetButtonContainer{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.resetButton{
+  background-color: transparent;
+  border: none;
+  font-size: 20px;
+  padding: 0px;
+  margin: 0px;
+  color: #5a60A5;
+  cursor: pointer;
+
+  transition-property: background-color, transform;
+  transition-duration: 0.2s, 0.2s;
+  transition-timing-function: ease-out, ease-out;
+  transition-delay: 0s, 0s;
+   
+}
+
+.resetButton:hover{
+  transform: scale(1.1);
+  color: #3c427e;
 }

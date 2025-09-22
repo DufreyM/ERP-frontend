@@ -17,6 +17,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faArrowDownShortWide, faCalendarDays, faArrowTrendDown, faArrowTrendUp, faArrowDownAZ, faArrowDownZA, faArrowDown19, faArrowDown91} from '@fortawesome/free-solid-svg-icons';
 import ButtonDisplay from "../ButtonDisplay/ButtonDisplay"
 import Options from "./Options/Options";
+import { useState } from "react";
 
 const OrderBy = ({
    
@@ -28,6 +29,8 @@ const OrderBy = ({
     onChange,
 
 }) => {
+    const [panelAbierto, setPanelAbierto] = useState(false);
+    
     return (
         <>
       
@@ -37,6 +40,8 @@ const OrderBy = ({
             <ButtonDisplay
                 icon={faArrowDownShortWide}
                 title={"Ordenar"}
+                abierto = {panelAbierto}
+                setAbierto = {setPanelAbierto}
             >
                 {FAbecedario ? (
                     <div>
@@ -65,7 +70,7 @@ const OrderBy = ({
                             text={"Mayor cantidad de existencias"}
                             onChange = {onChange}
                             value={"STOCK_HIGH"}
-                            selected = {selectedOption === "91"}
+                            selected = {selectedOption === "STOCK_HIGH"}
                         />
 
                         <Options
@@ -73,7 +78,7 @@ const OrderBy = ({
                             text={"Menor cantidad de existencias"}
                             onChange = {onChange}
                             value={"STOCK_LOW"}
-                            selected = {selectedOption === "19"}
+                            selected = {selectedOption === "STOCK_LOW"}
                         />
 
                     </div>
@@ -86,7 +91,7 @@ const OrderBy = ({
                             text={"Precio más alto"}
                             onChange = {onChange}
                             value={"PRICE_HIGH"}
-                            selected = {selectedOption === "PRECIO_BAJO"}
+                            selected = {selectedOption === "PRICE_HIGH"}
                         />
 
                         <Options
@@ -94,7 +99,7 @@ const OrderBy = ({
                             text={"Precio más bajo"}
                             onChange = {onChange}
                             value={"PRICE_LOW"}
-                            selected = {selectedOption === "PRECIO_ALTO"}
+                            selected = {selectedOption === "PRICE_LOW"}
                         />
 
                     </div>
@@ -107,7 +112,7 @@ const OrderBy = ({
                             text={"Realizado recientemente"}
                             onChange = {onChange}
                             value={"DATE_NEW"}
-                            selected = {selectedOption === "RECIENTE"}
+                            selected = {selectedOption === "DATE_NEW"}
                         />
 
                         <Options
@@ -115,7 +120,7 @@ const OrderBy = ({
                             text={"Realizado más antiguo"}
                             onChange = {onChange}
                             value={"DATE_OLD"}
-                            selected = {selectedOption === "ANTIGUO"}
+                            selected = {selectedOption === "DATE_OLD"}
                         />
 
                     </div>

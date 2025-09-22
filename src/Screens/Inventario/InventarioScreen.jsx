@@ -5,7 +5,6 @@ import PopupButton from '../../components/Popup/Popup';
 import styles from './InventarioScreen.module.css';
 import ButtonText from '../../components/ButtonText/ButtonText';
 import ButtonForm from '../../components/ButtonForm/ButtonForm';
-import InventarioFilters from '../../components/FIlters/InventarioFilters';
 import { useOutletContext } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
@@ -13,6 +12,7 @@ import OrderBy from '../../components/OrderBy/OrderBy.jsx';
 import { useOrderBy } from '../../hooks/useOrderBy.js';
 import { useFiltroGeneral } from '../../hooks/useFiltroGeneral.js';
 import Filters from '../../components/FIlters/Filters.jsx';
+import FiltroResumen from '../../components/FIlters/FiltroResumen/FiltroResumen.jsx';
 
 const InventarioScreen = () => {
   const { selectedLocal } = useOutletContext();
@@ -80,9 +80,29 @@ const InventarioScreen = () => {
   };
 
 
+  //Filtros
+  //manejo de filtros activos
+  const [panelAbierto, setPanelAbierto] = useState(false);
+  const [isOpendDate, setIsOpendDate] = useState(false);
+  const [isOpendRol, setIsOpendRol] = useState(false);
+  const [isOpendPrice, setIsOpendPrice] = useState(false);
+  const [isOpendMedic, setIsOpendMedic] = useState(false);
+
+  const expandFecha = () => {setIsOpendDate(prev => !prev); };
+  const expandPrecio = () => {setIsOpendPrice(prev => !prev);};
+  const expandRol = () => {setIsOpendRol(prev => !prev); };
+  const expandUsuario = () => {setIsOpendRol(prev => !prev); };
+  const expandMedicamento = () => {setIsOpendMedic(prev => !prev); };
+
+  const expandFechaResume = () => {setIsOpendDate(true); setPanelAbierto(true);};
+  const expandPrecioResume = () => {setIsOpendPrice(true); setPanelAbierto(true);};
+  const expandRolResume = () => {setIsOpendRol(true); setPanelAbierto(true);};
+  const expandUsuarioResume = () => {setIsOpendRol(true); setPanelAbierto(true);};
+  const expandMedicamentoResume = () => {setIsOpendMedic(true); setPanelAbierto(true);};
+
  // Función para manejar cambios en los filtros
   const [opcionesTipoMedicamento, setOpcionesTipoMedicamento] = useState([ ]);
-  const [medicamentoSeleccionado, setMedicamentoSeleccionado] = useState('')
+  const [medicamentoSeleccionado, setMedicamentoSeleccionado] = useState([ ])
 
 
   // Extraer tipos únicos de los productos
@@ -112,14 +132,19 @@ const InventarioScreen = () => {
     console.log(productosConvertidos);
 
     //intentofiltros
-    const handleMedicamentoChange = (e) => {
-      setMedicamentoSeleccionado(e.target.value);
+    const handleMedicamentoChange = (nuevosTiposSeleccionados) => {
+      setMedicamentoSeleccionado(nuevosTiposSeleccionados);
     };
+
 
     const [precioMin, setPrecioMin] = useState('');
     const [precioMax, setPrecioMax] = useState('');
    
-
+    const handleRemoveMedicamento = (tipo) => {
+      setMedicamentoSeleccionado(prev => 
+        prev.filter(m => m.value !== tipo.value)
+      );
+    };
 
      const filterKeyMap={
         RANGO_PRECIO: "precioventa",
@@ -147,6 +172,13 @@ const InventarioScreen = () => {
         PRICE_LOW: "precioventa",
    
     }
+
+    const resetFiltros = () => {
+      setPrecioMin('');
+      setPrecioMax('');
+      setMedicamentoSeleccionado([]);
+    };
+
    
   
     //LLamar useOrdeyBy desde hooks/useOrderBy.js
@@ -177,20 +209,29 @@ const InventarioScreen = () => {
 
         <Filters
           title = {"Inventario"}
+          panelAbierto={panelAbierto}
+          setPanelAbierto={setPanelAbierto}
           mostrarRangoFecha ={false}
           mostrarRangoPrecio = {true}
           mostrarUsuario = {false}
           mostrarMedicamento = {true}
 
+          //atributos para rango de precio
+          isOpendPrice = {isOpendPrice}
+          expandPrecio = {expandPrecio}
           precioMin = {precioMin}
           setPrecioMin = {setPrecioMin}
           precioMax = {precioMax}
           setPrecioMax = {setPrecioMax}
 
+          isOpendMedic = {isOpendMedic}
+          expandMedicamento = {expandMedicamento}
           opcionesTipoMedicamento = {opcionesTipoMedicamento}
           medicamentoSeleccionado ={medicamentoSeleccionado}
           handleChangeMedicamento ={handleMedicamentoChange}
 
+          resetFiltros = {resetFiltros}
+                       
         ></Filters>
 
         <OrderBy
@@ -202,6 +243,37 @@ const InventarioScreen = () => {
           onChange={setSortOption}
         ></OrderBy>
       </div>
+      
+      <FiltroResumen
+          //fechaInicio={fechaInicio}
+          //fechaFin={fechaFin}
+          precioMin={precioMin}
+          precioMax={precioMax}
+          //usuarioSeleccionado={usuarioSeleccionado}
+          //rolSeleccionado={rolSeleccionado}
+          medicamentoSeleccionado={medicamentoSeleccionado}
+
+           // funciones para abrir paneles
+          expandFecha={expandFechaResume}
+          expandPrecio={expandPrecioResume}
+          expandRol={expandRolResume}
+          expandMedicamento={expandMedicamentoResume}
+
+          onRemoveFecha={() => {
+            setFechaInicio(null);
+            setFechaFin(null);
+            setSelectedPreDate(""); // si lo manejas así
+          }}
+          onRemovePrecio={() => {
+            setPrecioMin('');
+            setPrecioMax('');
+          }}
+          onRemoveUsuario={() => handleChange({ target: { name: 'usuarios', value: '' } })}
+          onRemoveRol={() => handleChange({ target: { name: 'rol', value: '' } })}
+          onRemoveMedicamento={handleRemoveMedicamento}
+
+          
+        />
 
       {loading && <div className={styles.loading}>Cargando productos...</div>}
       {error && <div className={styles.error}>{error}</div>}

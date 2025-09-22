@@ -4,13 +4,14 @@
   font-size: 12px;   /* reduce tamaño general */
   width: 110px;      /* fuerza ancho */
 
+
 }
 
 .calendario-pequeno .react-datepicker__day {
   width: 1rem;
   line-height: 1rem;
-  margin: 0.12rem;
-  /* background-color: cadetblue; */
+  margin: 0.2rem;
+  
 }
 
 .calendario-pequeno .react-datepicker__day--in-range{
@@ -35,6 +36,7 @@
   color: white;
   font-weight: bold;
   padding: 1px;
+  
 }
 
 
@@ -42,7 +44,11 @@
 
 .calendario-pequeno .react-datepicker__month-container{
   width: 100%;
-  /* background-color: chartreuse; */
+ 
+}
+.calendario-pequeno .react-datepicker__day-names{
+  padding: 0px 10px;
+  
 }
 
 .calendario-pequeno .react-datepicker__day-name {
@@ -53,18 +59,20 @@
   padding-top: 4px;
   padding-bottom: 4px;
   height: 56px;
-  /* background-color: purple; */
+  
+   
 }
 
 .calendario-pequeno .react-datepicker__navigation {
   min-width: 20px;
   font-size: 1rem;
-  /* background-color: brown; */
+
 }
 
 .calendario-pequeno .react-datepicker__navigation-icon{
   transform: scale(0.8);
   font-size: 15px;
+  
 }
 
 /* Cambiar color del texto del mes y año */

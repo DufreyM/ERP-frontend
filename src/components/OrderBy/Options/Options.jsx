@@ -16,20 +16,13 @@ const Options = ({
     };
 
     return (
-        <div onClick={handleClick} className= {styles.contenedorOptions} 
-        
-        style={{
-                fontWeight: selected ? 'bold' : 'normal',
-                cursor: 'pointer',
-                padding: '4px 8px',
-                backgroundColor: selected ? '#ebebebff' : 'transparent'
-            }}
-        
-        >
+        <button 
+            onClick={handleClick} 
+            className= {` ${styles.contenedorOptions}  ${selected ? styles.contenedorOptionsActive: ''}`} >
              <FontAwesomeIcon icon={icon} className={styles.IconStyle1}/>
              <p>{text}</p>
         
-        </div>
+        </button>
     )
 }
 
