@@ -65,7 +65,17 @@
     color: #5a60a5;
     border: 0;
     cursor: pointer;
-    
+
+    /* Animación */
+    transition-property: background-color, transform;
+    transition-duration: 0.2s, 0.2s;
+    transition-timing-function: ease-out, ease-out;
+    transition-delay: 0s, 0s;
+}
+
+.buttonCalendarRow:hover{
+    color: #4a5095;
+    transform: scale(1.1);
 }
 
 .buttonCalendarDay{
@@ -82,6 +92,16 @@
     border: 0;
     cursor: pointer;
 
+    transition-property: background-color, transform;
+    transition-duration: 0.2s, 0.2s;
+    transition-timing-function: ease-out, ease-out;
+    transition-delay: 0s, 0s;
+
+}
+
+.buttonCalendarDay:hover{
+    color: #4a5095;
+    transform: scale(1.03);
 }
 
 

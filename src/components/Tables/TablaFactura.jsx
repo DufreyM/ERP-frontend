@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCirclePlus, faTrash, faCircleMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import styles from './Table.module.css'; // (opcional, para tus estilos personalizados)
+import ButtonIcon from '../ButtonIcon/ButtonIcon';
 
 export const TablaFactura = ({ 
   productosDisponibles,
@@ -92,14 +93,16 @@ export const TablaFactura = ({
 
       <div className={styles.total}>
         <strong className={styles.totalText}>Total de venta: Q{totalFactura.toFixed(2)}</strong>
+        <ButtonIcon 
+          solid = {true}
+          icon = {faPlus}
+          title={'Agregar producto'}
+          onClick={agregarLinea}
+          disabled={!puedeAgregarMas}
 
-        <button onClick={agregarLinea} className={styles.botonAgregar} disabled={!puedeAgregarMas}>
-          <FontAwesomeIcon 
-            icon={faPlus}
-            className={styles.IconStyles}
-          ></FontAwesomeIcon>
-          Agregar Producto
-        </button>
+        ></ButtonIcon>
+
+        
       </div>
 
       {productosRestantes.length === 0 && (
@@ -218,7 +221,7 @@ export const TablaFactura = ({
                 </td>
                               
               <td>Q{linea.subtotal.toFixed(2)}</td>
-              <td>
+              <td >
                 <button onClick={() => eliminarLinea(i)}
                 className={styles.buttonDeleteTable}
                   >

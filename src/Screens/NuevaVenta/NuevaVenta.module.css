@@ -22,6 +22,45 @@
   color: #5a60A5;
   cursor: pointer;
   height: 45px;
+  transition-property: background-color, transform;
+  transition-duration: 0.2s, 0.2s;
+  transition-timing-function: ease-out, ease-out;
+  transition-delay: 0s, 0s;
+}
+
+.buttonVolverV:hover{
+  transform: scale(1.1);
+}
+
+.buttonVolverV:active{
+  transform: scale(0.9);
+  
+}
+
+
+.buttonVolverC{
+  position:absolute;
+  background-color: transparent;
+  border: none;
+  color: #5a60A5;
+  cursor: pointer;
+  height: 45px;
+  top: 20px;
+  left: 20px;
+  transition-property: background-color, transform;
+  transition-duration: 0.2s, 0.2s;
+  transition-timing-function: ease-out, ease-out;
+  transition-delay: 0s, 0s;
+}
+
+.buttonVolverC:hover{
+
+  transform: scale(1.1);
+}
+
+.buttonVolverC:active{
+  transform: scale(0.9);
+  
 }
 
 
@@ -104,6 +143,9 @@
 }
 
 .buttonBuscarVenta{
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background-color: #5a60A5;
   border-radius: 10px;
   border: none;
@@ -111,6 +153,20 @@
   font-size: 20px;
   height: 35px;
   cursor: pointer;
+  transition-property: background-color, transform;
+  transition-duration: 0.2s, 0.2s;
+  transition-timing-function: ease-out, ease-out;
+  transition-delay: 0s, 0s;
+}
+
+.buttonBuscarVenta:hover{
+
+  transform: scale(1.1);
+}
+
+.buttonBuscarVenta:active{
+  transform: scale(0.9);
+  
 }
 
 .contenedorCF{

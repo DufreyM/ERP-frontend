@@ -6,16 +6,28 @@ Ultima modificación: 7/5/2025
 
 .divButtonText {
     text-align: center;
-     background-color: transparent;
+        background-color: transparent;
     border: none;
     font-size: 14px;
     margin-top: 10px;
     color: #003366;
     font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+    transition-property: background-color, transform;
+    transition-duration: 0.2s, 0.2s;
+    transition-timing-function: ease-out, ease-out;
+    transition-delay: 0s, 0s;
+    margin-bottom: 10px;
+
 }
 
-.spanButtonText {
+.divButtonText:hover {
+    transform: scale(1.05);
+
    
+}
+
+.spanButtonText {  
     font-weight: bold;
     cursor: pointer;
     text-decoration: underline;

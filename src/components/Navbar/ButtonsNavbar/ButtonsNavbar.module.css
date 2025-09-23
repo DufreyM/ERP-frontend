@@ -1,7 +1,10 @@
 .contentButtonNavbar {
+    width: 80px;
     text-decoration: none;
     cursor: pointer;
-    padding: 11px 0px ;
+    padding: 10px 2px;
+    
+ 
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -14,25 +17,26 @@
 .activeButtonNavbar{
     color: #5a60a5;
     background-color: rgb(255, 255, 255);
-    padding: 11px 0px;
-    border-radius: 8px;
+    border-radius: 0px 10px 10px 0px;
 }
 
 
-.contenButtonNavbar:hover {
-  color: #1966cb;
+.contentButtonNavbar:hover {
+    color: #efecec;
+    border-radius: 0px 10px 10px 0px;
+    background-color: #54599b;
 }
 
 .spanNavbarButton{
-    height: 25px;
+    height: 24px;
     color: inherit
 }
 
 .textNavbarButton {
-    margin: 0px;
+    margin: 2px;
     top: 5px;
     text-align: center;
-    font-size: 15px;
+    font-size: 14px;
     color: inherit;
    
 }

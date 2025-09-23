@@ -1,12 +1,9 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faAddressCard, faArrowLeft, faSearch} from '@fortawesome/free-solid-svg-icons';
 import IconoInput from "../../components/Inputs/InputIcono";
-import SimpleTitle from "../../components/Titles/SimpleTitle";
 import styles from "./NuevaVenta.module.css"
-import { Table } from '../../components/Tables/Table';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { TablaFactura } from "../../components/Tables/TablaFactura.jsx";
-import ButtonText from "../../components/ButtonText/ButtonText.jsx";
 import ButtonHeaders from "../../components/ButtonHeaders/ButtonHeaders.jsx";
 import { useState, useEffect} from "react";
 import { useFetch } from "../../utils/useFetch.jsx";
@@ -210,7 +207,7 @@ const NuevaVenta = () => {
       const errorText = await response.text();
   console.error("Error del servidor:", errorText);
   throw new Error("Error al crear la venta");
-  console.log("Payload enviado:", body);
+
     }
 
     const result = await response.json();
@@ -409,13 +406,13 @@ const NuevaVenta = () => {
                     <div className={styles.botonesVenta}> 
                       <ButtonHeaders
                         text="Cancelar Venta"
-                        onClick={handleCancelarVenta}
+                        onClick={openEliminarEvento}
                         red={true}
                       />
 
                       <ButtonHeaders
                         text="Confirmar venta"
-                        onClick={openEliminarEvento}
+                        onClick={handleConfirmarVenta}
                       />
                     </div>
                     
@@ -427,7 +424,7 @@ const NuevaVenta = () => {
 
             {
               <Popup 
-              isOpen={eliminarEvento} title={'Eliminar un recordatorio'}
+              isOpen={eliminarEvento} title={'¿Desea descartar esta venta?'}
               onClose={closeEliminarEvento} onClick={handleCancelarVenta}
               >
                   <div className='modalContenido'>

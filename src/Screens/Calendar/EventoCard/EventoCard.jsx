@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPen, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
+import { faPen, faChevronDown, faChevronUp , faChevronRight} from '@fortawesome/free-solid-svg-icons';
 import './EventoCard.css';
 
 const EventoCard = ({
@@ -15,12 +15,13 @@ const EventoCard = ({
     onDelete,
     expandirInicial = false
 }) => {
+    
     const [expandir, setExpandir] = useState(expandirInicial);
 
     return (
         <div className='divEventos' key={id}>
             <div className= 'espaciadoExtremos'>
-                <div className='vineta'></div>
+                <div className={'vineta'}></div>
 
                 <div className='contenido'>
                     <div className='tituloEvento'>{title}</div>
@@ -57,11 +58,14 @@ const EventoCard = ({
             
 
             <button
-                className='buttonCalendarRow'
+                className={"buttonCalendarRow"}
                 onClick={() => setExpandir(!expandir)}
                 style={{ marginBottom: '4px' }}
                 >
-                <FontAwesomeIcon icon={expandir ? faChevronUp : faChevronDown} />
+                <FontAwesomeIcon icon={faChevronRight} 
+                    className={`iconArrow ${expandir ? 'rotatevineta' : ''}`}
+
+                />
             </button>
         
          </div>

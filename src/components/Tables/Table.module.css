@@ -88,11 +88,25 @@
 }
 
 .botonCantidadFacturaVenta{
+  cursor: pointer;
   border: none;
   background-color: transparent;
   color: white;
   padding: 5px;
+  transition-property: background-color, transform;
+  transition-duration: 0.2s, 0.2s;
+  transition-timing-function: ease-out, ease-out;
+  transition-delay: 0s, 0s;
 }
+
+.botonCantidadFacturaVenta:hover{
+  transform: scale(1.03);
+}
+
+.botonCantidadFacturaVenta:active{
+  transform: scale(0.95);
+}
+
 .total{
   width: 100%;
   display: flex;
@@ -122,6 +136,19 @@
   gap:5px;
   align-items: center;
   color:#5a60a5;
+
+   transition-property: background-color, transform;
+  transition-duration: 0.2s, 0.2s;
+  transition-timing-function: ease-out, ease-out;
+  transition-delay: 0s, 0s;
+}
+
+.IconStyle:hover{
+  transform: scale(1.05);
+}
+
+.IconStyle:active{
+  transform: scale(0.95);
 }
 
 .IconPlusMin{

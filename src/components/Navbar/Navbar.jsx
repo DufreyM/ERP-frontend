@@ -7,7 +7,7 @@ const Navbar = ({ items }) => {
     <nav className="navbar">
     
 
-       <div>
+       <div className="opcionesNavBar">
         {items.map(({ label, to, icon }, index) => (
          
             <ButtonsNavbar

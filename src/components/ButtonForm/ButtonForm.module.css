@@ -17,8 +17,23 @@ Ultima modificación: 7/5/2025
     max-width: 300px;
     transition: background-color 0.3s ease;
     box-sizing: border-box;
+
+    /* Animación */
+    transition-property: background-color, transform;
+    transition-duration: 0.2s, 0.2s;
+    transition-timing-function: ease-out, ease-out;
+    transition-delay: 0s, 0s;
 }
 
-.divButtonForm:hover {
+
+
+.divButtonForm:hover{
     background-color: #4a5095;
-  }
+    transform: scale(1.03);
+}
+
+.divButtonForm:active{
+    color: #5a60A5;
+    transform: scale(0.95);
+    border: none;
+}
