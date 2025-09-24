@@ -8,6 +8,7 @@ import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import Isotipo from '../../assets/svg/isotipoEconofarma.svg';
 import { useNavigate } from 'react-router-dom';
 import styles from './ChangePassword.module.css';
+import { changePassword } from '../../services/authService';
 
 const ChangePassword = () => {
   const [formData, setFormData] = useState({
@@ -73,30 +74,14 @@ const ChangePassword = () => {
     setLoading(true);
 
     try {
-      // TODO: Implementar llamada al backend para cambiar contraseña
-      // const response = await fetch(`${API_BASE_URL}/api/usuario/me/change-password`, {
-      //   method: 'POST',
-      //   headers: {
-      //     'Authorization': `Bearer ${token}`,
-      //     'Content-Type': 'application/json'
-      //   },
-      //   body: JSON.stringify({
-      //     currentPassword: formData.currentPassword,
-      //     newPassword: formData.newPassword
-      //   })
-      // });
-
-      // Simulación de éxito (remover cuando se implemente el backend)
+      await changePassword(formData.currentPassword, formData.newPassword);
+      setSuccess('Contraseña cambiada exitosamente');
+      setLoading(false);
       setTimeout(() => {
-        setSuccess('Contraseña cambiada exitosamente');
-        setLoading(false);
-                 setTimeout(() => {
-           navigate('/admin/mi-perfil');
-         }, 2000);
-      }, 1000);
-
+        navigate('/admin/mi-perfil');
+      }, 1500);
     } catch (err) {
-      setError('Error al cambiar la contraseña');
+      setError(err?.message || 'Error al cambiar la contraseña');
       setLoading(false);
     }
   };
@@ -211,18 +196,22 @@ const ChangePassword = () => {
           )}
 
           {/* Botón de cambiar contraseña */}
-          <ButtonForm
-            text={loading ? "Cambiando..." : "Cambiar contraseña"}
-            onClick={handleSubmit}
-            disabled={!isFormValid() || loading}
-          />
+          <div className={styles.buttonRow}>
+            <ButtonForm
+              text={loading ? "Cambiando..." : "Cambiar contraseña"}
+              onClick={handleSubmit}
+              disabled={!isFormValid() || loading}
+            />
+          </div>
 
           {/* Botón para volver */}
-          <ButtonText
-            texto="¿Deseas volver al perfil?"
-            textoButton="Volver"
-            accion={handleGoBack}
-          />
+          <div className={styles.buttonTextRow}>
+            <ButtonText
+              texto="¿Deseas volver al perfil?"
+              textoButton="Volver"
+              accion={handleGoBack}
+            />
+          </div>
         </div>
       </div>
   );
