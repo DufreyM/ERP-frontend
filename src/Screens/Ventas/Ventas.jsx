@@ -63,17 +63,17 @@ const Ventas = () => {
 
 
     const columnas = [  
-    { key: 'id', titulo: '#No.' },
+    { key: 'id', titulo: '#No.',type: 'texto' },
     
-    { key: 'fecha_venta_mostrar', titulo: 'Fecha' },
-    { key: 'usuarioID', titulo: 'Realizado por:' },
-    { key: 'tipo_pago', titulo: 'Tipo de pago' },
-    { key: 'producto', titulo: 'Producto' }, 
-    { key: 'cantidad', titulo: 'Cantidad' },     
-    { key: 'cliente', titulo: 'Cliente' },
-    { key: 'precio_unitario', titulo: 'Precio Unitario (Q)' },
-    { key: 'descuento', titulo: 'Descuento (Q)' },
-    { key: 'total', titulo: 'Total (Q' },
+    { key: 'fecha_venta_mostrar', titulo: 'Fecha', type: 'texto' },
+    { key: 'usuarioID', titulo: 'Realizado por:', type: 'texto' },
+    { key: 'cliente', titulo: 'Cliente', type: 'texto' },
+    { key: 'tipo_pago', titulo: 'Forma de pago',type: 'texto' },
+    { key: 'producto', titulo: 'Producto', type: 'texto' }, 
+    { key: 'cantidad', titulo: 'Cantidad', type: 'numero' },     
+    { key: 'precio_unitario', titulo: 'Precio Unitario (Q)', type: 'numero' },
+    { key: 'descuento', titulo: 'Descuento (Q)', type: 'numero' },
+    { key: 'total', titulo: 'Total (Q)', type: 'numero' },
    
     ];
 

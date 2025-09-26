@@ -4,12 +4,13 @@ import IconoInput from '../../components/Inputs/InputIcono';
 import InputPassword from '../../components/Inputs/InputPassword';
 import ButtonForm from '../../components/ButtonForm/ButtonForm';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faLock, faEnvelope, faPhone, faFilePdf, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faLock, faEnvelope, faPhone, faFilePdf, faPlus, faPen } from '@fortawesome/free-solid-svg-icons';
 import Isotipo from '../../assets/svg/isotipoEconofarma.svg'; 
 import { useNavigate } from 'react-router-dom';
 import ButtonText from '../../components/ButtonText/ButtonText';
 import ButtonIcon from '../../components/ButtonIcon/ButtonIcon';
 import { add } from 'date-fns';
+import InputFile from '../../components/Inputs/InputFile';
 
 const Visitadores = () => {
     const [nombre, setNombre] = useState('');
@@ -355,6 +356,17 @@ const Visitadores = () => {
                         <FontAwesomeIcon icon={faFilePdf} style={{ color: '#5a60a5' }} />
                         Subir Documentos (PDF)
                     </label>
+                    
+
+                    <InputFile
+                        icon={faPen }
+                        placeholder = {"Nombre del archivo"}
+                        value = {documentos}
+                        accept=".pdf"
+                        onChange = {handleFileChange}
+                        name = ""
+                    >
+                    </InputFile>
                     <input
                         type="file"
                         multiple

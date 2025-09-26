@@ -1,9 +1,12 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faAddressCard, faArrowLeft, faSearch} from '@fortawesome/free-solid-svg-icons';
 import IconoInput from "../../components/Inputs/InputIcono";
+import SimpleTitle from "../../components/Titles/SimpleTitle";
 import styles from "./NuevaVenta.module.css"
+import { Table } from '../../components/Tables/Table';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { TablaFactura } from "../../components/Tables/TablaFactura.jsx";
+import ButtonText from "../../components/ButtonText/ButtonText.jsx";
 import ButtonHeaders from "../../components/ButtonHeaders/ButtonHeaders.jsx";
 import { useState, useEffect} from "react";
 import { useFetch } from "../../utils/useFetch.jsx";
@@ -123,7 +126,7 @@ const NuevaVenta = () => {
 
       const data = await response.json();
       // Aquí verificamos si el cliente fue encontrado (según tu API, ajusta si es un array)
-      if (!data || Object.keys(data).length === 0) {
+      if (!data || Object.keys(data).length === 0 || data.error || !data.id || !data.nombre) {
         throw new Error("Cliente no encontrado, escribe el nombre para registrarlo."); // Esto fuerza el catch
       }
 
@@ -207,7 +210,7 @@ const NuevaVenta = () => {
       const errorText = await response.text();
   console.error("Error del servidor:", errorText);
   throw new Error("Error al crear la venta");
-
+  console.log("Payload enviado:", body);
     }
 
     const result = await response.json();
@@ -357,7 +360,7 @@ const NuevaVenta = () => {
                       
                       <p className={styles.textoCF}>Moneda:</p>
                       <p>GTQ</p>
-                      <p className={styles.textoCF} htmlFor="tipoPago"><strong>Tipo de Pago:</strong></p>
+                      <p className={styles.textoCF} htmlFor="tipoPago"><strong>Forma de Pago:</strong></p>
                       <select
                       id="tipoPago"
                       value={tipoPago}
