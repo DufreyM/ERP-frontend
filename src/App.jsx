@@ -18,6 +18,7 @@ import InventarioScreen from './Screens/Inventario/InventarioScreen.jsx';
 import NuevaVenta from './Screens/NuevaVenta/NuevaVenta.jsx';
 import HistorialComprasVentas from './Screens/HistorialComprasVentas/HistorialComprasVentas.jsx';
 import EmpleadosClientes from './Screens/Empleados/EmpleadosClientes.jsx';
+import NuevaCompra from './Screens/NuevaCompra/NuevaCompra.jsx';
 
 function App() {
     return (
@@ -71,6 +72,7 @@ function App() {
                 <Route path="inventario" element={<InventarioScreen />} />
                 <Route path="historial-vc" element={<HistorialComprasVentas />}></Route>
                 <Route path= "historial-vc/nueva-venta" element={<NuevaVenta />}></Route>
+                <Route path= "historial-vc/nueva-compra" element={<NuevaCompra />}></Route>
                 <Route path="configurar-ec" element={<EmpleadosClientes />} />
                 </Route>
             </Routes>

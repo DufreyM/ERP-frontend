@@ -126,7 +126,7 @@ const NuevaVenta = () => {
 
       const data = await response.json();
       // Aquí verificamos si el cliente fue encontrado (según tu API, ajusta si es un array)
-      if (!data || Object.keys(data).length === 0) {
+      if (!data || Object.keys(data).length === 0 || data.error || !data.id || !data.nombre) {
         throw new Error("Cliente no encontrado, escribe el nombre para registrarlo."); // Esto fuerza el catch
       }
 
@@ -360,7 +360,7 @@ const NuevaVenta = () => {
                       
                       <p className={styles.textoCF}>Moneda:</p>
                       <p>GTQ</p>
-                      <p className={styles.textoCF} htmlFor="tipoPago"><strong>Tipo de Pago:</strong></p>
+                      <p className={styles.textoCF} htmlFor="tipoPago"><strong>Forma de Pago:</strong></p>
                       <select
                       id="tipoPago"
                       value={tipoPago}
@@ -409,13 +409,13 @@ const NuevaVenta = () => {
                     <div className={styles.botonesVenta}> 
                       <ButtonHeaders
                         text="Cancelar Venta"
-                        onClick={handleCancelarVenta}
+                        onClick={openEliminarEvento}
                         red={true}
                       />
 
                       <ButtonHeaders
                         text="Confirmar venta"
-                        onClick={openEliminarEvento}
+                        onClick={handleConfirmarVenta}
                       />
                     </div>
                     
@@ -427,7 +427,7 @@ const NuevaVenta = () => {
 
             {
               <Popup 
-              isOpen={eliminarEvento} title={'Eliminar un recordatorio'}
+              isOpen={eliminarEvento} title={'¿Desea descartar esta venta?'}
               onClose={closeEliminarEvento} onClick={handleCancelarVenta}
               >
                   <div className='modalContenido'>

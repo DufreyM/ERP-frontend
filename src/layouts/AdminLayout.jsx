@@ -16,7 +16,7 @@ const adminItems = [
   { label: "Inventario", to: "/admin/inventario", icon: faBoxOpen },
   { label: "Calendario", to: "/admin/calendario", icon: faCalendar },
   { label: "Visitadores médicos", to: "/admin/visitadores-medicos", icon: faTruckMedical },
-   { label: "Notificaciones", to: "/admin/notificaciones", icon: faBell },
+   { label: "Alertas", to: "/admin/notificaciones", icon: faBell },
   { label: "Mi perfil", to: "/admin/mi-perfil", icon: faUser },
 ];
 

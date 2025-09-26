@@ -13,6 +13,7 @@ import { useFiltroGeneral } from "../../hooks/useFiltroGeneral";
 import { useFetch } from "../../utils/useFetch";
 import { getToken } from "../../services/authService";
 import { faUser, faSearch } from '@fortawesome/free-solid-svg-icons';
+import InputSearch from "../../components/Inputs/InputSearch";
 
 const EmpleadosClientes = () => {
   const { selectedLocal } = useOutletContext();
@@ -372,14 +373,24 @@ const EmpleadosClientes = () => {
 
         {/* Buscador */}
         <div className={styles.buscadorContainer}>
-          <IconoInput
+          <InputSearch
             icono={faSearch}
             placeholder="Buscar empleados..."
             value={busqueda}
             onChange={handleBusqueda}
             type="text"
             name="busqueda"
+          
+          
           />
+          {/* <IconoInput
+            icono={faSearch}
+            placeholder="Buscar empleados..."
+            value={busqueda}
+            onChange={handleBusqueda}
+            type="text"
+            name="busqueda"
+          /> */}
         </div>
 
         {/* Filtros */}

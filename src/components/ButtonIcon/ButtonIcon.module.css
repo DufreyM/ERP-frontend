@@ -1,0 +1,74 @@
+.filtroBotonIcon {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
+
+  background: transparent;
+  border-color: #5a60A5;
+  color: #5a60A5;
+
+  border-radius: 10px;
+  padding: 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+
+  transition-property: background-color, transform;
+  transition-duration: 0.2s, 0.2s;
+  transition-timing-function: ease-out, ease-out;
+  transition-delay: 0s, 0s;
+
+
+}
+
+.filtroBotonRojo{
+    background-color: rgb(210, 69, 90);
+    color: white;
+    border: none;
+}
+
+.filtroBotonRojo:hover{
+    background-color: rgb(189, 61, 80);
+    color: white;
+    transform: scale(1.05);
+    border: none;
+}
+
+.filtroBotonRojo:disabled{
+    color:#ffffff;
+    background-color: #d38888;
+}
+
+
+
+.filtroBotonSolido{
+    background-color: #5a60A5;
+    color: white;
+    border: none;
+}
+
+.filtroBotonSolido:hover{
+    background-color: #50568f;
+    color: white;
+    transform: scale(1.05);
+    border: none;
+}
+
+.filtroBotonSolido:disabled{
+    color:#ffffff;
+    background-color: #a2a6cb;
+}
+
+
+.filtroBotonRojo:active{
+    color:#ffffff;
+    transform: scale(0.98); 
+}
+
+.filtroBotonIcon:active{
+ 
+  transform: scale(0.98);
+}

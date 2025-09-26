@@ -1,10 +1,19 @@
 import React, { useState } from 'react';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {  faArrowLeft} from '@fortawesome/free-solid-svg-icons';
+import styles from "../NuevaVenta/NuevaVenta.module.css"
 import BackgroundCross from '../../components/BackgroundCross/BackgroundCross';
 import IconoInput from '../../components/Inputs/InputIcono';
 import ButtonForm from '../../components/ButtonForm/ButtonForm';
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import { useNavigate } from 'react-router-dom';
 
 const ResetPassword = () => {
+
+    const navigate = useNavigate();
+    const volver = () => {
+        navigate(-1); // Va una página atrás en el historial
+    };
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
@@ -47,10 +56,15 @@ const ResetPassword = () => {
                     justifyContent: 'center',
                     position: 'relative',
                     width: '100%',
-                    maxWidth: '600px',
+                   
                     height: '100vh',
                 }}
+
             >
+                <button className ={styles.buttonVolverC} onClick={volver}>
+                    <FontAwesomeIcon icon={faArrowLeft} style={{ fontSize: "25px" }}></FontAwesomeIcon>
+                </button>
+
                 {/* Contenedor del título */}
                 <div style={{ textAlign: 'center', marginBottom: '10px' }}>
                     <h1 style={{ color: '#5a60a5', fontFamily: 'Segoe UI', fontWeight: 'bold', margin: 0 }}>

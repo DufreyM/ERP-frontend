@@ -67,14 +67,44 @@
   }
   .estadoActivo {
     background: #e6f7ec;
-    color: #1bbf5c;
-    border-color: #1bbf5c;
+    color: #18a852;
+    border-color: #18a852;
+
+    transition-property: background-color, transform;
+    transition-duration: 0.2s, 0.2s;
+    transition-timing-function: ease-out, ease-out;
+    transition-delay: 0s, 0s;
   }
+
+
+  .estadoActivo:hover {
+    transform: scale(1.05);
+  }
+
+  .estadoActivo:active{
+    transform: scale(0.95);
+  }
+
+
   .estadoInactivo {
     background: #fdeaea;
-    color: #e74c3c;
-    border-color: #e74c3c;
+    color: #c14032;
+    border-color: #c14032;
+
+    transition-property: background-color, transform;
+    transition-duration: 0.2s, 0.2s;
+    transition-timing-function: ease-out, ease-out;
+    transition-delay: 0s, 0s;
   }
+
+  .estadoInactivo:hover {
+    transform: scale(1.05);
+  }
+
+  .estadoInactivo:active{
+    transform: scale(0.95);
+  }
+
   
   /* Responsive */
   @media (max-width: 768px) {

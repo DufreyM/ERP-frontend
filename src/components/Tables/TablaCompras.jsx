@@ -1,10 +1,9 @@
-import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCirclePlus, faTrash, faCircleMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import styles from './Table.module.css'; // (opcional, para tus estilos personalizados)
 import ButtonIcon from '../ButtonIcon/ButtonIcon';
 
-export const TablaFactura = ({ 
+export const TablaCompras = ({ 
   productosDisponibles,
   lineas,
   setLineas
@@ -16,11 +15,11 @@ export const TablaFactura = ({
   };
 
   const productosRestantes = productosDisponibles.filter(
-    (producto) => producto.stock_actual > 0 || !productoYaAgregado(producto.id)
+    (producto) =>  !productoYaAgregado(producto.id)
   );
   
   const puedeAgregarMas = productosDisponibles.some(
-    (producto) => producto.stock_actual > 0 && !productoYaAgregado(producto.id)
+    (producto) =>  !productoYaAgregado(producto.id)
   );
 
   const agregarLinea = () => {
@@ -139,8 +138,8 @@ export const TablaFactura = ({
                   <option value="">Seleccionar</option>
                   {productosDisponibles.map((producto) => {
                     const yaUsado = productoYaAgregado(producto.id) && producto.id !== parseInt(linea.productoId);
-                    const sinStock = producto.stock_actual === 0;
-                    const deshabilitado = (yaUsado || sinStock) && producto.id !== parseInt(linea.productoId);
+                   
+                    const deshabilitado = (yaUsado) && producto.id !== parseInt(linea.productoId);
 
                     return (
                       <option

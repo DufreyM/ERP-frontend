@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 
 import { faUser, faEnvelope, faBirthdayCake } from '@fortawesome/free-solid-svg-icons';
 import styles from './MiPerfil.module.css';
+import ButtonIcon from "../../components/ButtonIcon/ButtonIcon";
 
 const MiPerfil = () => {
   const navigate = useNavigate();
@@ -361,11 +362,9 @@ const MiPerfil = () => {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <SimpleTitle text="Mi Perfil" />
-        <button className={styles.logoutButton} onClick={handleLogout}>
-          <FontAwesomeIcon icon={faSignOutAlt} />
-          Cerrar sesión
-        </button>
+        <SimpleTitle text="Mi Perfil"/>
+        <ButtonIcon icon = {faSignOutAlt}  title = "Cerrar sesión" red = {true} onClick={handleLogout}></ButtonIcon>
+       
       </div>
       
       {loading && <div style={{ color: '#5a60a5', fontWeight: 600, marginBottom: 12 }}>Cargando perfil...</div>}
@@ -462,20 +461,14 @@ const MiPerfil = () => {
 
           <div className={styles.buttonContainer}>
             {!isEditing ? (
-              <button className={styles.editButton} onClick={handleEditProfile}>
-                <FontAwesomeIcon icon={faPencil} />
-                Editar perfil
-              </button>
+              <ButtonIcon icon = {faPencil}  title = "Editar Perfil" onClick={handleEditProfile}></ButtonIcon>
+              
             ) : (
               <div className={styles.editButtons}>
-                <button className={styles.cancelButton} onClick={handleCancelEdit}>
-                  <FontAwesomeIcon icon={faTimes} />
-                  Cancelar
-                </button>
-                <button className={styles.saveButton} onClick={handleSaveProfile} disabled={saving}>
-                  <FontAwesomeIcon icon={faCheck} />
-                  {saving ? "Guardando..." : "Guardar"}
-                </button>
+                <ButtonIcon icon = {faTimes}  title = "Cancelar" onClick={handleCancelEdit} red={true}></ButtonIcon>
+
+                <ButtonIcon icon = {faCheck}  title = {saving ? "Guardando..." : "Guardar"} onClick={handleSaveProfile} solid={true} disabled={saving}></ButtonIcon>
+
               </div>
             )}
           </div>

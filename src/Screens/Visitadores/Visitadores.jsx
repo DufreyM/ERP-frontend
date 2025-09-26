@@ -4,10 +4,13 @@ import IconoInput from '../../components/Inputs/InputIcono';
 import InputPassword from '../../components/Inputs/InputPassword';
 import ButtonForm from '../../components/ButtonForm/ButtonForm';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faLock, faEnvelope, faPhone, faFilePdf } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faLock, faEnvelope, faPhone, faFilePdf, faPlus, faPen } from '@fortawesome/free-solid-svg-icons';
 import Isotipo from '../../assets/svg/isotipoEconofarma.svg'; 
 import { useNavigate } from 'react-router-dom';
 import ButtonText from '../../components/ButtonText/ButtonText';
+import ButtonIcon from '../../components/ButtonIcon/ButtonIcon';
+import { add } from 'date-fns';
+import InputFile from '../../components/Inputs/InputFile';
 
 const Visitadores = () => {
     const [nombre, setNombre] = useState('');
@@ -244,11 +247,13 @@ const Visitadores = () => {
                 {/* Sección de Teléfonos */}
                 <div style={{ width: '100%', maxWidth: '400px', marginBottom: '16px' }}>
                     <label style={{ 
-                        color: '#5a60a5', 
-                        fontWeight: 500, 
-                        marginBottom: '8px', 
-                        display: 'block',
-                        fontSize: '14px'
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        color: '#5a60a5',
+                        fontFamily: 'Segoe UI',
+                        fontWeight: 'bold',
+                        marginBottom: '10px',
                     }}>
                         Teléfonos
                     </label>
@@ -257,7 +262,8 @@ const Visitadores = () => {
                             display: 'flex', 
                             gap: '8px', 
                             marginBottom: '8px',
-                            alignItems: 'center'
+                            alignItems: 'start',
+                         
                         }}>
                             <IconoInput
                                 icono={faPhone}
@@ -301,22 +307,15 @@ const Visitadores = () => {
                             )}
                         </div>
                     ))}
-                    <button
-                        type="button"
+
+                    <ButtonIcon
+                        solid = {true}
+                        title={'Agregar Teléfono'}
+                        icon = {faPlus}
                         onClick={addTelefono}
-                        style={{
-                            background: '#5a60a5',
-                            border: 'none',
-                            borderRadius: '4px',
-                            color: 'white',
-                            padding: '8px 16px',
-                            cursor: 'pointer',
-                            fontSize: '12px',
-                            marginTop: '8px'
-                        }}
                     >
-                        + Agregar Teléfono
-                    </button>
+                    </ButtonIcon>
+                   
                 </div>
                 <IconoInput
                     icono={faUser}
@@ -352,11 +351,22 @@ const Visitadores = () => {
                         fontFamily: 'Segoe UI',
                         fontWeight: 'bold',
                         marginBottom: '10px',
-                        cursor: 'pointer'
+                        
                     }}>
                         <FontAwesomeIcon icon={faFilePdf} style={{ color: '#5a60a5' }} />
                         Subir Documentos (PDF)
                     </label>
+                    
+
+                    <InputFile
+                        icon={faPen }
+                        placeholder = {"Nombre del archivo"}
+                        value = {documentos}
+                        accept=".pdf"
+                        onChange = {handleFileChange}
+                        name = ""
+                    >
+                    </InputFile>
                     <input
                         type="file"
                         multiple

@@ -1,23 +1,32 @@
 .navbar {
-  width: 100px;
-  border-radius: 10px;
-  background-color: #5a60a5;
+  width: 90px;
+  
+  /* border-radius: 0px 10px 15px 0px; */
+  background-color: #666cad;
   color: white;
-  padding: 1rem;
-  margin: 1rem;
+  padding: 0px;
+  margin: 0rem;
+  overflow-y: auto;
 
 }
 
-.nav-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.opcionesNavBar{
+  display: flex;
+  padding-top: 10px;
+  flex-direction: column;
+  align-items:start;
+  gap: 0px;
+  margin-bottom: 16px;
+  
+
 }
+
+
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap:8px;
+  gap: 8px;
   margin-bottom: 16px;
 }
 

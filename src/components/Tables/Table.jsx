@@ -12,12 +12,12 @@ Atributos:
   - onEliminarClick: Función que se ejecuta al hacer clic en el ícono de eliminar.
   - onEditarClick: Función que se ejecuta al hacer clic en el ícono de editar.
 Autor: Melisa 
-Última modificación: 17/8/2025 
+Última modificación: 24/9/2025 
 */
 
 import styles from "./Table.module.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFile, faTrash, faPen } from '@fortawesome/free-solid-svg-icons';
+import { faFile, faTrash, faPen, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 
 export const Table = ({
     nameColumns,
@@ -37,6 +37,13 @@ export const Table = ({
 
   //acciones especificas
   const renderCellContent = (col, item) => {
+    const valor = item[col.key];
+
+    if (col.key === 'precio_unitario' || col.key === 'descuento' || col.key === 'total') {
+      // Mostrar dinero con 2 decimales
+      return Number(valor).toFixed(2);
+    }
+
     if (col.key === 'archivo') {
       return (
         <span  title = {'Ver Archivo'} onClick={() => window.open(item.archivo, '_blank')} className={styles.IconStyle}>
@@ -86,9 +93,7 @@ export const Table = ({
     return item[col.key] || '' // valor genérico
   }
 
-  if (!data || data.length === 0) {
-    return <h2 style={{color: '#5a60A5'}}>No hay datos disponibles</h2>
-  }
+  
 
   return(
       
@@ -115,16 +120,34 @@ export const Table = ({
           </thead>
 
           <tbody className={styles.tbodyStyle}>
-              {data.map((item) => (
+            {data.length === 0 ? (
+                <tr >
+                  
+
+                  <td colSpan={nameColumns.length} className={styles.emptyRow}>
+                    <div className={styles.emptyRowContent}>
+                      <span className={styles.IconError}>
+                        <FontAwesomeIcon icon={faTriangleExclamation} />
+                      </span>
+                      No hay datos disponibles por el momento
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+              
+              data.map((item) => (
                   <tr key = {`${item.id}-${item.producto}`} className={styles.rowHover}>
                       {nameColumns.map((col) => (
                           <td key = {col.key} 
                             className={[
-                                styles.thStyle,
+                          
+                                col.type === 'numero' && styles.configuracionNumeros,
+                                col.type === 'texto' && styles.configuracionTexto,
                                 col.key === 'archivo' && styles.colArchivo,
                                 col.key === 'eliminar' && styles.colIcono,
                                 col.key === 'editar' && styles.colIcono,
                                 col.key === 'creacion' && styles.colCreacion,
+                                styles.thStyle,
                               ].filter(Boolean).join(' ')}
                             
                           >
@@ -136,7 +159,7 @@ export const Table = ({
                   </tr>
               ))
 
-              }
+              )}
           </tbody>
       </table>    
     </div>
