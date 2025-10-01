@@ -1,421 +1,486 @@
-import React, { useState, useEffect } from 'react';
-import SimpleTitle from '../../components/Titles/SimpleTitle.jsx';
-import IconoInput from '../../components/Inputs/InputIcono.jsx';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faPen, faTrash, faFilePdf, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
+import React, { useState, useMemo, useEffect } from "react";
+import { useOutletContext } from 'react-router-dom';
+import styles from "./VisitadoresAdmin.module.css";
+import SimpleTitle from "../../components/Titles/SimpleTitle";
+import { Table } from "../../components/Tables/Table";
+import Popup from '../../components/Popup/Popup';
+import IconoInput from "../../components/Inputs/InputIcono";
+import Filters from "../../components/FIlters/Filters";
+import ButtonHeaders from "../../components/ButtonHeaders/ButtonHeaders";
+import OrderBy from "../../components/OrderBy/OrderBy";
+import { useOrderBy } from "../../hooks/useOrderBy";
+import { useFetch } from "../../utils/useFetch";
+import { getToken } from "../../services/authService";
+import { faUser, faSearch } from '@fortawesome/free-solid-svg-icons';
+import InputSearch from "../../components/Inputs/InputSearch";
 
 const VisitadoresAdmin = () => {
-  const [nombre, setNombre] = useState('');
-  const [proveedor, setProveedor] = useState('');
-  const [data, setData] = useState([]);
-  const [filtered, setFiltered] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  
-  // Estados para edición inline
-  const [editingField, setEditingField] = useState(null); // { rowId, fieldName }
-  const [editingValue, setEditingValue] = useState('');
-  const [saving, setSaving] = useState(false);
+  const { selectedLocal } = useOutletContext();
+  const localSeleccionado = selectedLocal + 1;
 
-  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-
-  const mapVisitadorToView = (v) => {
-    const nombreCompleto = `${v?.usuario?.nombre ?? ''} ${v?.usuario?.apellidos ?? ''}`.trim();
-    const correo = v?.usuario?.correo ?? v?.usuario?.email ?? '-';
-    const telefono = v?.usuario?.telefono ?? v?.usuario?.telefono_movil ?? '-';
-    const proveedorNombre = v?.proveedor?.nombre ?? v?.proveedor?.razon_social ?? v?.proveedor?.name ?? (v?.proveedor_id ? `ID ${v.proveedor_id}` : '-');
-    const documentos = v?.documentos ?? v?.documento?.url ?? v?.usuario?.documento ?? '';
-    const estatus = v?.usuario?.status === 'activo' ? 'Activo' : 'Inactivo';
-    return {
-      id: v?.id,
-      nombre: nombreCompleto || '- ',
-      correo,
-      telefono,
-      proveedor: proveedorNombre,
-      documentos,
-      estatus,
-      raw: v,
-    };
+  // Función para formatear fecha
+  const formatearFecha = (fechaISO) => {
+    const fecha = new Date(fechaISO);
+    const dia = String(fecha.getDate()).padStart(2, '0');
+    const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+    const año = fecha.getFullYear();
+    return `${dia}-${mes}-${año}`;
   };
 
-  const fetchVisitadores = async () => {
-    setLoading(true);
-    setError('');
-    try {
-      const res = await fetch(`${API_BASE_URL}/visitadores`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
-      const list = Array.isArray(json) ? json.map(mapVisitadorToView) : [];
-      setData(list);
-      setFiltered(list);
-    } catch (e) {
-      setError('Error al cargar visitadores');
-    } finally {
-      setLoading(false);
+  // Estados para filtros
+  const [busqueda, setBusqueda] = useState('');
+  const [proveedorSeleccionado, setProveedorSeleccionado] = useState("");
+  const [fechaInicio, setFechaInicio] = useState(null);
+  const [fechaFin, setFechaFin] = useState(null);
+
+  // Filtros de API
+  const [statusSeleccionado, setStatusSeleccionado] = useState(""); // 'activo' | 'inactivo' | ""
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+
+  const params = new URLSearchParams();
+  params.set('id_local', String(localSeleccionado));
+  if (proveedorSeleccionado) params.set('proveedor_id', String(proveedorSeleccionado));
+  if (statusSeleccionado) params.set('status', statusSeleccionado);
+  if (page) params.set('page', String(page));
+  if (limit) params.set('limit', String(limit));
+
+  const token = getToken();
+  const shouldFetch = Boolean(token);
+  const visitadoresUrl = shouldFetch ? `http://localhost:3000/visitadores?${params.toString()}` : null;
+  const { data: visitadoresResponse, loading, error, refetch } = useFetch(
+    visitadoresUrl,
+    {
+      headers: {
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        'Content-Type': 'application/json',
+      },
+      method: 'GET'
+    },
+    [localSeleccionado, proveedorSeleccionado, statusSeleccionado, page, limit]
+  );
+
+  // Estados para popups
+  const [visitadorAEliminar, setVisitadorAEliminar] = useState(null);
+  const [advertencia, setAdvertencia] = useState(false);
+  const [visitadorAEditar, setVisitadorAEditar] = useState(null);
+  const [editarVisitador, setEditarVisitador] = useState(false);
+
+  // Form state crear/editar
+  const estadosPosibles = ['activo', 'inactivo'];
+  const [formVisitador, setFormVisitador] = useState({
+    nombre: '',
+    apellido: '',
+    correo: '',
+    telefono_fijo: '',
+    telefono_movil: '',
+    fecha_nacimiento: '',
+    proveedor_id: '',
+    contrasena: '',
+    documento: null
+  });
+
+  // Opciones de proveedores para filtros (esto debería venir de una API)
+  const opcionesProveedores = [
+    { id: 1, nombre: "Proveedor 1" },
+    { id: 2, nombre: "Proveedor 2" }
+  ];
+
+  // Configuración de columnas de la tabla
+  const columnas = [
+    { key: 'nombre', titulo: 'Nombre' },
+    { key: 'apellido', titulo: 'Apellido' },
+    { key: 'correo', titulo: 'Correo Electrónico' },
+    { key: 'telefono_fijo', titulo: 'Teléfono Fijo' },
+    { key: 'telefono_movil', titulo: 'Teléfono Móvil' },
+    { key: 'fecha_nacimiento', titulo: 'Fecha de Nacimiento' },
+    { key: 'proveedor', titulo: 'Proveedor' },
+    { key: 'documento', titulo: 'Documento' },
+    { key: 'status', titulo: 'Estado' },
+    { key: 'editar', titulo: 'Editar' }
+  ];
+
+  // Función para manejar búsqueda
+  const handleBusqueda = (e) => {
+    setBusqueda(e.target.value);
+  };
+
+  // Función para manejar cambio de proveedor
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "proveedor") {
+      const numValue = parseInt(value);
+      setProveedorSeleccionado(isNaN(numValue) ? "" : numValue);
     }
   };
 
+  // Función para abrir popup de eliminar
+  const openAdvertencia = (visitador) => {
+    setVisitadorAEliminar(visitador);
+    setAdvertencia(true);
+  };
+
+  const closeAdvertencia = () => {
+    setAdvertencia(false);
+    setVisitadorAEliminar(null);
+  };
+
+  // Función para abrir popup de editar
+  const openEditarVisitador = (visitador) => {
+    const base = (visitador && visitadoresData?.find?.((v) => v.id === visitador.id)) || visitador;
+    setVisitadorAEditar(base);
+    setEditarVisitador(true);
+  };
+
+  const closeEditarVisitador = () => {
+    setEditarVisitador(false);
+    setVisitadorAEditar(null);
+  };
+
+
+  // Cargar datos al formulario al abrir editar
   useEffect(() => {
-    fetchVisitadores();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Filtrado reactivo en tiempo real al escribir y cuando cambian los datos
-  useEffect(() => {
-    const termNombre = nombre.trim().toLowerCase();
-    const termProv = proveedor.trim().toLowerCase();
-    const next = data.filter((item) => {
-      const matchNombre = termNombre === '' || item.nombre.toLowerCase().includes(termNombre);
-      const matchProveedor = termProv === '' || item.proveedor.toLowerCase().includes(termProv);
-      return matchNombre && matchProveedor;
-    });
-    setFiltered(next);
-  }, [nombre, proveedor, data]);
-
-  const toggleEstatus = async (index) => {
-    const current = filtered[index];
-    if (!current?.id) return;
-    const activar = current.estatus !== 'Activo';
-    try {
-      const url = `${API_BASE_URL}/visitadores/${current.id}/${activar ? 'activate' : 'deactivate'}`;
-      const res = await fetch(url, { method: 'PATCH' });
-      if (!res.ok) throw new Error('No se pudo cambiar el estado');
-      // actualizar en memoria
-      const nextFiltered = filtered.map((it, i) =>
-        i === index ? { ...it, estatus: activar ? 'Activo' : 'Inactivo' } : it
-      );
-      setFiltered(nextFiltered);
-      const nextData = data.map((it) =>
-        it.id === current.id ? { ...it, estatus: activar ? 'Activo' : 'Inactivo' } : it
-      );
-      setData(nextData);
-    } catch (e) {
-      alert('Error al actualizar estado');
-    }
-  };
-
-  const handleDelete = async (id) => {
-    if (!id) return;
-    const confirm = window.confirm('¿Eliminar este visitador?');
-    if (!confirm) return;
-    try {
-      const res = await fetch(`${API_BASE_URL}/visitadores/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('No se pudo eliminar');
-      const nextData = data.filter((d) => d.id !== id);
-      setData(nextData);
-      // El useEffect de filtrado se encargará de actualizar "filtered"
-    } catch (e) {
-      alert('Error al eliminar visitador');
-    }
-  };
-
-  // Funciones para edición inline
-  const startEditing = (rowId, fieldName, currentValue) => {
-    setEditingField({ rowId, fieldName });
-    setEditingValue(currentValue);
-  };
-
-  const cancelEditing = () => {
-    setEditingField(null);
-    setEditingValue('');
-  };
-
-  const saveField = async () => {
-    if (!editingField || saving) return;
-    
-    setSaving(true);
-    try {
-      const { rowId, fieldName } = editingField;
-      const visitador = data.find(d => d.id === rowId);
-      if (!visitador) throw new Error('Visitador no encontrado');
-
-      // Preparar datos para actualizar según el campo
-      // El backend del visitador médico no maneja actualizaciones anidadas del usuario
-      // Necesitamos actualizar el usuario directamente
-      let updateData = {};
-      if (fieldName === 'nombre') {
-        // Separar nombre y apellidos
-        const parts = editingValue.trim().split(' ');
-        const nombre = parts[0] || '';
-        const apellidos = parts.slice(1).join(' ') || '';
-        updateData = {
-          nombre,
-          apellidos
-        };
-      } else if (fieldName === 'correo') {
-        updateData = {
-          correo: editingValue
-        };
-      } else if (fieldName === 'telefono') {
-        updateData = {
-          telefono: editingValue
-        };
-      }
-
-      // Si no hay datos para actualizar, no proceder
-      if (Object.keys(updateData).length === 0) {
-        throw new Error('No hay datos para actualizar');
-      }
-
-      // Obtener el ID del usuario del visitador
-      const usuarioId = visitador.raw?.usuario_id || visitador.raw?.usuario?.id;
-      if (!usuarioId) {
-        throw new Error('No se encontró el ID del usuario');
-      }
-      
-      console.log('Enviando datos de actualización:', {
-        rowId,
-        fieldName,
-        updateData,
-        usuarioId,
-        url: `${API_BASE_URL}/api/usuarios/${usuarioId}`
+    if (visitadorAEditar) {
+      setFormVisitador({
+        nombre: visitadorAEditar.nombre || '',
+        apellido: visitadorAEditar.apellido || '',
+        correo: visitadorAEditar.correo || '',
+        telefono_fijo: visitadorAEditar.telefono_fijo || '',
+        telefono_movil: visitadorAEditar.telefono_movil || '',
+        fecha_nacimiento: visitadorAEditar.fecha_nacimientoISO ? visitadorAEditar.fecha_nacimientoISO.slice(0,10) : '',
+        proveedor_id: visitadorAEditar.proveedor_id || '',
+        contrasena: '',
+        documento: null
       });
+    }
+  }, [visitadorAEditar]);
 
-      // Obtener token de autenticación
-      const token = localStorage.getItem('token');
-      
-      // Actualizar directamente el usuario usando el endpoint de usuarios
-      const res = await fetch(`${API_BASE_URL}/api/usuarios/${usuarioId}`, {
-        method: 'PUT',
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormVisitador(prev => ({ ...prev, [name]: name === 'proveedor_id' ? Number(value) : value }));
+  };
+
+
+  // Actualizar visitador
+  const actualizarVisitador = async () => {
+    if (!visitadorAEditar) return;
+    try {
+      // Preparar datos según la estructura del backend
+      const updateData = {
+        proveedor_id: formVisitador.proveedor_id,
+        usuario: {
+          nombre: formVisitador.nombre,
+          apellidos: formVisitador.apellido,
+          email: formVisitador.correo,
+          fechanacimiento: formVisitador.fecha_nacimiento
+        },
+        telefonos: [
+          ...(formVisitador.telefono_fijo ? [{ numero: formVisitador.telefono_fijo, tipo: 'fijo' }] : []),
+          ...(formVisitador.telefono_movil ? [{ numero: formVisitador.telefono_movil, tipo: 'movil' }] : [])
+        ]
+      };
+
+      const resp = await fetch(`http://localhost:3000/visitadores/${visitadorAEditar.id}`, {
+        method: 'PATCH',
         headers: {
+          'Authorization': getToken() ? `Bearer ${getToken()}` : '',
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(updateData)
       });
-
-      const responseData = await res.json().catch(() => ({}));
-      console.log('Respuesta del servidor:', { status: res.status, data: responseData });
-
-      if (!res.ok) {
-        console.error('Error response:', responseData);
-        throw new Error(`Error al actualizar: ${res.status} - ${responseData.error || responseData.message || 'Error desconocido'}`);
+      if (!resp.ok) {
+        let serverMsg = '';
+        try { serverMsg = (await resp.json())?.error || (await resp.json())?.message || ''; } catch {}
+        throw new Error(serverMsg || `Error al actualizar visitador (HTTP ${resp.status})`);
       }
-
-      // Actualizar datos locales
-      const updatedData = data.map(item => {
-        if (item.id === rowId) {
-          const updated = { ...item };
-          if (fieldName === 'nombre') {
-            updated.nombre = editingValue;
-          } else if (fieldName === 'correo') {
-            updated.correo = editingValue;
-          } else if (fieldName === 'telefono') {
-            updated.telefono = editingValue;
-          }
-          return updated;
-        }
-        return item;
-      });
-
-      setData(updatedData);
-      setEditingField(null);
-      setEditingValue('');
+      await refetch();
+      closeEditarVisitador();
     } catch (e) {
-      alert('Error al guardar cambios: ' + e.message);
-    } finally {
-      setSaving(false);
+      console.error(e);
+      alert(`No se pudo actualizar el visitador. ${e.message || ''}`);
     }
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      saveField();
-    } else if (e.key === 'Escape') {
-      cancelEditing();
+  // Eliminar visitador
+  const eliminarVisitador = async () => {
+    if (!visitadorAEliminar) return;
+    try {
+      const resp = await fetch(`http://localhost:3000/visitadores/${visitadorAEliminar.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': getToken() ? `Bearer ${getToken()}` : '',
+        }
+      });
+      if (!resp.ok) throw new Error('Error al eliminar');
+      await refetch();
+      closeAdvertencia();
+    } catch (e) {
+      console.error(e);
+      alert('No se pudo eliminar el visitador');
     }
   };
 
-  // Componente para campos editables
-  const EditableField = ({ rowId, fieldName, value, onEdit }) => {
-    const isEditing = editingField?.rowId === rowId && editingField?.fieldName === fieldName;
+  // Toggle status activo/inactivo
+  const onToggleStatus = async (visitador) => {
+    const original = visitadoresData?.find?.((v) => v.id === visitador.id) || visitador;
+    const nuevoStatus = (String(original.status).toLowerCase() === 'activo' || original.status === true) ? 'inactivo' : 'activo';
+    try {
+      const resp = await fetch(`http://localhost:3000/visitadores/${original.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': getToken() ? `Bearer ${getToken()}` : '',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          usuario: { 
+            status: nuevoStatus 
+          } 
+        })
+      });
+      if (!resp.ok) throw new Error('Error al cambiar estado');
+      await refetch();
+    } catch (e) {
+      console.error(e);
+      alert('No se pudo cambiar el estado');
+    }
+  };
+
+
+  // Normalizar respuesta y aplicar filtros
+  const visitadoresData = useMemo(() => {
+    if (visitadoresResponse) {
+      try { console.debug('Visitadores GET response:', visitadoresResponse); } catch {}
+    }
     
-    if (isEditing) {
-      return (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <input
-            type="text"
-            value={editingValue}
-            onChange={(e) => setEditingValue(e.target.value)}
-            onKeyDown={handleKeyPress}
-            style={{
-              padding: '4px 8px',
-              border: '1px solid #5a60a5',
-              borderRadius: '4px',
-              fontSize: '14px',
-              minWidth: '120px'
-            }}
-            autoFocus
-            disabled={saving}
-          />
-          <button
-            onClick={saveField}
-            disabled={saving}
-            style={{
-              background: '#1bbf5c',
-              border: 'none',
-              borderRadius: '4px',
-              color: 'white',
-              padding: '4px 8px',
-              cursor: saving ? 'not-allowed' : 'pointer',
-              opacity: saving ? 0.6 : 1
-            }}
-            title="Guardar"
-          >
-            <FontAwesomeIcon icon={faCheck} size="sm" />
-          </button>
-          <button
-            onClick={cancelEditing}
-            disabled={saving}
-            style={{
-              background: '#e74c3c',
-              border: 'none',
-              borderRadius: '4px',
-              color: 'white',
-              padding: '4px 8px',
-              cursor: saving ? 'not-allowed' : 'pointer',
-              opacity: saving ? 0.6 : 1
-            }}
-            title="Cancelar"
-          >
-            <FontAwesomeIcon icon={faTimes} size="sm" />
-          </button>
-        </div>
+    // Si hay error en la respuesta, mostrar datos de prueba
+    if (visitadoresResponse?.error) {
+      console.warn('Error del servidor, mostrando datos de prueba:', visitadoresResponse.error);
+      return [
+        {
+          id: 1,
+          nombre: 'Juan',
+          apellido: 'Pérez',
+          correo: 'juan.perez@ejemplo.com',
+          telefono_fijo: '1234567890',
+          telefono_movil: '0987654321',
+          fecha_nacimiento: '15-03-1985',
+          fecha_nacimientoISO: '1985-03-15',
+          proveedor_id: 1,
+          proveedor: 'Proveedor 1',
+          documento: '',
+          status: 'activo'
+        },
+        {
+          id: 2,
+          nombre: 'María',
+          apellido: 'González',
+          correo: 'maria.gonzalez@ejemplo.com',
+          telefono_fijo: '2345678901',
+          telefono_movil: '1876543210',
+          fecha_nacimiento: '22-07-1990',
+          fecha_nacimientoISO: '1990-07-22',
+          proveedor_id: 2,
+          proveedor: 'Proveedor 2',
+          documento: '',
+          status: 'inactivo'
+        }
+      ];
+    }
+    
+    const maybeArrays = [
+      visitadoresResponse?.data?.items,
+      visitadoresResponse?.data?.rows,
+      visitadoresResponse?.data,
+      visitadoresResponse?.items,
+      visitadoresResponse?.rows,
+      visitadoresResponse?.visitadores,
+      visitadoresResponse?.results,
+      visitadoresResponse,
+    ];
+    const lista = maybeArrays.find(arr => Array.isArray(arr)) || [];
+    return lista.map((v) => {
+      // Extraer teléfonos fijo y móvil de la relación telefonos
+      const telefonos = v.telefonos || [];
+      const telefonoFijo = telefonos.find(t => t.tipo === 'fijo')?.numero || '';
+      const telefonoMovil = telefonos.find(t => t.tipo === 'movil')?.numero || '';
+      
+      return {
+        id: v.id,
+        nombre: v.usuario?.nombre || '',
+        apellido: v.usuario?.apellidos || '',
+        correo: v.usuario?.email || '',
+        telefono_fijo: telefonoFijo,
+        telefono_movil: telefonoMovil,
+        fecha_nacimiento: v.usuario?.fechanacimiento ? formatearFecha(v.usuario.fechanacimiento) : '',
+        fecha_nacimientoISO: v.usuario?.fechanacimiento || '',
+        proveedor_id: v.proveedor_id || '',
+        proveedor: v.proveedor?.nombre || v.proveedor?.razon_social || (v.proveedor_id ? `ID ${v.proveedor_id}` : ''),
+        documento: v.documento_url || '',
+        status: v.usuario?.status || 'inactivo'
+      };
+    });
+  }, [visitadoresResponse]);
+
+  // Aplicar filtros y búsqueda
+  const dataFiltrada = useMemo(() => {
+    let filtered = visitadoresData;
+    
+    // Filtro por proveedor
+    if (proveedorSeleccionado) {
+      filtered = filtered.filter(visitador => 
+        String(visitador.proveedor_id) === String(proveedorSeleccionado)
       );
     }
+    
+    // Filtro por fecha de nacimiento
+    if (fechaInicio || fechaFin) {
+      filtered = filtered.filter(visitador => {
+        if (!visitador.fecha_nacimientoISO) return true;
+        const fechaItem = new Date(visitador.fecha_nacimientoISO);
+        return (!fechaInicio || fechaItem >= fechaInicio) && 
+               (!fechaFin || fechaItem <= fechaFin);
+      });
+    }
+    
+    // Aplicar búsqueda
+    if (busqueda) {
+      filtered = filtered.filter(visitador => {
+        const camposBusqueda = ['nombre', 'apellido', 'correo', 'proveedor'];
+        return camposBusqueda.some(campo => 
+          visitador[campo]?.toLowerCase().includes(busqueda.toLowerCase())
+        );
+      });
+    }
+    
+    return filtered;
+  }, [visitadoresData, proveedorSeleccionado, fechaInicio, fechaFin, busqueda]);
 
-    return (
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <span>{value}</span>
-        <button
-          onClick={() => onEdit(rowId, fieldName, value)}
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            color: '#5a60a5',
-            padding: '2px'
-          }}
-          title="Editar"
-        >
-          <FontAwesomeIcon icon={faPen} size="sm" />
-        </button>
-      </div>
-    );
+  // Configuración de ordenamiento
+  const sortKeyMap = {
+    AZ: "nombre",
+    ZA: "nombre",
   };
 
+  const { sortedData, sortOption, setSortOption } = useOrderBy({
+    data: dataFiltrada,
+    sortKeyMap
+  });
+
   return (
-    <div style={{ padding: '32px 24px 0 24px', maxWidth: '1200px', margin: '0 auto' }}>
-      <div style={{ marginBottom: '16px' }}>
+    <div className={styles.contenedorGeneral}>
+      <div className={styles.contenedorEncabezado}>
+        <div className={styles.contenedorTitle}>
         <SimpleTitle text="Visitadores médicos" />
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', minWidth: '220px' }}>
-          <label style={{ color: '#5a60a5', fontWeight: 500, marginBottom: 4 }}>Nombre</label>
-          <IconoInput
+        </div>
+
+        {/* Buscador */}
+        <div className={styles.buscadorContainer}>
+          <InputSearch
             icono={faSearch}
-            placeholder="Ingrese el nombre del médico"
-            value={nombre}
-            onChange={e => setNombre(e.target.value)}
+            placeholder="Buscar visitadores..."
+            value={busqueda}
+            onChange={handleBusqueda}
             type="text"
-            name="nombre"
+            name="busqueda"
           />
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', minWidth: '220px' }}>
-          <label style={{ color: '#5a60a5', fontWeight: 500, marginBottom: 4 }}>Proveedor</label>
-          <IconoInput
-            icono={faSearch}
-            placeholder="Ingrese un proveedor"
-            value={proveedor}
-            onChange={e => setProveedor(e.target.value)}
-            type="text"
-            name="proveedor"
-          />
-        </div>
+
+        {/* Filtros */}
+        <Filters
+          title="Visitadores"
+          mostrarRangoFecha={true}
+          mostrarRangoPrecio={false}
+          mostrarUsuario={false}
+          mostrarMedicamento={false}
+          fechaInicio={fechaInicio}
+          setFechaInicio={setFechaInicio}
+          fechaFin={fechaFin}
+          setFechaFin={setFechaFin}
+          opcionesRoles={opcionesProveedores}
+          rolSeleccionado={proveedorSeleccionado}
+          handleChange={handleChange}
+        />
+
+        {/* Ordenar */}
+        <OrderBy
+          FAbecedario={true}
+          FExistencias={false}
+          FPrecio={false}
+          FFecha={false}
+          selectedOption={sortOption}
+          onChange={setSortOption}
+        />
+
       </div>
 
-      {loading && <div style={{ color: '#5a60a5', fontWeight: 600, marginBottom: 12 }}>Cargando visitadores...</div>}
-      {error && <div style={{ color: '#e74c3c', fontWeight: 600, marginBottom: 12 }}>{error}</div>}
-
-      <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 800 }}>
-          <thead>
-            <tr style={{ background: '#f2f2f2', color: '#222' }}>
-              <th style={{ padding: '12px 8px', textAlign: 'left' }}>Nombre</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left' }}>Correo</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left' }}>Teléfono</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left' }}>Proveedor</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left' }}>Documentos</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left' }}>Estatus</th>
-              <th style={{ padding: '12px 8px', textAlign: 'left' }}>Acción</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((item, idx) => (
-              <tr key={item.id ?? item.nombre} style={{ borderBottom: '1px solid #e0e0e0' }}>
-                <td style={{ padding: '10px 8px' }}>
-                  <EditableField
-                    rowId={item.id}
-                    fieldName="nombre"
-                    value={item.nombre}
-                    onEdit={startEditing}
-                  />
-                </td>
-                <td style={{ padding: '10px 8px' }}>
-                  <EditableField
-                    rowId={item.id}
-                    fieldName="correo"
-                    value={item.correo}
-                    onEdit={startEditing}
-                  />
-                </td>
-                <td style={{ padding: '10px 8px' }}>
-                  <EditableField
-                    rowId={item.id}
-                    fieldName="telefono"
-                    value={item.telefono}
-                    onEdit={startEditing}
-                  />
-                </td>
-                <td style={{ padding: '10px 8px' }}>{item.proveedor}</td>
-                <td style={{ padding: '10px 8px' }}>
-                  {item.documentos ? (
-                    <a href={item.documentos} target="_blank" rel="noopener noreferrer" style={{ color: '#5a60a5', textDecoration: 'none' }}>
-                      <FontAwesomeIcon icon={faFilePdf} /> PDF
+      <div className={styles.contenedorTabla}>
+        {loading && <p style={{color:'#5a60A5'}}>Cargando...</p>}
+        {error && <p style={{color:'crimson'}}>Error: {String(error)}</p>}
+        <Table
+          nameColumns={columnas}
+          data={sortedData.map(visitador => ({
+            ...visitador,
+            status: (
+              <span
+                className={[
+                  styles.estadoChip,
+                  (String(visitador.status).toLowerCase() === 'activo') ? styles.estadoActivo : styles.estadoInactivo
+                ].join(' ')}
+                onClick={() => onToggleStatus(visitador)}
+                title="Cambiar estado"
+              >
+                {String(visitador.status).toLowerCase() === 'activo' ? 'Activo' : 'Inactivo'}
+              </span>
+            ),
+            documento: visitador.documento ? (
+              <a href={visitador.documento} target="_blank" rel="noopener noreferrer" style={{ color: '#5a60a5', textDecoration: 'none' }}>
+                📄 PDF
                     </a>
                   ) : (
                     <span style={{ color: '#888' }}>-</span>
-                  )}
-                </td>
-                <td style={{ padding: '10px 8px' }}>
-                  <span
-                    onClick={() => toggleEstatus(idx)}
-                    style={{
-                      display: 'inline-block',
-                      padding: '4px 16px',
-                      borderRadius: '16px',
-                      background: item.estatus === 'Activo' ? '#e6f7ec' : '#fdeaea',
-                      color: item.estatus === 'Activo' ? '#1bbf5c' : '#e74c3c',
-                      fontWeight: 600,
-                      fontSize: 14,
-                      cursor: 'pointer',
-                      border: `1.5px solid ${item.estatus === 'Activo' ? '#1bbf5c' : '#e74c3c'}`,
-                      transition: 'all 0.2s',
-                    }}
-                  >
-                    {item.estatus}
-                  </span>
-                </td>
-                <td style={{ padding: '10px 8px', display: 'flex', gap: 12 }}>
-                  <button onClick={() => handleDelete(item.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#e74c3c' }} title="Eliminar">
-                    <FontAwesomeIcon icon={faTrash} />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+            )
+          }))}
+          onEliminarClick={openAdvertencia}
+          onEditarClick={openEditarVisitador}
+        />
       </div>
+
+      {/* Popup para eliminar visitador */}
+      <Popup 
+        isOpen={advertencia} 
+        onClose={closeAdvertencia}
+        title={`¿Estás seguro de eliminar a "${visitadorAEliminar?.nombre} ${visitadorAEliminar?.apellido}"?`}
+        onClick={eliminarVisitador}
+      >
+        <div className={styles.modalContenido}>
+          <p>Esta acción no se puede deshacer.</p>
+        </div>
+      </Popup>
+
+      {/* Popup para editar visitador */}
+      <Popup 
+        isOpen={editarVisitador} 
+        onClose={closeEditarVisitador}
+        title="Editar visitador médico"
+        onClick={actualizarVisitador}
+      >
+        <div className={styles.modalContenido}>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px',maxWidth:600,margin:'0 auto'}}>
+            <input name="nombre" value={formVisitador.nombre} onChange={handleFormChange} placeholder="Nombre" />
+            <input name="apellido" value={formVisitador.apellido} onChange={handleFormChange} placeholder="Apellido" />
+            <input name="correo" value={formVisitador.correo} onChange={handleFormChange} placeholder="Correo" />
+            <input name="telefono_fijo" value={formVisitador.telefono_fijo} onChange={handleFormChange} placeholder="Teléfono Fijo" />
+            <input name="telefono_movil" value={formVisitador.telefono_movil} onChange={handleFormChange} placeholder="Teléfono Móvil" />
+            <input name="fecha_nacimiento" type="date" value={formVisitador.fecha_nacimiento} onChange={handleFormChange} />
+            <select name="proveedor_id" value={formVisitador.proveedor_id} onChange={handleFormChange}>
+              <option value="">Seleccionar proveedor</option>
+              {opcionesProveedores.map(p => <option key={p.id} value={p.id}>{p.nombre}</option>)}
+            </select>
+            <input name="documento" type="file" accept=".pdf" onChange={(e) => setFormVisitador(prev => ({...prev, documento: e.target.files[0]}))} />
+          </div>
+        </div>
+      </Popup>
+
     </div>
   );
 };
