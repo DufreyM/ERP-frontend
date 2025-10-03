@@ -12,8 +12,10 @@ import { useOrderBy } from "../../hooks/useOrderBy";
 import { useFiltroGeneral } from "../../hooks/useFiltroGeneral";
 import { useFetch } from "../../utils/useFetch";
 import { getToken } from "../../services/authService";
-import { faUser, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faSearch, faEnvelope, faCalendar } from '@fortawesome/free-solid-svg-icons';
 import InputSearch from "../../components/Inputs/InputSearch";
+import InputSelects from "../../components/Inputs/InputSelects";
+import InputDates from "../../components/Inputs/InputDates";
 
 const EmpleadosClientes = () => {
   const { selectedLocal } = useOutletContext();
@@ -85,8 +87,10 @@ const EmpleadosClientes = () => {
 
   // Opciones de roles para filtros
   const opcionesRoles = [
-    { id: 1, nombre: "Administradora" },
-    { id: 2, nombre: "Dependiente" }
+    { id: 1, nombre: "Administrador" },
+    { id: 2, nombre: "Dependiente" },
+    { id: 3, nombre: "Visitador Médico" },
+    { id: 4, nombre: "Contador" }
   ];
 
   // Configuración de columnas de la tabla
@@ -324,7 +328,12 @@ const EmpleadosClientes = () => {
       fechanacimiento: e.fechanacimiento ? formatearFecha(e.fechanacimiento) : '',
       fechanacimientoISO: e.fechanacimiento || '',
       rol_id: e.rol_id,
-      rol: e.rol_id === 1 ? 'Administradora' : 'Dependiente',
+      rol: (
+        e.rol_id === 1 ? 'Administrador' :
+        e.rol_id === 2 ? 'Dependiente' :
+        e.rol_id === 3 ? 'Visitador Médico' :
+        e.rol_id === 4 ? 'Contador' : ''
+      ),
       status: (
         typeof e.status === 'string' ? e.status : (e.status ? 'activo' : 'inactivo')
       ),
@@ -471,21 +480,61 @@ const EmpleadosClientes = () => {
         onClick={actualizarEmpleado}
       >
         <div className={styles.modalContenido}>
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px',maxWidth:600,margin:'0 auto'}}>
-            <input name="nombre" value={formEmpleado.nombre} onChange={handleFormChange} placeholder="Nombre" />
-            <input name="apellidos" value={formEmpleado.apellidos} onChange={handleFormChange} placeholder="Apellidos" />
-            <input name="email" value={formEmpleado.email} onChange={handleFormChange} placeholder="Correo" />
-            <input name="fechanacimiento" type="date" value={formEmpleado.fechanacimiento} onChange={handleFormChange} />
-            <select name="rol_id" value={formEmpleado.rol_id} onChange={handleFormChange}>
-              {opcionesRoles.map(r => <option key={r.id} value={r.id}>{r.nombre}</option>)}
-            </select>
-            <select name="status" value={formEmpleado.status} onChange={handleFormChange}>
-              {estadosPosibles.map(s => <option key={s} value={s}>{s}</option>)}
-            </select>
-            <select name="id_local" value={formEmpleado.id_local} onChange={handleFormChange}>
-              <option value={1}>Local 1</option>
-              <option value={2}>Local 2</option>
-            </select>
+          <div style={{display:'grid',gridTemplateColumns:'1fr',gap:'12px',maxWidth:560,margin:'0 auto', width:'100%'}}>
+            <IconoInput
+              icono={faUser}
+              name="nombre"
+              value={formEmpleado.nombre}
+              onChange={handleFormChange}
+              placeholder={empleadoAEditar?.nombre || 'Nombre'}
+              type="text"
+            />
+            <IconoInput
+              icono={faUser}
+              name="apellidos"
+              value={formEmpleado.apellidos}
+              onChange={handleFormChange}
+              placeholder={empleadoAEditar?.apellidos || empleadoAEditar?.apellido || 'Apellidos'}
+              type="text"
+            />
+            <IconoInput
+              icono={faEnvelope}
+              name="email"
+              value={formEmpleado.email}
+              onChange={handleFormChange}
+              placeholder={empleadoAEditar?.email || 'Correo'}
+              type="email"
+            />
+            <InputDates
+              icono={faCalendar}
+              placeholder={empleadoAEditar?.fechanacimiento || 'Fecha de nacimiento'}
+              selected={formEmpleado.fechanacimiento ? new Date(formEmpleado.fechanacimiento) : (empleadoAEditar?.fechanacimientoISO ? new Date(empleadoAEditar.fechanacimientoISO) : null)}
+              onChange={(date) => setFormEmpleado(prev => ({...prev, fechanacimiento: date ? date.toISOString().slice(0,10) : ''}))}
+            />
+            <InputSelects
+              icono={faUser}
+              placeholder="Tipo de rol"
+              name="rol_id"
+              value={formEmpleado.rol_id || empleadoAEditar?.rol_id || ''}
+              onChange={handleFormChange}
+              opcions={opcionesRoles.map(r => ({ value: r.id, label: r.nombre }))}
+            />
+            <InputSelects
+              icono={faUser}
+              placeholder="Estado"
+              name="status"
+              value={formEmpleado.status || empleadoAEditar?.status || ''}
+              onChange={handleFormChange}
+              opcions={estadosPosibles.map(s => ({ value: s, label: s.charAt(0).toUpperCase()+s.slice(1) }))}
+            />
+            <InputSelects
+              icono={faUser}
+              placeholder="Local"
+              name="id_local"
+              value={formEmpleado.id_local || empleadoAEditar?.id_local || ''}
+              onChange={handleFormChange}
+              opcions={[{value:1,label:'Local 1'},{value:2,label:'Local 2'}]}
+            />
           </div>
         </div>
       </Popup>
@@ -498,22 +547,69 @@ const EmpleadosClientes = () => {
         onClick={crearEmpleado}
       >
         <div className={styles.modalContenido}>
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px',maxWidth:600,margin:'0 auto'}}>
-            <input name="nombre" value={formEmpleado.nombre} onChange={handleFormChange} placeholder="Nombre" />
-            <input name="apellidos" value={formEmpleado.apellidos} onChange={handleFormChange} placeholder="Apellidos" />
-            <input name="email" value={formEmpleado.email} onChange={handleFormChange} placeholder="Correo" />
-            <input name="fechanacimiento" type="date" value={formEmpleado.fechanacimiento} onChange={handleFormChange} />
-            <select name="rol_id" value={formEmpleado.rol_id} onChange={handleFormChange}>
-              {opcionesRoles.map(r => <option key={r.id} value={r.id}>{r.nombre}</option>)}
-            </select>
-            <select name="status" value={formEmpleado.status} onChange={handleFormChange}>
-              {estadosPosibles.map(s => <option key={s} value={s}>{s}</option>)}
-            </select>
-            <select name="id_local" value={formEmpleado.id_local} onChange={handleFormChange}>
-              <option value={1}>Local 1</option>
-              <option value={2}>Local 2</option>
-            </select>
-            <input name="contrasena" value={formEmpleado.contrasena} onChange={handleFormChange} placeholder="Contraseña" type="password" />
+          <div style={{display:'grid',gridTemplateColumns:'1fr',gap:'12px',maxWidth:560,margin:'0 auto', width:'100%'}}>
+            <IconoInput
+              icono={faUser}
+              name="nombre"
+              value={formEmpleado.nombre}
+              onChange={handleFormChange}
+              placeholder="Nombre"
+              type="text"
+            />
+            <IconoInput
+              icono={faUser}
+              name="apellidos"
+              value={formEmpleado.apellidos}
+              onChange={handleFormChange}
+              placeholder="Apellidos"
+              type="text"
+            />
+            <IconoInput
+              icono={faEnvelope}
+              name="email"
+              value={formEmpleado.email}
+              onChange={handleFormChange}
+              placeholder="Correo"
+              type="email"
+            />
+            <InputDates
+              icono={faCalendar}
+              placeholder="Fecha de nacimiento"
+              selected={formEmpleado.fechanacimiento ? new Date(formEmpleado.fechanacimiento) : null}
+              onChange={(date) => setFormEmpleado(prev => ({...prev, fechanacimiento: date ? date.toISOString().slice(0,10) : ''}))}
+            />
+            <InputSelects
+              icono={faUser}
+              placeholder="Tipo de rol"
+              name="rol_id"
+              value={formEmpleado.rol_id}
+              onChange={handleFormChange}
+              opcions={opcionesRoles.map(r => ({ value: r.id, label: r.nombre }))}
+            />
+            <InputSelects
+              icono={faUser}
+              placeholder="Estado"
+              name="status"
+              value={formEmpleado.status}
+              onChange={handleFormChange}
+              opcions={estadosPosibles.map(s => ({ value: s, label: s.charAt(0).toUpperCase()+s.slice(1) }))}
+            />
+            <InputSelects
+              icono={faUser}
+              placeholder="Local"
+              name="id_local"
+              value={formEmpleado.id_local}
+              onChange={handleFormChange}
+              opcions={[{value:1,label:'Local 1'},{value:2,label:'Local 2'}]}
+            />
+            <IconoInput
+              icono={faUser}
+              name="contrasena"
+              value={formEmpleado.contrasena}
+              onChange={handleFormChange}
+              placeholder="Contraseña"
+              type="password"
+            />
           </div>
         </div>
       </Popup>
