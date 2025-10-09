@@ -77,7 +77,7 @@ const Ventas = () => {
    
     ];
 
-    //console.log(datosTransformados);
+    console.log(datosTransformados);
 
 
   //Filtros
@@ -188,8 +188,6 @@ const Ventas = () => {
   }
 
   
-
-   
 
 
   const resetFiltros = () => {

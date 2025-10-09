@@ -83,11 +83,20 @@
 
 .configuracionTexto {
   text-align: left;
+  white-space: normal !important;
+  vertical-align: top !important;
+  overflow: visible;
+  text-overflow: clip;
+  max-width: 200px;
+
+
 }
 
 .configuracionNumeros {
-  width: 100%;
+
+  max-width: 100px;
   text-align: right !important;
+  vertical-align: top !important;
   /* font-family: 'Consolas', 'Courier New', monospace;
   font-weight:lighter !important; */
 }
