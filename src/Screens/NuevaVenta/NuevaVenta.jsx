@@ -193,9 +193,10 @@ const NuevaVenta = () => {
           nit: nitCliente,
           nombre: nombreClienteManual,
           direccion: "",   // opcional
-          correo: "no@gmail.com"       // opcional
+          correo: null        // opcional
         };
       }
+
 
     const response = await fetch("http://localhost:3000/ventas", {
       method: "POST",
