@@ -21,6 +21,7 @@ Autor: Melisa
 */
 
 import { useState, useEffect, useCallback } from "react";
+import { getToken } from '../services/authService';
 
 export const useFetch = (url, options = {}, dependencies = []) => {
   const [data, setData] = useState(null);         //almacna la data que responde la API
@@ -34,7 +35,13 @@ export const useFetch = (url, options = {}, dependencies = []) => {
       setError(null);
 
       try {
-        const response = await fetch(url, options);
+        const token = getToken();
+        const headers = {
+          ...options.headers,
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        };
+
+        const response = await fetch(url, { ...options, headers });
         if (!response.ok) throw new Error(`Error ${response.status}`);
 
         const result = await response.json();

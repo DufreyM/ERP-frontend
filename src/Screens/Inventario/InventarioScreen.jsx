@@ -13,6 +13,8 @@ import { useOrderBy } from '../../hooks/useOrderBy.js';
 import { useFiltroGeneral } from '../../hooks/useFiltroGeneral.js';
 import Filters from '../../components/FIlters/Filters.jsx';
 import FiltroResumen from '../../components/FIlters/FiltroResumen/FiltroResumen.jsx';
+import { getToken } from '../../services/authService';
+
 
 const InventarioScreen = () => {
   const { selectedLocal } = useOutletContext();
@@ -24,16 +26,35 @@ const InventarioScreen = () => {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
- 
 
- 
+
+  const token = getToken();
+  const getPayloadFromToken = (token) => {
+    try {
+      return JSON.parse(atob(token.split('.')[1]));
+    } catch (error) {
+      console.error("Token inválido", error);
+      return null;
+    }
+  };
 
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
   useEffect(() => {
     if (selectedLocal !== undefined && selectedLocal !== null) {
       setLoading(true);
-      fetch(`${API_BASE_URL}/api/productos/con-stock?local_id=${selectedLocal + 1}`)
+      const tokenActual = token;
+      if (!tokenActual) {
+        setError('No se encontró el token de autenticación');
+        setLoading(false);
+        return;
+      }
+
+      fetch(`${API_BASE_URL}/api/productos/con-stock?local_id=${selectedLocal + 1}`, {
+        headers: {
+          'Authorization': `Bearer ${tokenActual}`,
+        },
+      })
         .then(res => res.json())
         .then(data => {
           const productosArray = Array.isArray(data) ? data : [];
@@ -46,7 +67,7 @@ const InventarioScreen = () => {
           setLoading(false);
         });
     }
-  }, [selectedLocal]);
+  }, [selectedLocal, token]);
 
   const handleSearchInputChange = (e) => {
     const value = e.target.value;
@@ -68,7 +89,19 @@ const InventarioScreen = () => {
     if (!productoSeleccionado) return;
     setDeleting(true);
     try {
-      await fetch(`/api/productos/${productoSeleccionado.codigo}`, { method: 'DELETE' });
+      const tokenActual = token;
+      if (!tokenActual) {
+        alert('No se encontró el token de autenticación');
+        setDeleting(false);
+        return;
+      }
+
+      await fetch(`${API_BASE_URL}/api/productos/${productoSeleccionado.codigo}`, { 
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${tokenActual}`,
+        },
+      });
       setProductos(productos.filter(p => p.codigo !== productoSeleccionado.codigo));
       setProductoSeleccionado(null);
       setShowConfirmDelete(false);
