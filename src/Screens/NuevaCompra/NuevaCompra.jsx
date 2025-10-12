@@ -12,6 +12,8 @@ import { TablaCompras } from "../../components/Tables/TablaCompras";
 import { TablaFactura } from "../../components/Tables/TablaFactura";
 import ButtonHeaders from "../../components/ButtonHeaders/ButtonHeaders";
 import ButtonText from "../../components/ButtonText/ButtonText";
+import Popup from "../../components/Popup/Popup";
+import { useEventHandlers } from "../../hooks/Calendar/useEventHandlers";
 
 const NuevaCompra = () => {
 
@@ -28,6 +30,16 @@ const NuevaCompra = () => {
     const [lineas, setLineas] = useState([]);
 
     const [notificacion, setNotificacion] = useState('');
+    const [datosRestaurados, setDatosRestaurados] = useState(false);
+    const [mostrarPopupCancelar, setMostrarPopupCancelar] = useState(false);
+    const [eliminarCompra, setEliminarCompra] = useState(false);
+    const openEliminarCompra = () => setEliminarCompra(true);
+    const closeEliminarCompra = () => setEliminarCompra(false);
+     const [errorMessage, setErrorMessage] = useState("");
+
+
+
+
     useEffect(() => {
         if (notificacion) {
             const timer = setTimeout(() => {
@@ -64,12 +76,10 @@ const NuevaCompra = () => {
     const proveedorSeleccionado = useMemo(() => {
       return opcionesProveedores.find(p => p.value === proveedorSeleccionadoId) || null;
     }, [proveedorSeleccionadoId, opcionesProveedores]);
-//     useEffect(() => {
-//   console.log('✅ proveedorSeleccionado:', proveedorSeleccionado);
-// }, [proveedorSeleccionado]);
+
 
   useEffect(() => {
-    if (lineas.length > 0) {
+    if (!datosRestaurados && !agregandoProveedor) {
       setLineas([]);
     }
   }, [proveedorSeleccionadoId]);
@@ -116,7 +126,9 @@ const NuevaCompra = () => {
       // Agrega el nuevo proveedor al listado (opcional)
       // También podrías refetch desde el servidor si prefieres
       if (Array.isArray(proveedores)) {
-        proveedores.push(result);
+        setNotificacion("¡Proveedor agregado correctamente!");
+        setTimeout(() => window.location.reload(), 1000);
+
       }
 
       // Selecciona el proveedor recién creado
@@ -148,9 +160,11 @@ const NuevaCompra = () => {
   const [cuotasSeleccionadas, setCuotasSeleccionadas] = useState(0);
 
 
-   const handleNumeroFactura = (e) => {
-    setNumeroFactura(e.target.value);
-    setErrorMessage('');
+  const handleNumeroFactura = (e) => {
+    const value = e.target.value;
+    if (/^\d*$/.test(value)) {  // solo acepta números
+      setNumeroFactura(value);
+    }
   };
 
   const handleDescripcionCompra = (e) => {
@@ -183,6 +197,59 @@ const NuevaCompra = () => {
     setErrorMessage('');
   };
 
+  useEffect(() => {
+
+    if (!datosRestaurados) return;
+      const datosCompra = {
+        lineas,
+        numeroFactura,
+        descripcionCompra,
+        cuotasSeleccionadas,
+        proveedorSeleccionadoId,
+        agregandoProveedor,
+        nuevoProveedorNombre,
+        nuevoProveedorTelefono,
+        nuevoProveedorCorreo,
+        nuevoProveedorDireccion
+      };
+      localStorage.setItem("compra-temporal", JSON.stringify(datosCompra));
+    }, [
+      lineas,
+      numeroFactura,
+      descripcionCompra,
+      cuotasSeleccionadas,
+      proveedorSeleccionadoId,
+      agregandoProveedor,
+      nuevoProveedorNombre,
+      nuevoProveedorTelefono,
+      nuevoProveedorCorreo,
+      nuevoProveedorDireccion
+    ]);
+
+    useEffect(() => {
+    const datosGuardados = localStorage.getItem("compra-temporal");
+    if (datosGuardados) {
+      const compra = JSON.parse(datosGuardados);
+      setLineas(compra.lineas || []);
+      setNumeroFactura(compra.numeroFactura || '');
+      setDescripcionCompra(compra.descripcionCompra || '');
+      setCuotasSeleccionadas(compra.cuotasSeleccionadas || 0);
+      setProveedorSeleccionadoId(compra.proveedorSeleccionadoId || '');
+      setAgregandoProveedor(compra.agregandoProveedor || false);
+      setNuevoProveedorNombre(compra.nuevoProveedorNombre || '');
+      setNuevoProveedorTelefono(compra.nuevoProveedorTelefono || '');
+      setNuevoProveedorCorreo(compra.nuevoProveedorCorreo || '');
+      setNuevoProveedorDireccion(compra.nuevoProveedorDireccion || '');
+
+
+      setDatosRestaurados(true);
+      } else {
+        setDatosRestaurados(true); // Aun si no hay nada guardado
+      }
+    }, []);
+
+
+
 
 
 
@@ -193,8 +260,78 @@ const NuevaCompra = () => {
       {value: 2, label: "2 cuotas"},
       {value: 3, label: "3 cuotas"},
     ]
-  
+
+
+    //eventos
+    
+    //Obtener estas funciones desde useEventsHandlers (hooks/calendar/useEvents)
+        const { combinarFechaYHora, obtenerHoraDesdeFecha, crearEvento, actualizarEvento, HandleEliminarEvento } = useEventHandlers({
+            token,
+            localId: localSeleccionado,
+            onSuccess: (msg) => setNotificacion(msg),
+            onError: (msg) => setErrorMessage(msg),
+            removeEventFromState: (id) => setEvents(prev => prev.filter(e => e.id !== id))
+        });
+    const agendarRecordatoriosPago = async (cuotas, compraId) => {
+  const hoy = new Date();
+  const intervaloDias = 15;
+
+  const eventos = [];
+
+  for (let i = 0; i < cuotas; i++) {
+    const fecha = new Date(hoy);
+    fecha.setDate(hoy.getDate() + (i + 1) * intervaloDias);
+
+    eventos.push({
+      titulo: `Pago cuota ${i + 1} de la compra #${compraId}`,
+      tipo_evento_id: 2, // Asegurarse que 2 es notificación
+      estado_id: 2,
+      fecha: fecha.toISOString(),
+      visitador_id: null,
+      detalles: `Recordatorio para el pago de la cuota ${i + 1}`,
+      local_id: localSeleccionado,
+    });
+  }
+
+   
+
+  try {
+    for (const evento of eventos) {
+      await crearEvento(evento); // reutilizás tu función de calendario
+    }
+    console.log('Eventos de pago creados correctamente');
+  } catch (error) {
+    console.error('Error al crear eventos de pago:', error);
+  }
+};
+
+//enviar compras  
  const enviarCompra = async () => {
+
+  if (!numeroFactura) {
+    setNotificacion("Debes ingresar el número de factura.");
+    return;
+  }
+
+  if (lineas.length === 0) {
+    setNotificacion("Debes agregar al menos un producto a la compra.");
+    return;
+  }
+
+  if (!proveedorSeleccionadoId && !agregandoProveedor) {
+    setNotificacion("Selecciona o crea un proveedor.");
+    return;
+  }
+
+  const algunaLineaSinProducto = lineas.some(
+    linea => !linea.productoId || linea.productoId === ""
+  );
+
+  if (algunaLineaSinProducto) {
+    setNotificacion("Todas las filas deben tener un producto seleccionado.");
+    return;
+  }
+
     const detalles = lineas.map(linea => ({
       producto_id: parseInt(linea.productoId),
       cantidad: parseFloat(linea.cantidad),
@@ -214,7 +351,7 @@ const NuevaCompra = () => {
     );
 
     if (camposInvalidos) {
-      alert("Hay errores en los productos: verifica cantidad, lote y fecha.");
+      setNotificacion("Hay errores en los productos: verifica cantidad, lote y fecha.");
       return;
     }
 
@@ -223,7 +360,7 @@ const NuevaCompra = () => {
     const numeroFacturaEntero = parseInt(numeroFactura, 10);
 
 if (isNaN(numeroFacturaEntero)) {
-  alert("El número de factura no es válido");
+  setNotificacion("El número de factura no es válido");
   return;
 }
 
@@ -267,22 +404,46 @@ console.log("Payload a enviar:", JSON.stringify(payload, null, 2));
       if (!res.ok) {
         const errData = await res.json();
         console.error("Error en la respuesta:", errData);
-        alert("No se pudo guardar la compra.");
+        setNotificacion("No se pudo guardar la compra.");
         return;
       }
 
       const data = await res.json();
-      alert("Compra registrada con éxito");
+      localStorage.removeItem("compra-temporal");
+      setNotificacion("Compra registrada con éxito");
+      if (credito && data && data.compra_id) {
+        console.log(`Agendando ${cuotasSeleccionadas} recordatorio(s) para la compra #${data.compra_id}`);
+
+        await agendarRecordatoriosPago(cuotasSeleccionadas, data.compra_id);
+      }
+
       console.log("Respuesta:", data);
+      navigate(-1);
 
       // limpiar form si querés
       // setLineas([]);
       // reset otros campos
     } catch (error) {
       console.error("Error al enviar:", error);
-      alert("Error de red al registrar la compra.");
+      setNotificacion("Error de red al registrar la compra.");
     }
   };
+
+  const handleCancelarCompra = () => {
+    setLineas([]);
+    setNumeroFactura('');
+    setDescripcionCompra('');
+    setCuotasSeleccionadas(0);
+    setProveedorSeleccionadoId('');
+    setAgregandoProveedor(false);
+    setNuevoProveedorNombre('');
+    setNuevoProveedorTelefono('');
+    setNuevoProveedorCorreo('');
+    setNuevoProveedorDireccion('');
+    localStorage.removeItem("compra-temporal");
+    navigate(-1);
+  };
+
 
     
   
@@ -315,7 +476,34 @@ console.log("Payload a enviar:", JSON.stringify(payload, null, 2));
 
 
     return(
+
+      
         <main className={styles.NuevaCompraMain}>
+          {notificacion && (
+            <div className={styles.toast}>
+              {notificacion}
+            </div>
+          )}
+
+          {
+  <Popup
+    isOpen={eliminarCompra}
+    title={'¿Desea descartar esta compra?'}
+    onClose={closeEliminarCompra}
+    onClick={handleCancelarCompra}
+  >
+    <div className='modalContenido'>
+      {errorMessage && (
+        <p style={{ color: 'red', marginTop: '10px' }}>{errorMessage}</p>
+      )}
+    </div>
+  </Popup>
+}
+
+
+          
+
+
             <div className={styles.titloNuevaVentayBoton}>
                         <button className ={styles.buttonVolverV} onClick={volver}>
                            <FontAwesomeIcon icon={faArrowLeft} style={{ fontSize: "25px" }}></FontAwesomeIcon>
@@ -388,7 +576,7 @@ console.log("Payload a enviar:", JSON.stringify(payload, null, 2));
                                     placeholder="Nombre del proveedor"
                                     value={proveedorSeleccionadoId}
                                     onChange={(e) => setProveedorSeleccionadoId(e.target.value)}
-                                    type="numeric"
+                                    type="text"
                                     opcions={opcionesProveedores}
                                   />
 
@@ -411,7 +599,7 @@ console.log("Payload a enviar:", JSON.stringify(payload, null, 2));
                                     <IconoInput
                                       icono={faPhone}
                                       placeholder="Ingrese el teléfono del proveedor"
-                                      value={proveedorSeleccionado.telefonos || ""}
+                                      value={proveedorSeleccionado.telefonos?.[0]?.numero || ""}
                                       disabled
                                     />
                                     <IconoInput
@@ -462,7 +650,7 @@ console.log("Payload a enviar:", JSON.stringify(payload, null, 2));
                             placeholder={"No de la factura"}
                             value={numeroFactura}
                             onChange={handleNumeroFactura}
-                            type = {"numeric"}
+                            type = {"number"}
                             
                           />
 
@@ -471,7 +659,7 @@ console.log("Payload a enviar:", JSON.stringify(payload, null, 2));
                             placeholder={"Descripción de la venta"}
                             value={descripcionCompra}
                             onChange={handleDescripcionCompra}
-                            type = {"numeric"}
+                            type = {"text"}
                        
                           />
                           
@@ -515,13 +703,13 @@ console.log("Payload a enviar:", JSON.stringify(payload, null, 2));
                                        
                                        
                                           <ButtonHeaders
-                                            text="Cancelar Venta"
-                                            // onClick={openEliminarEvento}
+                                            text="Cancelar compra"
+                                            onClick={openEliminarCompra}
                                             red={true}
                                           />
 
                                           <ButtonHeaders
-                                            text="Confirmar venta"
+                                            text="Confirmar compra"
                                             onClick={enviarCompra}
                                           />
                                         </div>
