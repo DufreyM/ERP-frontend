@@ -9,6 +9,13 @@
   color: #5a60A5;
 }
 
+.NuevaCompraMain{
+  overflow-y: auto;
+  scrollbar-gutter: stable; 
+  height: calc(100% - 58px);
+  background-color: white;
+  
+}
 
 .tituloNuevaVenta{
   width: 100%;
@@ -62,6 +69,7 @@
   transform: scale(0.9);
   
 }
+
 
 
 
@@ -169,6 +177,33 @@
   
 }
 
+.buttonBuscarVenta2{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #983737;
+  border-radius: 10px;
+  border: none;
+  color: white;
+  font-size: 20px;
+  height: 35px;
+  cursor: pointer;
+  transition-property: background-color, transform;
+  transition-duration: 0.2s, 0.2s;
+  transition-timing-function: ease-out, ease-out;
+  transition-delay: 0s, 0s;
+}
+
+.buttonBuscarVenta2:hover{
+
+  transform: scale(1.1);
+}
+
+.buttonBuscarVenta2:active{
+  transform: scale(0.9);
+  
+}
+
 .contenedorCF{
   
   display: flex;
@@ -222,6 +257,16 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
+  padding: 15px 0px;
+}
+
+.selectPagoWrapper2{
+  width: 98%;
+  display: flex;
+  flex-direction: row;
+  justify-content: right;
+  gap: 10px;
   align-items: center;
   padding: 15px 0px;
 }

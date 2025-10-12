@@ -358,8 +358,8 @@ export const CalendarScreen= () =>{
     });
 
 
-    //Por fin, el return
-    return (
+//Por fin, el return
+return (
     
     <div className='pantallaCalendario' key = {key}>
         {notificacion && (
