@@ -9,4 +9,6 @@
 .admin-content {
   flex: 1;
   overflow-y: auto;
+  /* overflow-y: hidden; */
+  /* scrollbar-gutter: stable; */
 }

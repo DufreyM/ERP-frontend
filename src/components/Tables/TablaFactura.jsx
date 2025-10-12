@@ -207,7 +207,7 @@ export const TablaFactura = ({
                   className={styles.InputTableFactura}
                   type="number"
                   min="0"
-                  max="100"
+                  max="10000"
                   value={linea.descuento}
                   onChange={(e) => actualizarLinea(i, 'descuento', e.target.value)}
                 />
