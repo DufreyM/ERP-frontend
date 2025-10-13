@@ -171,7 +171,9 @@ const NuevaVenta = () => {
 
       let body = {
         tipo_pago: tipoPago,
-        detalles
+        detalles,
+        local_id: localSeleccionado
+
       };
 
       if (tipoCliente === "cf") {

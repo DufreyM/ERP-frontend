@@ -371,7 +371,8 @@ const NuevaCompra = () => {
       : {
           proveedor_id: parseInt(proveedorSeleccionadoId)
         }),
-    detalles
+    detalles,
+    local_id: localSeleccionado
   };
 
 
