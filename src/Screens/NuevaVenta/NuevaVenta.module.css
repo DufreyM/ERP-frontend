@@ -101,17 +101,14 @@
   
   justify-content: start;
   align-items: center;
-
-
   width: 50%;
- 
   padding: 10px;
   margin: 10px;
   padding-bottom: 20px;
-
   background-color: #f3f3f8;
   border-radius: 20px;
 }
+
 
 .gridDatosVenta{
   display: flex;
@@ -127,6 +124,27 @@
   margin: 5px;
 
   border-radius: 20px;
+
+}
+
+.gridDatosCompra{
+  display: flex;
+  flex-direction: column;
+  gap: 35px;
+  padding: 15px;
+  
+   justify-content: start;
+  align-items: center;
+
+  width: 50%;
+  border-radius: 20px;
+}
+
+.contenedorDatosCompra {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+    align-items: center;
 
 }
 
@@ -355,6 +373,87 @@
 
 .radioTipoCliente label.selected::after {
   transform: scaleX(1);
+}
+
+@media (max-width: 768px) {
+
+  .encabezadoNuevaVenta{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  
+    margin: 0px;
+    padding: 0px;
+  }
+
+  .datosClienteVenta{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    
+    justify-content: start;
+    align-items: center;
+
+
+    width: 90%;
+  
+    padding: 10px;
+    margin: 10px;
+    padding-bottom: 20px;
+
+    background-color: #f3f3f8;
+    border-radius: 20px;
+  }
+
+  .contenedorRegistrado{
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+
+  }
+
+  .gridDatosVenta{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    
+    justify-content: start;
+    align-items: center;
+  
+
+    width: 90%;
+    padding: 10px;
+    margin: 5px;
+
+    border-radius: 20px;
+
+  }
+
+  .gridDatosCompra{
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px;
+    
+    justify-content: start;
+    align-items: center;
+
+    width: 90%;
+    border-radius: 20px;
+  }
+
+  .contenedorDatosCompra {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+      align-items: center;
+
+  }
+
+
 }
 
 

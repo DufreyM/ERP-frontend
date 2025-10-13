@@ -14,6 +14,7 @@ import ButtonHeaders from "../../components/ButtonHeaders/ButtonHeaders";
 import ButtonText from "../../components/ButtonText/ButtonText";
 import Popup from "../../components/Popup/Popup";
 import { useEventHandlers } from "../../hooks/Calendar/useEventHandlers";
+import SelectSearch from "../../components/Inputs/SelectSearch";
 
 const NuevaCompra = () => {
 
@@ -489,10 +490,10 @@ return(
 
               <article className={styles.encabezadoNuevaVenta}>
         
-                  <div className={styles.datosClienteVenta}>
+                <div className={styles.datosClienteVenta}>
                   <h2 className={styles.subtituloNuevaVenta}>Datos del Proveedor</h2>
 
-                  <div className={styles.contenedorRegistrado}>
+                 
 
                     <div className={styles.contenedorRegistrado}>
 
@@ -547,14 +548,24 @@ return(
                       ) : (
                         <>
                           <div className={styles.contenedorNitcliente}>
-                            <InputSelects
+                            {/* <InputSelects
                               icono={faHouseMedical}
                               placeholder="Nombre del proveedor"
                               value={proveedorSeleccionadoId}
                               onChange={(e) => setProveedorSeleccionadoId(e.target.value)}
                               type="text"
                               opcions={opcionesProveedores}
-                            />
+                            /> */}
+
+                            <SelectSearch
+                              icono={faHouseMedical}
+                              placeholder="Nombre del proveedor"
+                              value={proveedorSeleccionadoId}
+                              onChange={(value) => setProveedorSeleccionadoId(value)}
+                              type="text"
+                              options={opcionesProveedores}
+                              tableStyle = {false}
+                            ></SelectSearch>
 
                             <button
                               onClick={() => {
@@ -605,22 +616,14 @@ return(
                       )}
                     </div>
 
-                                              
-                                              
-
-
+                                                
                   
-
-          
-                      
-                  
-                      
-                  
+                
                   </div>
-                  </div>
-                  <div className={styles.gridDatosVenta}>
-                  <div className={styles.contenedorRegistrado}>
+                  <div className={styles.gridDatosCompra}>
+                 
                       <h2 className={styles.subtituloNuevaVenta}>Datos de la compra</h2>
+                  <div className={styles.contenedorDatosCompra}>
                   <IconoInput
                       icono={faCircleInfo}
                       placeholder={"No de la factura"}
@@ -656,8 +659,8 @@ return(
                       </p>
                     )}
 
-          
-                    </div>
+          </div>
+                 
                     </div>
               </article>
 
