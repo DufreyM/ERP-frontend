@@ -20,3 +20,24 @@ export async function getOptions(url, mapFn) {
     }
     
 }
+
+export async function getOptionsToken(url, mapFn, token) {
+    try {
+        const res = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
+        
+        const data = await res.json();
+        return data.map(mapFn);
+
+    } catch (err) {
+        console.error("Error al obtener opciones: ", err);
+        return [];
+    }
+}

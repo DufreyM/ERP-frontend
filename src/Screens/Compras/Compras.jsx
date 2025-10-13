@@ -33,8 +33,8 @@ const Compras = () => {
     const { data, loading, error } = useFetch(url, {headers: { 'Authorization': `Bearer ${token}` }}, [token, localSeleccionado]);
 
     const datosCompras = Array.isArray(data) ? data : [];    //Se guardan los datos en un array
-    console.log("datosCompras");
-    console.log(datosCompras);
+    //console.log("datosCompras");
+    //console.log(datosCompras);
 
 
 
@@ -88,8 +88,8 @@ const Compras = () => {
         );
     }, [datosCompras]);
 
-    console.log("datos compras transformados")
-    console.log(datosTransformados)
+    //console.log("datos compras transformados")
+    //console.log(datosTransformados)
    
 
     

@@ -26,7 +26,9 @@ const NuevaVenta = () => {
   const token = getToken(); 
   const { selectedLocal } = useOutletContext();
   const localSeleccionado = selectedLocal + 1 ;
-  const {data: productos, loading, error } = useFetch(`http://localhost:3000/api/productos/con-stock?local_id=${localSeleccionado}`);
+  const {data: productos, loading, error } = useFetch(`http://localhost:3000/api/productos/con-stock?local_id=${localSeleccionado}`, {
+      headers: {'Authorization': `Bearer ${token}`}
+  });
 
   const [notificacion, setNotificacion] = useState('');
     useEffect(() => {
@@ -94,7 +96,7 @@ const NuevaVenta = () => {
       setNitCliente(venta.nitCliente || "");
       setNombreClienteManual(venta.nombreClienteManual || "");
       setTipoPago(venta.tipoPago || "efectivo");
-      console.log("Datos cargados de localStorage", venta);
+      //console.log("Datos cargados de localStorage", venta);
     }
     
     setDatosCargados(true);
@@ -134,9 +136,9 @@ const NuevaVenta = () => {
       setMostrarInputNombreManual(false);
       setErrorMessage(""); // limpia errores si había
 
-      console.log("Cliente encontrado:", data);
+      //console.log("Cliente encontrado:", data);
     } catch (error) {
-      console.error("Error al buscar cliente:", error.message);
+      //console.error("Error al buscar cliente:", error.message);
       setDatosCliente(null);
       setMostrarInputNombreManual(true);
       setErrorMessage("Cliente no encontrado, completa el nombre para registrarlo.");
@@ -169,7 +171,9 @@ const NuevaVenta = () => {
 
       let body = {
         tipo_pago: tipoPago,
-        detalles
+        detalles,
+        local_id: localSeleccionado
+
       };
 
       if (tipoCliente === "cf") {
@@ -215,7 +219,7 @@ const NuevaVenta = () => {
     }
 
     const result = await response.json();
-    console.log("Venta registrada correctamente:", result);
+    //console.log("Venta registrada correctamente:", result);
     setNotificacion("¡Venta registrada con éxito!");
     localStorage.removeItem("venta-temporal");
 
@@ -252,7 +256,7 @@ const NuevaVenta = () => {
 
     return(
       
-        <main>
+        <main className= {styles.NuevaCompraMain}>
           {notificacion && (
               <div className={styles.toast}>
                   {notificacion}

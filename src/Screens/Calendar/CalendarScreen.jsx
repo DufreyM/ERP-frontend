@@ -76,7 +76,7 @@ export const CalendarScreen= () =>{
 
     //Se manda a llamar las siguientes funciones para extraer las opciones disponibles para mostrar en los 3 selects del formulario
     //Se llaman de useOpcionsCalendarForm (hooks/calendar/useOpcionsCalendarForm) se manda el local, ya que visitadores manda respuestas distintas dependiendo el local
-    const { opcionesTipoRecordatorio, opcionesEstados, opcionesVisitadores } = useOpcionsCalendarForm(localSeleccionado);
+    const { opcionesTipoRecordatorio, opcionesEstados, opcionesVisitadores } = useOpcionsCalendarForm(localSeleccionado, token);
 
     //Variables de datos y formularios
     const [nombreEvento, setNombreEvento] = useState('');

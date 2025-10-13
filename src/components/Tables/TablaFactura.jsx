@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCirclePlus, faTrash, faCircleMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
-import styles from './Table.module.css'; // (opcional, para tus estilos personalizados)
+import styles from './Table.module.css'; 
 import ButtonIcon from '../ButtonIcon/ButtonIcon';
+import SelectSearchCV from '../Inputs/SelectSearchCV';
+
 
 export const TablaFactura = ({ 
   productosDisponibles,
@@ -132,7 +134,7 @@ export const TablaFactura = ({
               <td>{i + 1}</td>
 
               <td  className={styles.thStyle}>
-                <select
+                {/* <select
                   value={linea.productoId}
                   onChange={(e) => actualizarLinea(i, 'productoId', e.target.value)}
                 >
@@ -153,7 +155,25 @@ export const TablaFactura = ({
                     );
                   })}
 
-                </select>
+                </select> */}
+
+                
+
+                <SelectSearchCV
+
+                  options={productosDisponibles}
+                  value={linea.productoId}
+                  onChange={(newVal) => actualizarLinea(i, "productoId", newVal)}
+                  getOptionLabel={(p) => p.nombre}
+                  getOptionValue={(p) => String(p.id)}
+                  getOptionDisabled={(p) => {
+                    const yaUsado = productoYaAgregado(p.id) && p.id !== parseInt(linea.productoId);
+                    const sinStock = p.stock_actual === 0;
+                    return yaUsado || sinStock;
+                  }}
+                  placeholder="Seleccionar"
+                />
+
               </td>
               <td>
                 {/**Input de cantidad */}

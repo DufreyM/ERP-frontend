@@ -38,7 +38,7 @@ export default function AdminLayout() {
     "/admin/inventario": "blue",
     "/admin/calendario": "transparent",
     "/admin/visitadores-medicos": "blue",
-    "/admin/mi-perfil": "blue",
+ 
   };
 
   const variantMapPositionMirrored = {

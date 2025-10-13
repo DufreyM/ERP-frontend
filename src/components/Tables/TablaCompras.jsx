@@ -11,14 +11,11 @@ export const TablaCompras = ({
 
 }) => {
 
-  
-  
   const productoYaAgregado = (productoId, indexActual) => {
     return lineas.some((linea, i) => {
       return i !== indexActual && parseInt(linea.productoId) === parseInt(productoId);
     });
   };
-
 
   const productosRestantes = productosDisponibles.filter(
     (producto) =>  !productoYaAgregado(producto.id)
@@ -42,16 +39,13 @@ export const TablaCompras = ({
       fecha_vencimiento: null,
       subtotal: 0
     };
-
-    console.log("Agregando nueva línea:", nuevaLinea);
+    //console.log("Agregando nueva línea:", nuevaLinea);
 
     setLineas([
       ...lineas,
       nuevaLinea
     ]);
   };
-
-
 
   // Elimina una fila
   const eliminarLinea = (index) => {
@@ -60,69 +54,60 @@ export const TablaCompras = ({
     setLineas(nuevasLineas);
   };
 
-const actualizarLinea = (index, campo, valor) => {
-  const nuevasLineas = [...lineas];
-  const linea = {...nuevasLineas[index]};
- 
 
+  const actualizarLinea = (index, campo, valor) => {
+    const nuevasLineas = [...lineas];
+    const linea = {...nuevasLineas[index]};
 
-  if (campo === 'productoId') {
-    const idNumerico = parseInt(valor);
-    if (isNaN(idNumerico)) {
-      linea.productoId = '';
-      linea.nombre = '';
-    } else {
-      const producto = productosDisponibles.find(p => p.id === idNumerico);
-      if (producto) {
-        linea.productoId = producto.id;
-        linea.nombre = producto.nombre;
-        linea.precio_costo = producto.preciocosto || linea.precio_costo;
-        linea.precio_venta = producto.precioventa || linea.precio_venta;
+    if (campo === 'productoId') {
+      const idNumerico = parseInt(valor);
+      if (isNaN(idNumerico)) {
+        linea.productoId = '';
+        linea.nombre = '';
+      } else {
+        const producto = productosDisponibles.find(p => p.id === idNumerico);
+        if (producto) {
+          linea.productoId = producto.id;
+          linea.nombre = producto.nombre;
+          linea.precio_costo = producto.preciocosto || linea.precio_costo;
+          linea.precio_venta = producto.precioventa || linea.precio_venta;
+        }
       }
+    } else {
+      linea[campo] = valor;
     }
-  } else {
-    linea[campo] = valor;
-  }
 
-  const cantidad = parseFloat(linea.cantidad) || 0;
-  const precioCosto = parseFloat(linea.precio_costo) || 0;
-  linea.subtotal = cantidad * precioCosto;
+    const cantidad = parseFloat(linea.cantidad) || 0;
+    const precioCosto = parseFloat(linea.precio_costo) || 0;
+    linea.subtotal = cantidad * precioCosto;
 
-  nuevasLineas[index] = linea;
-  setLineas(nuevasLineas);
-};
-
-  console.log("Productos disponibles:", productosDisponibles);
-console.log("Productos restantes para agregar:", productosRestantes);
-
-const handleChangeProducto = (index, value) => {
-  const idNumerico = parseInt(value);
-  const productoSeleccionado = productosDisponibles.find(p => p.id === idNumerico);
-  if (productoSeleccionado) {
-    console.log("Seleccionado (en onChange):", productoSeleccionado.nombre);
-    // Actualizá la línea en una sola pasada para evitar problemas de estado
-    setLineas(prev => prev.map((l, idx) => {
-      if (idx !== index) return l;
-      const cantidad = parseFloat(l.cantidad) || 1;
-      const precio_costo = productoSeleccionado.preciocosto || 0;
-      return {
-        ...l,
-        productoId: productoSeleccionado.id,    // numérico en el objeto
-        nombre: productoSeleccionado.nombre,
-        precio_costo,
-        precio_venta: productoSeleccionado.precioventa || 0,
-        subtotal: cantidad * precio_costo
-      };
-    }));
-  }
-};
+    nuevasLineas[index] = linea;
+    setLineas(nuevasLineas);
+  };
 
 
 
- 
-
-  
-
+  const handleChangeProducto = (index, value) => {
+    const idNumerico = parseInt(value);
+    const productoSeleccionado = productosDisponibles.find(p => p.id === idNumerico);
+    if (productoSeleccionado) {
+      //console.log("Seleccionado (en onChange):", productoSeleccionado.nombre);
+      // Actualizá la línea en una sola pasada para evitar problemas de estado
+      setLineas(prev => prev.map((l, idx) => {
+        if (idx !== index) return l;
+        const cantidad = parseFloat(l.cantidad) || 1;
+        const precio_costo = productoSeleccionado.preciocosto || 0;
+        return {
+          ...l,
+          productoId: productoSeleccionado.id,    // numérico en el objeto
+          nombre: productoSeleccionado.nombre,
+          precio_costo,
+          precio_venta: productoSeleccionado.precioventa || 0,
+          subtotal: cantidad * precio_costo
+        };
+      }));
+    }
+  };
 
   const totalFactura = lineas.reduce((acc, linea) => acc + linea.subtotal, 0);
 
@@ -140,8 +125,6 @@ const handleChangeProducto = (index, value) => {
           disabled={!puedeAgregarMas}
 
         ></ButtonIcon>
-
-        
       </div>
 
       {productosRestantes.length === 0 && (
@@ -175,29 +158,29 @@ const handleChangeProducto = (index, value) => {
 
             {/* Producto */}
             <td className={styles.thStyle}>
-              
-<select
-  value={String(linea.productoId || '')} // forzamos string
-  onChange={(e) => {
-    console.log('Seleccionado (en onChange):', e.target.value);
-    handleChangeProducto(i, e.target.value);
-  }}
->
-  <option value="">Seleccionar</option>
-  {productosDisponibles.map((producto) => {
-    const yaUsado = productoYaAgregado(producto.id, i) && producto.id !== parseInt(linea.productoId);
-    const deshabilitado = yaUsado;
-    return (
-      <option
-        key={producto.id}
-        value={String(producto.id)} // value string
-        disabled={deshabilitado}
-      >
-        {producto.nombre}
-      </option>
-    );
-  })}
-</select>
+                            
+              <select
+                value={String(linea.productoId || '')} // forzamos string
+                onChange={(e) => {
+                  //console.log('Seleccionado (en onChange):', e.target.value);
+                  handleChangeProducto(i, e.target.value);
+                }}
+              >
+                <option value="">Seleccionar</option>
+                {productosDisponibles.map((producto) => {
+                  const yaUsado = productoYaAgregado(producto.id, i) && producto.id !== parseInt(linea.productoId);
+                  const deshabilitado = yaUsado;
+                  return (
+                    <option
+                      key={producto.id}
+                      value={String(producto.id)} // value string
+                      disabled={deshabilitado}
+                    >
+                      {producto.nombre}
+                    </option>
+                  );
+                })}
+              </select>
 
             </td>
 

@@ -164,6 +164,19 @@
     z-index: 2;
 }
 
+.iconoStyles{
+  position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%) translateX(-355px);
+    cursor: pointer;
+    pointer-events: none;
+    user-select: none;
+    color: #ffffff;
+    z-index: 3;
+
+}
+
 .iconoSelects{
     position: absolute;
     right: 15px;
@@ -265,8 +278,10 @@
   border-radius: 5px;
   padding: 0.5rem;
   max-height: 200px;
+  max-width: 325px;
   overflow-y: auto;
   scrollbar-gutter: stable;
+  padding-left: 35px;
 
   box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.15);
 }
@@ -275,7 +290,7 @@
   padding: 0.4rem;
   cursor: pointer;
   border-radius: 3px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family:Arial, Helvetica, sans-serif;
   font-size: 14px;
 }
 
@@ -286,4 +301,6 @@
 .noOptions {
   padding: 0.4rem;
   color: #999;
+  font-family:Arial, Helvetica, sans-serif;
+  font-size: 14px;
 }
