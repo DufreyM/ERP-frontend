@@ -17,65 +17,66 @@ import { useEventHandlers } from "../../hooks/Calendar/useEventHandlers";
 
 const NuevaCompra = () => {
 
-    const navigate = useNavigate();
-    const volver = () => {
-        navigate(-1); // Va una página atrás en el historial
-    };
+  const navigate = useNavigate();
+  const volver = () => {
+      navigate(-1); // Va una página atrás en el historial
+  };
 
-    //productos
-    const token = getToken(); 
-    const { selectedLocal } = useOutletContext();
-    const localSeleccionado = selectedLocal + 1 ;
-    const {data: productos, loading, error } = useFetch(`http://localhost:3000/api/productos/con-stock?local_id=${localSeleccionado}`);
-    const [lineas, setLineas] = useState([]);
+  //productos
+  const token = getToken(); 
+  const { selectedLocal } = useOutletContext();
+  const localSeleccionado = selectedLocal + 1 ;
+  const {data: productos, loading, error } = useFetch(`http://localhost:3000/api/productos/con-stock?local_id=${localSeleccionado}`, {
+      headers: {'Authorization': `Bearer ${token}`}
+  });
+  const [lineas, setLineas] = useState([]);
 
-    const [notificacion, setNotificacion] = useState('');
-    const [datosRestaurados, setDatosRestaurados] = useState(false);
-    const [mostrarPopupCancelar, setMostrarPopupCancelar] = useState(false);
-    const [eliminarCompra, setEliminarCompra] = useState(false);
-    const openEliminarCompra = () => setEliminarCompra(true);
-    const closeEliminarCompra = () => setEliminarCompra(false);
-     const [errorMessage, setErrorMessage] = useState("");
+  const [notificacion, setNotificacion] = useState('');
+  const [datosRestaurados, setDatosRestaurados] = useState(false);
+  const [mostrarPopupCancelar, setMostrarPopupCancelar] = useState(false);
+  const [eliminarCompra, setEliminarCompra] = useState(false);
+  const openEliminarCompra = () => setEliminarCompra(true);
+  const closeEliminarCompra = () => setEliminarCompra(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
+  useEffect(() => {
+      if (notificacion) {
+          const timer = setTimeout(() => {
+          setNotificacion('');
+          }, 2500); // se quita en 2.5 segundos
 
-
-
-    useEffect(() => {
-        if (notificacion) {
-            const timer = setTimeout(() => {
-            setNotificacion('');
-            }, 2500); // se quita en 2.5 segundos
-
-            return () => clearTimeout(timer);
-        }
-    }, [notificacion]);
-
-
-    //proveedores
-    const {data: proveedores, loadingP, errorP } = useFetch(`http://localhost:3000/api/proveedor`);
-     const [agregandoProveedor, setAgregandoProveedor] = useState(false);
-    const [proveedorSeleccionadoId, setProveedorSeleccionadoId] = useState('');
-    
-    // Datos del proveedor nuevo (si estás agregando uno)
-    const [nuevoProveedorNombre, setNuevoProveedorNombre] = useState('');
-    const [nuevoProveedorTelefono, setNuevoProveedorTelefono] = useState('');
-    const [nuevoProveedorCorreo, setNuevoProveedorCorreo] = useState('');
-    const [nuevoProveedorDireccion, setNuevoProveedorDireccion] = useState('');
+          return () => clearTimeout(timer);
+      }
+  }, [notificacion]);
 
 
-    const opcionesProveedores = useMemo(() => {
-      if (!Array.isArray(proveedores)) return [];
+  //proveedores
+  const {data: proveedores, loadingP, errorP } = useFetch(`http://localhost:3000/api/proveedor`, {
+      headers: {'Authorization': `Bearer ${token}`}
+  });
+    const [agregandoProveedor, setAgregandoProveedor] = useState(false);
+  const [proveedorSeleccionadoId, setProveedorSeleccionadoId] = useState('');
+  
+  // Datos del proveedor nuevo (si estás agregando uno)
+  const [nuevoProveedorNombre, setNuevoProveedorNombre] = useState('');
+  const [nuevoProveedorTelefono, setNuevoProveedorTelefono] = useState('');
+  const [nuevoProveedorCorreo, setNuevoProveedorCorreo] = useState('');
+  const [nuevoProveedorDireccion, setNuevoProveedorDireccion] = useState('');
 
-      return proveedores.map(proveedor => ({
-        value: String(proveedor.id),
-        label: proveedor.nombre,
-        ...proveedor
-      }));
-    }, [proveedores]);
 
-    const proveedorSeleccionado = useMemo(() => {
-      return opcionesProveedores.find(p => p.value === proveedorSeleccionadoId) || null;
-    }, [proveedorSeleccionadoId, opcionesProveedores]);
+  const opcionesProveedores = useMemo(() => {
+    if (!Array.isArray(proveedores)) return [];
+
+    return proveedores.map(proveedor => ({
+      value: String(proveedor.id),
+      label: proveedor.nombre,
+      ...proveedor
+    }));
+  }, [proveedores]);
+
+  const proveedorSeleccionado = useMemo(() => {
+    return opcionesProveedores.find(p => p.value === proveedorSeleccionadoId) || null;
+  }, [proveedorSeleccionadoId, opcionesProveedores]);
 
 
   useEffect(() => {
@@ -102,12 +103,13 @@ const NuevaCompra = () => {
           }
         ]
       };
+      
 
       const response = await fetch("http://localhost:3000/api/proveedor", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(nuevoProveedor)
       });
@@ -119,7 +121,7 @@ const NuevaCompra = () => {
       }
 
       const result = await response.json();
-      console.log("Proveedor agregado con éxito:", result);
+      //console.log("Proveedor agregado con éxito:", result);
 
       setNotificacion("¡Proveedor agregado correctamente!");
       
@@ -146,13 +148,6 @@ const NuevaCompra = () => {
       setNotificacion("Ocurrió un error al registrar el proveedor.");
     }
   };
-
-
-
-
-
-
-
 
   // Datos de la compra
   const [numeroFactura, setNumeroFactura] = useState('');
@@ -224,9 +219,9 @@ const NuevaCompra = () => {
       nuevoProveedorTelefono,
       nuevoProveedorCorreo,
       nuevoProveedorDireccion
-    ]);
+  ]);
 
-    useEffect(() => {
+  useEffect(() => {
     const datosGuardados = localStorage.getItem("compra-temporal");
     if (datosGuardados) {
       const compra = JSON.parse(datosGuardados);
@@ -241,69 +236,63 @@ const NuevaCompra = () => {
       setNuevoProveedorCorreo(compra.nuevoProveedorCorreo || '');
       setNuevoProveedorDireccion(compra.nuevoProveedorDireccion || '');
 
-
       setDatosRestaurados(true);
       } else {
         setDatosRestaurados(true); // Aun si no hay nada guardado
       }
-    }, []);
+  }, []);
+
+  //Cuotas
+    const opcionesCuotas = [
+    {value: 0, label: "Sin cuotas"},
+    {value: 1, label: "1 cuota"},
+    {value: 2, label: "2 cuotas"},
+    {value: 3, label: "3 cuotas"},
+  ]
 
 
+  //eventos
+  //Obtener estas funciones desde useEventsHandlers (hooks/calendar/useEvents)
+  const { combinarFechaYHora, obtenerHoraDesdeFecha, crearEvento, actualizarEvento, HandleEliminarEvento } = useEventHandlers({
+    token,
+    localId: localSeleccionado,
+    onSuccess: (msg) => setNotificacion(msg),
+    onError: (msg) => setErrorMessage(msg),
+    removeEventFromState: (id) => setEvents(prev => prev.filter(e => e.id !== id))
+  });
 
+  const agendarRecordatoriosPago = async (cuotas, compraId) => {
+    const hoy = new Date();
+    const intervaloDias = 15;
 
+    const eventos = [];
 
+    for (let i = 0; i < cuotas; i++) {
+      const fecha = new Date(hoy);
+      fecha.setDate(hoy.getDate() + (i + 1) * intervaloDias);
 
-    //Cuotas
-     const opcionesCuotas = [
-      {value: 0, label: "Sin cuotas"},
-      {value: 1, label: "1 cuota"},
-      {value: 2, label: "2 cuotas"},
-      {value: 3, label: "3 cuotas"},
-    ]
-
-
-    //eventos
-    
-    //Obtener estas funciones desde useEventsHandlers (hooks/calendar/useEvents)
-        const { combinarFechaYHora, obtenerHoraDesdeFecha, crearEvento, actualizarEvento, HandleEliminarEvento } = useEventHandlers({
-            token,
-            localId: localSeleccionado,
-            onSuccess: (msg) => setNotificacion(msg),
-            onError: (msg) => setErrorMessage(msg),
-            removeEventFromState: (id) => setEvents(prev => prev.filter(e => e.id !== id))
-        });
-    const agendarRecordatoriosPago = async (cuotas, compraId) => {
-  const hoy = new Date();
-  const intervaloDias = 15;
-
-  const eventos = [];
-
-  for (let i = 0; i < cuotas; i++) {
-    const fecha = new Date(hoy);
-    fecha.setDate(hoy.getDate() + (i + 1) * intervaloDias);
-
-    eventos.push({
-      titulo: `Pago cuota ${i + 1} de la compra #${compraId}`,
-      tipo_evento_id: 2, // Asegurarse que 2 es notificación
-      estado_id: 2,
-      fecha: fecha.toISOString(),
-      visitador_id: null,
-      detalles: `Recordatorio para el pago de la cuota ${i + 1}`,
-      local_id: localSeleccionado,
-    });
-  }
-
-   
-
-  try {
-    for (const evento of eventos) {
-      await crearEvento(evento); // reutilizás tu función de calendario
+      eventos.push({
+        titulo: `Pago cuota ${i + 1} de la compra #${compraId}`,
+        tipo_evento_id: 2, // Asegurarse que 2 es notificación
+        estado_id: 2,
+        fecha: fecha.toISOString(),
+        visitador_id: null,
+        detalles: `Recordatorio para el pago de la cuota ${i + 1}`,
+        local_id: localSeleccionado,
+      });
     }
-    console.log('Eventos de pago creados correctamente');
-  } catch (error) {
-    console.error('Error al crear eventos de pago:', error);
-  }
-};
+
+    
+
+    try {
+      for (const evento of eventos) {
+        await crearEvento(evento); // reutilizás tu función de calendario
+      }
+      //console.log('Eventos de pago creados correctamente');
+    } catch (error) {
+      console.error('Error al crear eventos de pago:', error);
+    }
+  };
 
 //enviar compras  
  const enviarCompra = async () => {
@@ -359,65 +348,62 @@ const NuevaCompra = () => {
 
     const numeroFacturaEntero = parseInt(numeroFactura, 10);
 
-if (isNaN(numeroFacturaEntero)) {
-  setNotificacion("El número de factura no es válido");
-  return;
-}
+  if (isNaN(numeroFacturaEntero)) {
+    setNotificacion("El número de factura no es válido");
+    return;
+  }
 
 
-const payload = {
-  no_factura: numeroFacturaEntero,
-  descripcion: descripcionCompra,
-  credito,
-  ...(credito ? { cuotas: cuotasSeleccionadas } : {}),
-  ...(agregandoProveedor
-    ? {
-        nuevo_proveedor: {
-          nombre: nuevoProveedorNombre,
-          telefono: nuevoProveedorTelefono,
-          correo: nuevoProveedorCorreo,
-          direccion: nuevoProveedorDireccion
+  const payload = {
+    no_factura: numeroFacturaEntero,
+    descripcion: descripcionCompra,
+    credito,
+    ...(credito ? { cuotas: cuotasSeleccionadas } : {}),
+    ...(agregandoProveedor
+      ? {
+          nuevo_proveedor: {
+            nombre: nuevoProveedorNombre,
+            telefono: nuevoProveedorTelefono,
+            correo: nuevoProveedorCorreo,
+            direccion: nuevoProveedorDireccion
+          }
         }
-      }
-    : {
-        proveedor_id: parseInt(proveedorSeleccionadoId)
-      }),
-  detalles
-};
-
-console.log("Payload a enviar:", JSON.stringify(payload, null, 2));
+      : {
+          proveedor_id: parseInt(proveedorSeleccionadoId)
+        }),
+    detalles
+  };
 
 
-
-    try {
+  try {
       
       
-      const res = await fetch('http://localhost:3000/compras', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(payload)
-      });
+    const res = await fetch('http://localhost:3000/compras', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(payload)
+    });
 
-      if (!res.ok) {
-        const errData = await res.json();
-        console.error("Error en la respuesta:", errData);
-        setNotificacion("No se pudo guardar la compra.");
-        return;
-      }
+    if (!res.ok) {
+      const errData = await res.json();
+      console.error("Error en la respuesta:", errData);
+      setNotificacion("No se pudo guardar la compra.");
+      return;
+    }
 
       const data = await res.json();
       localStorage.removeItem("compra-temporal");
       setNotificacion("Compra registrada con éxito");
       if (credito && data && data.compra_id) {
-        console.log(`Agendando ${cuotasSeleccionadas} recordatorio(s) para la compra #${data.compra_id}`);
+        //console.log(`Agendando ${cuotasSeleccionadas} recordatorio(s) para la compra #${data.compra_id}`);
 
         await agendarRecordatoriosPago(cuotasSeleccionadas, data.compra_id);
       }
 
-      console.log("Respuesta:", data);
+      //console.log("Respuesta:", data);
       navigate(-1);
 
       // limpiar form si querés
@@ -445,9 +431,6 @@ console.log("Payload a enviar:", JSON.stringify(payload, null, 2));
   };
 
 
-    
-  
-
   //Filtrado de productos (que aparezcan unicamente los que estan relacionado con el proveedor)
     
   const filtrarProductos = (productos) => {
@@ -464,18 +447,14 @@ console.log("Payload a enviar:", JSON.stringify(payload, null, 2));
     }));
   };
 
-  
-
   const productosFiltrados = productos
-  ? filtrarProductos(productos).filter(p => {
-      if (!proveedorSeleccionadoId) return true; // si no hay proveedor seleccionado, devuelve todo
-      return parseInt(p.proveedor_id) === parseInt(proveedorSeleccionadoId);
-    })
-  : [];
+    ? filtrarProductos(productos).filter(p => {
+        if (!proveedorSeleccionadoId) return true; // si no hay proveedor seleccionado, devuelve todo
+        return parseInt(p.proveedor_id) === parseInt(proveedorSeleccionadoId);
+      })
+    : [];
 
-
-
-    return(
+return(
 
       
         <main className={styles.NuevaCompraMain}>
@@ -486,238 +465,230 @@ console.log("Payload a enviar:", JSON.stringify(payload, null, 2));
           )}
 
           {
-  <Popup
-    isOpen={eliminarCompra}
-    title={'¿Desea descartar esta compra?'}
-    onClose={closeEliminarCompra}
-    onClick={handleCancelarCompra}
-  >
-    <div className='modalContenido'>
-      {errorMessage && (
-        <p style={{ color: 'red', marginTop: '10px' }}>{errorMessage}</p>
-      )}
-    </div>
-  </Popup>
-}
-
-
-          
-
+            <Popup
+              isOpen={eliminarCompra}
+              title={'¿Desea descartar esta compra?'}
+              onClose={closeEliminarCompra}
+              onClick={handleCancelarCompra}
+            >
+              <div className='modalContenido'>
+                {errorMessage && (
+                  <p style={{ color: 'red', marginTop: '10px' }}>{errorMessage}</p>
+                )}
+              </div>
+            </Popup>
+          }
 
             <div className={styles.titloNuevaVentayBoton}>
-                        <button className ={styles.buttonVolverV} onClick={volver}>
-                           <FontAwesomeIcon icon={faArrowLeft} style={{ fontSize: "25px" }}></FontAwesomeIcon>
-                        </button>
-                        <h1 className={styles.tituloNuevaVenta}> Registro de nueva compra</h1>
-                      </div>
+              <button className ={styles.buttonVolverV} onClick={volver}>
+                  <FontAwesomeIcon icon={faArrowLeft} style={{ fontSize: "25px" }}></FontAwesomeIcon>
+              </button>
+              <h1 className={styles.tituloNuevaVenta}> Registro de nueva compra</h1>
+            </div>
 
-                    <article className={styles.encabezadoNuevaVenta}>
-             
-                        <div className={styles.datosClienteVenta}>
-                        <h2 className={styles.subtituloNuevaVenta}>Datos del Proveedor</h2>
+              <article className={styles.encabezadoNuevaVenta}>
+        
+                  <div className={styles.datosClienteVenta}>
+                  <h2 className={styles.subtituloNuevaVenta}>Datos del Proveedor</h2>
 
-                        <div className={styles.contenedorRegistrado}>
+                  <div className={styles.contenedorRegistrado}>
 
-                          <div className={styles.contenedorRegistrado}>
+                    <div className={styles.contenedorRegistrado}>
 
-                            {/* Si está en modo "agregar proveedor nuevo" */}
-                            {agregandoProveedor ? (
-                              <>
-                                <div className={styles.contenedorNitcliente}>
-                                  <IconoInput
-                                    icono={faHouseMedical}
-                                    placeholder="Nombre del nuevo proveedor"
-                                    type="text"
-                                    value={nuevoProveedorNombre}
-                                    onChange={handleNuevoProveedorNombre}
-                                  />
-                                  <button
-                                    onClick={() => setAgregandoProveedor(false)}
-                                    className={styles.buttonBuscarVenta2}
-                                  >
-                                    <FontAwesomeIcon icon={faTimes} />
-                                  </button>
-                                </div>
-
-                                <IconoInput 
-                                  icono={faPhone} 
-                                  placeholder="Teléfono del proveedor" 
-                                  type="text" 
-                                  value={nuevoProveedorTelefono}
-                                  onChange={handleNuevoProveedorTelefono}
-                                />
-
-                                <IconoInput 
-                                  icono={faEnvelope} 
-                                  placeholder="Correo del proveedor" 
-                                  type="email" 
-                                  value={nuevoProveedorCorreo}
-                                  onChange={handleNuevoProveedorCorreo}
-                                />
-
-                                <IconoInput 
-                                  icono={faLocationDot} 
-                                  placeholder="Dirección del proveedor" 
-                                  type="text" 
-                                  value={nuevoProveedorDireccion}
-                                  onChange={handleNuevoProveedorDireccion}
-                                />
-
-                            <ButtonHeaders
-                              text = {"Agregar proveedor"}
-                              onClick={handleAgregarProveedor}
-                            ></ButtonHeaders>
-                              </>
-                            ) : (
-                              <>
-                                <div className={styles.contenedorNitcliente}>
-                                  <InputSelects
-                                    icono={faHouseMedical}
-                                    placeholder="Nombre del proveedor"
-                                    value={proveedorSeleccionadoId}
-                                    onChange={(e) => setProveedorSeleccionadoId(e.target.value)}
-                                    type="text"
-                                    opcions={opcionesProveedores}
-                                  />
-
-                                  <button
-                                    onClick={() => {
-                                      setAgregandoProveedor(true);
-                                      setProveedorSeleccionadoId(null); // limpia el select si vas a agregar
-                                    }}
-                                    className={styles.buttonBuscarVenta}
-                                  >
-                                    <FontAwesomeIcon icon={faPlus} />
-                                  </button>
-                                </div>
-
-                                
-
-                                {/* Si se seleccionó un proveedor, mostrar los datos */}
-                                {proveedorSeleccionado && (
-                                  <>
-                                    <IconoInput
-                                      icono={faPhone}
-                                      placeholder="Ingrese el teléfono del proveedor"
-                                      value={proveedorSeleccionado.telefonos?.[0]?.numero || ""}
-                                      disabled
-                                    />
-                                    <IconoInput
-                                      icono={faEnvelope}
-                                      placeholder="Ingrese el correo del proveedor"
-                                      value={proveedorSeleccionado.correo || ""}
-                                      disabled
-                                    />
-                                    <IconoInput
-                                      icono={faLocationDot}
-                                      placeholder="Ingrese la dirección del proveedor"
-                                      value={proveedorSeleccionado.direccion || ""}
-                                      disabled
-                                    />
-
-                                   
-
-                                <ButtonText
-                                texto={""}
-                                textoButton={"Agregar producto relacionado con el proveedor"}
-                                ></ButtonText>
-                                  </>
-
-                                  
-                                )}
-                              </>
-                            )}
+                      {/* Si está en modo "agregar proveedor nuevo" */}
+                      {agregandoProveedor ? (
+                        <>
+                          <div className={styles.contenedorNitcliente}>
+                            <IconoInput
+                              icono={faHouseMedical}
+                              placeholder="Nombre del nuevo proveedor"
+                              type="text"
+                              value={nuevoProveedorNombre}
+                              onChange={handleNuevoProveedorNombre}
+                            />
+                            <button
+                              onClick={() => setAgregandoProveedor(false)}
+                              className={styles.buttonBuscarVenta2}
+                            >
+                              <FontAwesomeIcon icon={faTimes} />
+                            </button>
                           </div>
 
-                                                    
-                                                    
-
-
-                        
-
-                
-                            
-                        
-                            
-                        
-                        </div>
-                        </div>
-                        <div className={styles.gridDatosVenta}>
-                        <div className={styles.contenedorRegistrado}>
-                            <h2 className={styles.subtituloNuevaVenta}>Datos de la compra</h2>
-                        <IconoInput
-                            icono={faCircleInfo}
-                            placeholder={"No de la factura"}
-                            value={numeroFactura}
-                            onChange={handleNumeroFactura}
-                            type = {"number"}
-                            
+                          <IconoInput 
+                            icono={faPhone} 
+                            placeholder="Teléfono del proveedor" 
+                            type="text" 
+                            value={nuevoProveedorTelefono}
+                            onChange={handleNuevoProveedorTelefono}
                           />
 
-                          <IconoInput
-                            icono={faPen}
-                            placeholder={"Descripción de la venta"}
-                            value={descripcionCompra}
-                            onChange={handleDescripcionCompra}
-                            type = {"text"}
-                       
+                          <IconoInput 
+                            icono={faEnvelope} 
+                            placeholder="Correo del proveedor" 
+                            type="email" 
+                            value={nuevoProveedorCorreo}
+                            onChange={handleNuevoProveedorCorreo}
                           />
+
+                          <IconoInput 
+                            icono={faLocationDot} 
+                            placeholder="Dirección del proveedor" 
+                            type="text" 
+                            value={nuevoProveedorDireccion}
+                            onChange={handleNuevoProveedorDireccion}
+                          />
+
+                      <ButtonHeaders
+                        text = {"Agregar proveedor"}
+                        onClick={handleAgregarProveedor}
+                      ></ButtonHeaders>
+                        </>
+                      ) : (
+                        <>
+                          <div className={styles.contenedorNitcliente}>
+                            <InputSelects
+                              icono={faHouseMedical}
+                              placeholder="Nombre del proveedor"
+                              value={proveedorSeleccionadoId}
+                              onChange={(e) => setProveedorSeleccionadoId(e.target.value)}
+                              type="text"
+                              opcions={opcionesProveedores}
+                            />
+
+                            <button
+                              onClick={() => {
+                                setAgregandoProveedor(true);
+                                setProveedorSeleccionadoId(null); // limpia el select si vas a agregar
+                              }}
+                              className={styles.buttonBuscarVenta}
+                            >
+                              <FontAwesomeIcon icon={faPlus} />
+                            </button>
+                          </div>
+
                           
 
-                          <InputSelects
-                            icono={faCommentDollar}
-                            placeholder={"Seleccione una opción de crédito"}
-                            value={cuotasSeleccionadas}
-                            onChange={handleCuotasSeleccionadas}
-                            type = {"numeric"}
-                            opcions={opcionesCuotas}
+                          {/* Si se seleccionó un proveedor, mostrar los datos */}
+                          {proveedorSeleccionado && (
+                            <>
+                              <IconoInput
+                                icono={faPhone}
+                                placeholder="Ingrese el teléfono del proveedor"
+                                value={proveedorSeleccionado.telefonos?.[0]?.numero || ""}
+                                disabled
+                              />
+                              <IconoInput
+                                icono={faEnvelope}
+                                placeholder="Ingrese el correo del proveedor"
+                                value={proveedorSeleccionado.correo || ""}
+                                disabled
+                              />
+                              <IconoInput
+                                icono={faLocationDot}
+                                placeholder="Ingrese la dirección del proveedor"
+                                value={proveedorSeleccionado.direccion || ""}
+                                disabled
+                              />
+
+                              
+
+                          <ButtonText
+                          texto={""}
+                          textoButton={"Agregar producto relacionado con el proveedor"}
+                          ></ButtonText>
+                            </>
+
                             
-                          />
-
-                          {cuotasSeleccionadas > 0 && (
-                            <p style={{ fontSize: "0.9rem", color: "#666" }}>
-                              Se programarán {cuotasSeleccionadas} recordatorio(s) de pago para dentro de {cuotasSeleccionadas === 1 ? '15' : cuotasSeleccionadas === 2 ? '15 y 30' : '15, 30 y 45'} días.
-                            </p>
                           )}
+                        </>
+                      )}
+                    </div>
 
-                
-                          </div>
-                          </div>
-                    </article>
+                                              
+                                              
 
-                    <article className={styles.contenedorDatosVenta}>
-                                    <div>
-                                        <h2 className={styles.subtituloNuevaVenta}>Detalles de compra</h2>
-                                        
+
+                  
+
+          
+                      
+                  
+                      
+                  
+                  </div>
+                  </div>
+                  <div className={styles.gridDatosVenta}>
+                  <div className={styles.contenedorRegistrado}>
+                      <h2 className={styles.subtituloNuevaVenta}>Datos de la compra</h2>
+                  <IconoInput
+                      icono={faCircleInfo}
+                      placeholder={"No de la factura"}
+                      value={numeroFactura}
+                      onChange={handleNumeroFactura}
+                      type = {"number"}
+                      
+                    />
+
+                    <IconoInput
+                      icono={faPen}
+                      placeholder={"Descripción de la venta"}
+                      value={descripcionCompra}
+                      onChange={handleDescripcionCompra}
+                      type = {"text"}
+                  
+                    />
                     
-                                        <TablaCompras
-                                          productosDisponibles = {productosFiltrados}
-                                          lineas={lineas}
-                                          setLineas={setLineas}
-                                        ></TablaCompras>
-                                 
-                                    </div>
 
-                                    <div>
-                                      <div className={styles.selectPagoWrapper2}>
-                                       
-                                       
-                                          <ButtonHeaders
-                                            text="Cancelar compra"
-                                            onClick={openEliminarCompra}
-                                            red={true}
-                                          />
+                    <InputSelects
+                      icono={faCommentDollar}
+                      placeholder={"Seleccione una opción de crédito"}
+                      value={cuotasSeleccionadas}
+                      onChange={handleCuotasSeleccionadas}
+                      type = {"numeric"}
+                      opcions={opcionesCuotas}
+                      
+                    />
 
-                                          <ButtonHeaders
-                                            text="Confirmar compra"
-                                            onClick={enviarCompra}
-                                          />
-                                        </div>
-                                        
-                                    
-                                        
-                                 </div>
-                    </article>
+                    {cuotasSeleccionadas > 0 && (
+                      <p style={{ fontSize: "0.9rem", color: "#666" }}>
+                        Se programarán {cuotasSeleccionadas} recordatorio(s) de pago para dentro de {cuotasSeleccionadas === 1 ? '15' : cuotasSeleccionadas === 2 ? '15 y 30' : '15, 30 y 45'} días.
+                      </p>
+                    )}
+
+          
+                    </div>
+                    </div>
+              </article>
+
+              <article className={styles.contenedorDatosVenta}>
+                  <div>
+                    <h2 className={styles.subtituloNuevaVenta}>Detalles de compra</h2>
+                  
+                    <TablaCompras
+                      productosDisponibles = {productosFiltrados}
+                      lineas={lineas}
+                      setLineas={setLineas}
+                    ></TablaCompras>
+                
+                  </div>
+
+                  <div>
+                    <div className={styles.selectPagoWrapper2}>
+                   
+                        <ButtonHeaders
+                          text="Cancelar compra"
+                          onClick={openEliminarCompra}
+                          red={true}
+                        />
+
+                        <ButtonHeaders
+                          text="Confirmar compra"
+                          onClick={enviarCompra}
+                        />
+                      </div>
+                      
+                </div>
+              </article>
 
            
         </main>

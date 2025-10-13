@@ -22,9 +22,9 @@ Autor: Melisa
 */
 
 import { useEffect, useState } from "react";
-import { getOptions } from "../../utils/selects";
+import { getOptions, getOptionsToken } from "../../utils/selects";
 
-export const useOpcionsCalendarForm = (localSeleccionado) => {
+export const useOpcionsCalendarForm = (localSeleccionado, token) => {
   const [opcionesTipoRecordatorio, setOpcionesTipoRecordatorio] = useState([]);
   const [opcionesEstados, setOpcionesEstados] = useState([]);
   const [opcionesVisitadores, setOpcionesVisitadores] = useState([]);
@@ -36,7 +36,7 @@ export const useOpcionsCalendarForm = (localSeleccionado) => {
     getOptions("http://localhost:3000/api/calendario/estados", i => ({ value: i.id, label: i.nombre }))
       .then(setOpcionesEstados);
       
-    getOptions(`http://localhost:3000/visitadores/por-local/${localSeleccionado}`, i => ({ value: i.id, label: i.nombre }))
+    getOptionsToken(`http://localhost:3000/visitadores/por-local/${localSeleccionado}`, i => ({ value: i.id, label: i.nombre }), token)
       .then(setOpcionesVisitadores);
   }, [localSeleccionado]);
 

@@ -28,10 +28,13 @@ import FiltroResumen from "../../components/FIlters/FiltroResumen/FiltroResumen"
 const ArchivosScreen = () => {
   const { selectedLocal } = useOutletContext();
   const localSeleccionado = selectedLocal + 1 ;
-  const {data, loading, error } = useFetch(`http://localhost:3000/documentos-locales?local_id=${localSeleccionado}`);
-
-   
+     
   const token = getToken();
+  const {data, loading, error } = useFetch(`http://localhost:3000/documentos-locales?local_id=${localSeleccionado}` , {
+      headers: {'Authorization': `Bearer ${token}`}
+  });
+
+
   const getPayloadFromToken = (token) => {
     try {
       return JSON.parse(atob(token.split('.')[1]));
