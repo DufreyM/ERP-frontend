@@ -1,0 +1,330 @@
+.container {
+  max-width: 1000px;
+  margin: auto;
+  padding: 2rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.logoutButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.logoutButton:hover {
+  background: #c0392b;
+}
+
+.profileSection {
+  display: flex;
+  gap: 3rem;
+  padding: 2rem;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 16px;
+  margin-bottom: 2rem;
+  align-items: flex-start;
+  min-height: 200px;
+}
+
+.fotoContainer {
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+}
+
+.fotoContainer:hover {
+  transform: scale(1.05);
+}
+
+.fotoContainer:active {
+  transform: scale(0.98);
+}
+
+.fotoPerfil {
+  width: 200px;
+  height: 200px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 3px solid #5a60a5;
+  transition: 0.3s;
+}
+
+.fotoPerfil:hover {
+  opacity: 0.8;
+}
+
+.iconOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: 0.3s;
+  pointer-events: none;
+  background: rgba(90, 96, 165, 0.8);
+  border-radius: 12px;
+}
+
+.fotoContainer:hover .iconOverlay {
+  opacity: 1;
+}
+
+.cameraIcon {
+  color: white;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.cambiarText {
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.profileInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  justify-content: center;
+  min-height: 200px;
+}
+
+.infoItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.infoLabel {
+  font-weight: 600;
+  color: #5a60a5;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.infoValue {
+  color: #333;
+  font-size: 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 1rem;
+}
+
+.editButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: white;
+  color: #5a60a5;
+  border: 2px solid #5a60a5;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.editButton:hover {
+  background: #5a60a5;
+  color: white;
+}
+
+.editButtons {
+  display: flex;
+  gap: 1rem;
+}
+
+.cancelButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: white;
+  color: #e74c3c;
+  border: 2px solid #e74c3c;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.cancelButton:hover {
+  background: #e74c3c;
+  color: white;
+}
+
+.saveButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: #1bbf5c;
+  color: white;
+  border: 2px solid #1bbf5c;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.saveButton:hover:not(:disabled) {
+  background: #16a085;
+  border-color: #16a085;
+}
+
+.saveButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.changePasswordContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.logoutContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+/* Estilos para que los inputs tengan el mismo ancho que el contenedor del perfil */
+.container :global(.contenedorInput) {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+.container :global(.inputStyle) {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+.container :global(.inputStylePassword) {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+.container :global(.contenedorInputDate) {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+.container :global(.inputStyleDate) {
+  max-width: 100% !important;
+  width: 100% !important;
+  min-width: unset !important;
+}
+
+/* Estilos específicos para inputs en modo de edición */
+.infoItem :global(.contenedorInput) {
+  margin: 0 !important;
+}
+
+.infoItem :global(.inputStyle) {
+  border: 2px solid #e0e0e0 !important;
+  border-radius: 8px !important;
+  padding: 0.75rem !important;
+  font-size: 1rem !important;
+}
+
+.infoItem :global(.inputStyle):focus {
+  border-color: #5a60a5 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(90, 96, 165, 0.1) !important;
+}
+
+.infoItem :global(.contenedorInputDate) {
+  margin: 0 !important;
+}
+
+.infoItem :global(.inputStyleDate) {
+  border: 2px solid #e0e0e0 !important;
+  border-radius: 8px !important;
+  padding: 0.75rem !important;
+  font-size: 1rem !important;
+}
+
+.infoItem :global(.inputStyleDate):focus {
+  border-color: #5a60a5 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(90, 96, 165, 0.1) !important;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .container {
+    max-width: 100%;
+    padding: 1rem;
+  }
+  
+  .profileSection {
+    flex-direction: column;
+    gap: 2rem;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .fotoContainer {
+    align-self: center;
+  }
+  
+  .fotoPerfil {
+    width: 150px;
+    height: 150px;
+  }
+  
+  .profileInfo {
+    min-height: auto;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .fotoPerfil {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .profileSection {
+    padding: 1rem;
+    gap: 1.5rem;
+  }
+}

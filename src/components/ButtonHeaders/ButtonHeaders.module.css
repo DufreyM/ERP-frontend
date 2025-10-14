@@ -1,0 +1,63 @@
+.divButtonForm {
+    background-color: #5a60A5;
+    color: white;
+    border: none;
+    border-radius: 10px; 
+    padding: 12px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-size: 16px;
+    font-weight: bold;
+    min-width: 120px;
+    transition: background-color 0.3s ease;
+    box-sizing: border-box;
+
+    /* Animación */
+  transition-property: background-color, transform;
+    transition-duration: 0.2s, 0.2s;
+    transition-timing-function: ease-out, ease-out;
+    transition-delay: 0s, 0s;  
+    
+}
+
+.RedButton{
+    background-color: rgb(167, 49, 67)
+}
+
+.LineButton{
+    background-color: white;
+    color: #5a60A5;
+    border: solid 2px #5a60A5;
+
+}
+
+
+.divButtonForm:hover {
+    background-color: #4a5095;
+    transform: scale(1.03);
+}
+
+.RedButton:hover{
+    background-color: rgb(130, 31, 31);
+    transform: scale(1.03);
+}
+
+.LineButton:hover{
+    background-color: rgba(255, 255, 255, 0.766);
+    transform: scale(1.03);
+}
+
+.divButtonForm:active {
+    background-color: #4a5095;
+    transform: scale(0.95);
+}
+
+.RedButton:active{
+    background-color: rgb(130, 31, 31);
+    transform: scale(0.95);
+}
+
+.LineButton:active{
+    background-color: rgba(255, 255, 255, 0.766);
+    transform: scale(0.95);
+}

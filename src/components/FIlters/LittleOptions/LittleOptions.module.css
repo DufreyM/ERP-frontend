@@ -1,0 +1,34 @@
+.LittleOptionsButtons{
+    background-color: #5a60a50e;
+    border: solid 2px ;
+
+    border-radius: 10px;
+    padding: 3px 10px;
+    margin: 2px 2px;
+
+    color:#5a60a5;
+    font-weight: bold;
+    font-size: 13px;
+
+    transition-property: background-color, transform;
+    transition-duration: 0.2s, 0.2s;
+    transition-timing-function: ease-out, ease-out;
+    transition-delay: 0s, 0s;
+    cursor: pointer;
+}
+
+
+.LittleOptionsButtons:hover{ 
+    background-color: #5a60a534; 
+}
+
+.LittleOptionsButtonsActive{ 
+    border: solid 2px ;
+    background-color: #5a60a5; 
+    color: white;
+}
+
+.LittleOptionsButtonsActive:hover{ 
+    background-color: #5a60a5; 
+    color: white;
+}

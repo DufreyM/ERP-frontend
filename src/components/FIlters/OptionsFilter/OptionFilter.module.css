@@ -1,0 +1,72 @@
+.contenedorVisibleOptionFilter{
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    gap: 10px;
+
+    width: 100%;
+
+    background-color: white;
+    border: none;
+    border-radius: 10px;
+    color: #5a60A5;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif ;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 0px 5px;
+    margin: 0px 0px;
+
+    cursor: pointer;
+
+    transition-property: background-color, transform;
+    transition-duration: 0.2s, 0.2s;
+    transition-timing-function: ease-out, ease-out;
+    transition-delay: 0s, 0s;
+
+    /* background-color: brown; */
+}
+
+
+
+.contenedorVisibleOptionFilter:hover{
+    background-color: #5a60a515; 
+}
+
+
+
+.titulosOpciones{
+    /* background-color: cadetblue; */
+    margin: 10px;
+}
+
+
+.contenidoOptionFilter{
+    overflow: hidden;
+    height: 2px;
+    margin-left: 30px;
+    padding: 0px 0px;
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+    transition: opacity 0.05s ease, transform 0.5s ease;
+
+}
+
+.contenidoOptionFilterActive{ 
+    opacity: 100;
+    height: auto;
+    padding: 10px 0px;
+    transform: translateY(1px);
+    pointer-events: auto;
+
+}
+
+.chevronIcon {
+    font-size: 15px;
+  transition: transform 0.3s ease;
+}
+
+.rotateDown {
+  transform: rotate(90deg);
+}

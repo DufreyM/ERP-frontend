@@ -1,0 +1,283 @@
+
+
+
+
+
+
+.allTitle{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap:10px;
+    
+   
+}
+
+
+
+.buttonCalendarRow {
+    font-family: 'Segoe UI';
+    background-color: transparent;
+    font-weight: bold;
+    border-radius: 8px;
+    height: 30px;
+    color: #5a60a5;
+    border: 0;
+    cursor: pointer;
+
+   
+}
+.iconArrow {
+    transition: transform 0.3s ease;
+    color: #5a60a5;
+}
+
+
+.rotatevineta {
+  transform: rotate(90deg);
+}
+
+    
+
+
+
+
+
+.encabezadoMesStyle {
+    
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap:20px;
+
+}
+
+
+
+.tituloMes{
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    margin: 0px;
+    font-size: 22px;
+}
+
+.title2{
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    color: #5a60A5;
+    margin: 0px;
+    font-size: 18px;
+}
+
+.descripcionStyle {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    
+}
+
+.divEventos{
+
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    justify-content: flex-start;
+    color: #5a60A5;
+    padding-bottom: 5px;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: rgba(97, 122, 185, 0);
+    border-bottom: solid 1px #5a60a56b;
+}
+
+.espaciadoExtremos{
+
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    gap: 10px;
+    justify-content: space-between;
+    color: #5a60A5;
+}
+
+.buttonText {
+    background-color: transparent;
+    cursor: pointer;
+    border: none;
+    color: #5a60A5;
+    margin: 0px 3px;
+    font-size: 16px;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition-property: background-color, transform;
+    transition-duration: 0.2s, 0.2s;
+    transition-timing-function: ease-out, ease-out;
+    transition-delay: 0s, 0s;
+   
+
+}
+
+.buttonText:hover {
+    transform: scale(1.05);
+}
+.buttonText:active {
+    transform: scale(0.95);
+}
+
+.buttonText2 {
+    background-color: transparent;
+    cursor: pointer;
+    border: none;
+    color: #851515;
+    margin: 0px 3px;
+    font-size: 16px;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition-property: background-color, transform;
+    transition-duration: 0.2s, 0.2s;
+    transition-timing-function: ease-out, ease-out;
+    transition-delay: 0s, 0s;
+
+}
+
+.buttonText2:hover {
+    transform: scale(1.05);
+}
+.buttonText2:active {
+    transform: scale(0.95);
+}
+
+.vineta {
+    margin-top: 9px;
+    
+    min-width: 10px;
+    min-height: 10px;
+    max-width: 10px;
+    max-height: 10px;
+    border-radius: 100%;
+    background-color:#5a60A5;
+}
+.contenido {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    text-align: left;
+    gap: 3px;
+ 
+}
+
+.bStyle{
+    margin: 0px;
+    padding: 0px;
+    font-size: 15px;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.tituloEvento{
+    margin: 0;
+    padding: 0px;
+    font-size: 16px;
+    min-width: 70%;
+
+    font-weight: bold;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-align: left;
+}
+
+.desc{
+    margin: 0;
+    padding: 0px;
+    font-size: 16px;
+    
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+
+
+
+
+
+
+
+
+
+@media (max-width: 768px) {
+    
+    .calendarioyEventos {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+
+    }
+
+    .contenedorCalendario {
+        width: 100%;
+    
+    
+    }
+
+    .contentLeft {
+
+        max-width: 100%;
+        overflow-y: auto;
+        
+    }
+
+    
+}
+
+
+
+
+
+h2::first-letter {
+  text-transform: uppercase;
+}
+
+h3::first-letter {
+  text-transform: uppercase;
+}
+
+a::first-letter {
+  text-transform: uppercase;
+}
+
+
+.fc-header-toolbar {
+    background-color: rgb(255, 255, 255);
+}
+
+.fc-col-header-cell {
+  background-color: #8186c2;
+  color: white;
+  font-weight: bold;
+  font-family: 'Segoe UI';
+}
+.fc-toolbar-title{
+   
+  color: #5a60a5;
+  font-weight: bold;
+  font-family: 'Segoe UI';
+}
+
+.fc-event-title-container{
+    background-color: #5a60a5;
+    border-radius: 1px #5a60a5;
+}
+
+.fc-event-title {
+    
+    font-family: 'Segoe UI';
+}
+
+.fc-event-title::first-letter  {
+    text-transform: uppercase;
+}
+
+.fc-today-button {
+    background-color: #5a60a5;
+}

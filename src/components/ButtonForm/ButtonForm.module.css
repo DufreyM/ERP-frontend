@@ -1,0 +1,39 @@
+/*ButtonForm.module.css
+Es el estilo del botón azul jiji
+Autor: Melisa 
+Ultima modificación: 7/5/2025 
+*/
+
+.divButtonForm {
+    background-color: #5a60A5;
+    color: white;
+    border: none;
+    border-radius: 20px; 
+    padding: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    width: 100%;
+    max-width: 300px;
+    transition: background-color 0.3s ease;
+    box-sizing: border-box;
+
+    /* Animación */
+    transition-property: background-color, transform;
+    transition-duration: 0.2s, 0.2s;
+    transition-timing-function: ease-out, ease-out;
+    transition-delay: 0s, 0s;
+}
+
+
+
+.divButtonForm:hover{
+    background-color: #4a5095;
+    transform: scale(1.03);
+}
+
+.divButtonForm:active{
+    color: #5a60A5;
+    transform: scale(0.95);
+    border: none;
+}

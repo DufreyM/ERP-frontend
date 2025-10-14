@@ -23,3 +23,7 @@ logs/
 
 # OS-specific files
 Thumbs.db
+
+#bun
+bun.lock
+.bun/
