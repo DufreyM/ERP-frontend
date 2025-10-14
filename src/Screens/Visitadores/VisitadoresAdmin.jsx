@@ -16,18 +16,18 @@ import InputSearch from "../../components/Inputs/InputSearch";
 import InputSelects from "../../components/Inputs/InputSelects";
 import InputDates from "../../components/Inputs/InputDates";
 
+// Función para formatear fecha
+const formatearFecha = (fechaISO) => {
+  const fecha = new Date(fechaISO);
+  const dia = String(fecha.getDate()).padStart(2, '0');
+  const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+  const año = fecha.getFullYear();
+  return `${dia}-${mes}-${año}`;
+};
+
 const VisitadoresAdmin = () => {
   const { selectedLocal } = useOutletContext();
   const localSeleccionado = selectedLocal + 1;
-
-  // Función para formatear fecha
-  const formatearFecha = (fechaISO) => {
-    const fecha = new Date(fechaISO);
-    const dia = String(fecha.getDate()).padStart(2, '0');
-    const mes = String(fecha.getMonth() + 1).padStart(2, '0');
-    const año = fecha.getFullYear();
-    return `${dia}-${mes}-${año}`;
-  };
 
   // Estados para filtros
   const [busqueda, setBusqueda] = useState('');
@@ -36,30 +36,40 @@ const VisitadoresAdmin = () => {
   const [fechaFin, setFechaFin] = useState(null);
 
   // Filtros de API
-  const [statusSeleccionado, setStatusSeleccionado] = useState(""); // 'activo' | 'inactivo' | ""
+  const [statusSeleccionado, setStatusSeleccionado] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
 
-  const params = new URLSearchParams();
-  params.set('id_local', String(localSeleccionado));
-  if (proveedorSeleccionado) params.set('proveedor_id', String(proveedorSeleccionado));
-  if (statusSeleccionado) params.set('status', statusSeleccionado);
-  if (page) params.set('page', String(page));
-  if (limit) params.set('limit', String(limit));
-
   const token = getToken();
   const shouldFetch = Boolean(token);
-  const visitadoresUrl = shouldFetch ? `http://localhost:3000/visitadores?${params.toString()}` : null;
+  
+  // Memoizar la URL para evitar recálculos innecesarios
+  const visitadoresUrl = useMemo(() => {
+    if (!shouldFetch) return null;
+    
+    const params = new URLSearchParams();
+    params.set('id_local', String(localSeleccionado));
+    if (proveedorSeleccionado) params.set('proveedor_id', String(proveedorSeleccionado));
+    if (statusSeleccionado) params.set('status', statusSeleccionado);
+    if (page) params.set('page', String(page));
+    if (limit) params.set('limit', String(limit));
+    
+    return `http://localhost:3000/visitadores?${params.toString()}`;
+  }, [shouldFetch, localSeleccionado, proveedorSeleccionado, statusSeleccionado, page, limit]);
+
+  // Memoizar las opciones de headers para evitar recreación
+  const fetchHeaders = useMemo(() => ({
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+    'Content-Type': 'application/json',
+  }), [token]);
+
   const { data: visitadoresResponse, loading, error, refetch } = useFetch(
     visitadoresUrl,
     {
-      headers: {
-        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-        'Content-Type': 'application/json',
-      },
+      headers: fetchHeaders,
       method: 'GET'
     },
-    [localSeleccionado, proveedorSeleccionado, statusSeleccionado, page, limit]
+    [visitadoresUrl, fetchHeaders]
   );
 
   // Estados para popups
@@ -69,7 +79,6 @@ const VisitadoresAdmin = () => {
   const [editarVisitador, setEditarVisitador] = useState(false);
 
   // Form state crear/editar
-  const estadosPosibles = ['activo', 'inactivo'];
   const [formVisitador, setFormVisitador] = useState({
     nombre: '',
     apellido: '',
@@ -82,7 +91,7 @@ const VisitadoresAdmin = () => {
     documento: null
   });
 
-  // Opciones de proveedores para filtros (esto debería venir de una API)
+  // Opciones de proveedores para filtros
   const opcionesProveedores = [
     { id: 1, nombre: "Proveedor 1" },
     { id: 2, nombre: "Proveedor 2" }
@@ -101,6 +110,8 @@ const VisitadoresAdmin = () => {
     { key: 'status', titulo: 'Estado' },
     { key: 'editar', titulo: 'Editar' }
   ];
+
+  console.log("VisitadoresAdmin: Configuración de columnas lista");
 
   // Función para manejar búsqueda
   const handleBusqueda = (e) => {
@@ -127,17 +138,9 @@ const VisitadoresAdmin = () => {
     setVisitadorAEliminar(null);
   };
 
-  // Función para abrir popup de editar
-  const openEditarVisitador = (visitador) => {
-    const base = (visitador && visitadoresData?.find?.((v) => v.id === visitador.id)) || visitador;
-    setVisitadorAEditar(base);
-    setEditarVisitador(true);
-  };
-
   const closeEditarVisitador = () => {
     setEditarVisitador(false);
     setVisitadorAEditar(null);
-    // Limpiar formulario al cerrar
     setFormVisitador({
       nombre: '',
       apellido: '',
@@ -151,182 +154,14 @@ const VisitadoresAdmin = () => {
     });
   };
 
-
-  // Cargar datos al formulario al abrir editar
-  useEffect(() => {
-    if (visitadorAEditar) {
-      console.log('Cargando datos del visitador:', visitadorAEditar);
-      setFormVisitador({
-        nombre: visitadorAEditar.usuario?.nombre || '',
-        apellido: visitadorAEditar.usuario?.apellidos || '',
-        correo: visitadorAEditar.usuario?.email || '',
-        telefono_fijo: visitadorAEditar.telefonos?.find(t => t.tipo === 'fijo')?.numero || '',
-        telefono_movil: visitadorAEditar.telefonos?.find(t => t.tipo === 'móvil')?.numero || '',
-        fecha_nacimiento: visitadorAEditar.usuario?.fechanacimiento
-          ? visitadorAEditar.usuario.fechanacimiento.slice(0, 10)
-          : '',
-        proveedor_id: visitadorAEditar.proveedor_id || '',
-        contrasena: '',
-        documento: visitadorAEditar.documento_url
-          ? { url: visitadorAEditar.documento_url, nombre: visitadorAEditar.documento_nombre }
-          : null
-      });
-    }
-  }, [visitadorAEditar]);
-
-  const handleFormChange = (e) => {
-    const { name, value } = e.target;
-    setFormVisitador(prev => ({ ...prev, [name]: name === 'proveedor_id' ? Number(value) : value }));
-  };
-
-
-  const actualizarVisitador = async () => {
-    // Validaciones
-    if (!visitadorAEditar || !visitadorAEditar.usuario) {
-      alert("El visitador no tiene datos de usuario cargados.");
-      return;
-    }
-
-    if (!getToken()) {
-      alert('No autorizado. Inicie sesión para continuar.');
-      return;
-    }
-
-    // Validar campos requeridos
-    if (!formVisitador.nombre?.trim()) {
-      alert('El nombre es obligatorio.');
-      return;
-    }
-
-    if (!formVisitador.apellido?.trim()) {
-      alert('Los apellidos son obligatorios.');
-      return;
-    }
-
-    if (!formVisitador.correo?.trim()) {
-      alert('El correo electrónico es obligatorio.');
-      return;
-    }
-
-    // Validar formato de email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formVisitador.correo?.trim())) {
-      alert('Por favor ingrese un correo electrónico válido.');
-      return;
-    }
-
-    const { usuario } = visitadorAEditar;
-
-    const telefonoFijo = formVisitador.telefono_fijo?.trim();
-    const telefonoMovil = formVisitador.telefono_movil?.trim();
-
-    const updateData = {
-      proveedor_id: Number(formVisitador.proveedor_id) || null,
-      usuario: {
-        id: Number(usuario.id),
-        nombre: formVisitador.nombre.trim(),
-        apellidos: formVisitador.apellido.trim(),
-        email: formVisitador.correo.trim(),
-        fechanacimiento: formVisitador.fecha_nacimiento || usuario.fechanacimiento,
-        rol_id: usuario.rol_id,
-        status: usuario.status,
-        contrasena: "unchanged" // No cambiar contraseña en edición
-      },
-      telefonos: [
-        ...(telefonoFijo ? [{
-          id: visitadorAEditar.telefonos?.find(t => t.tipo === 'fijo')?.id ?? null,
-          numero: telefonoFijo,
-          tipo: 'fijo'
-        }] : []),
-        ...(telefonoMovil ? [{
-          id: visitadorAEditar.telefonos?.find(t => t.tipo === 'móvil')?.id ?? null,
-          numero: telefonoMovil,
-          tipo: 'móvil'
-        }] : [])
-      ]
-    };
-
-    console.log("Payload enviado:", updateData);
-
-    try {
-      const resp = await fetch(`http://localhost:3000/visitadores/${visitadorAEditar.id}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${getToken()}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updateData),
-      });
-
-      if (!resp.ok) {
-        const errorText = await resp.text();
-        throw new Error(errorText || `Error al actualizar (HTTP ${resp.status})`);
-      }
-
-      const result = await resp.json();
-      console.log('Visitador actualizado:', result);
-      await refetch();
-      closeEditarVisitador();
-      alert('Visitador actualizado correctamente');
-    } catch (e) {
-      console.error("❌ Error al actualizar visitador:", e);
-      alert(`No se pudo actualizar el visitador. ${e.message || ''}`);
-    }
-  };
-
-  // Eliminar visitador
-  const eliminarVisitador = async () => {
-    if (!visitadorAEliminar) return;
-    try {
-      const resp = await fetch(`http://localhost:3000/visitadores/${visitadorAEliminar.id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': getToken() ? `Bearer ${getToken()}` : '',
-        }
-      });
-      if (!resp.ok) throw new Error('Error al eliminar');
-      await refetch();
-      closeAdvertencia();
-    } catch (e) {
-      console.error(e);
-      alert('No se pudo eliminar el visitador');
-    }
-  };
-
-  // Toggle status activo/inactivo
-  const onToggleStatus = async (visitador) => {
-    const original = visitadoresData.find(v => v.id === visitador.id) || visitador;
-    const nuevoStatus = String(original.status).toLowerCase() === 'activo' ? 'deactivate' : 'activate';
-
-    try {
-      const resp = await fetch(`http://localhost:3000/visitadores/${original.id}/${nuevoStatus}`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': getToken() ? `Bearer ${getToken()}` : '',
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      if (!resp.ok) {
-        const errorText = await resp.text();
-        throw new Error(errorText || `Error al cambiar estado (HTTP ${resp.status})`);
-      }
-      
-      const result = await resp.json();
-      console.log('Estado cambiado:', result);
-      await refetch();
-    } catch (e) {
-      console.error('Error al cambiar estado:', e);
-      alert(`No se pudo cambiar el estado: ${e.message}`);
-    }
-  };
-
-
-
   // Normalizar respuesta y aplicar filtros
   const visitadoresData = useMemo(() => {
     if (visitadoresResponse) {
-      try { console.debug('Visitadores GET response:', visitadoresResponse); } catch {}
+      try { 
+        console.debug('Visitadores GET response:', visitadoresResponse); 
+      } catch (e) {
+        console.error('Error al procesar respuesta:', e);
+      }
     }
     
     // Si hay error en la respuesta, mostrar datos de prueba
@@ -375,6 +210,7 @@ const VisitadoresAdmin = () => {
       visitadoresResponse,
     ];
     const lista = maybeArrays.find(arr => Array.isArray(arr)) || [];
+    
     return lista.map((v) => {
       // Extraer teléfonos fijo y móvil de la relación telefonos
       const telefonos = v.telefonos || [];
@@ -397,6 +233,63 @@ const VisitadoresAdmin = () => {
       };
     });
   }, [visitadoresResponse]);
+
+  // Función para abrir popup de editar (definida después de visitadoresData)
+  const openEditarVisitador = (visitador) => {
+    const base = (visitador && visitadoresData?.find?.((v) => v.id === visitador.id)) || visitador;
+    setVisitadorAEditar(base);
+    setEditarVisitador(true);
+  };
+
+  // Toggle status activo/inactivo (definida después de visitadoresData)
+  const onToggleStatus = async (visitador) => {
+    const original = visitadoresData.find(v => v.id === visitador.id) || visitador;
+    const esActivo = String(original.status).toLowerCase() === 'activo';
+    
+    // Si está activo y va a inactivo, usar PATCH deactivate
+    // Si está inactivo y va a activo, usar PATCH activate
+    if (esActivo) {
+      // Cambiar de activo a inactivo = PATCH deactivate
+      try {
+        const resp = await fetch(`http://localhost:3000/visitadores/${original.id}/deactivate`, {
+          method: 'PATCH',
+          headers: {
+            'Authorization': getToken() ? `Bearer ${getToken()}` : '',
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!resp.ok) {
+          const errorText = await resp.text();
+          throw new Error(errorText || `Error al desactivar visitador (HTTP ${resp.status})`);
+        }
+        
+        await refetch();
+      } catch (e) {
+        console.error('Error al desactivar visitador:', e);
+      }
+    } else {
+      // Cambiar de inactivo a activo = PATCH activate
+      try {
+        const resp = await fetch(`http://localhost:3000/visitadores/${original.id}/activate`, {
+          method: 'PATCH',
+          headers: {
+            'Authorization': getToken() ? `Bearer ${getToken()}` : '',
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!resp.ok) {
+          const errorText = await resp.text();
+          throw new Error(errorText || `Error al activar visitador (HTTP ${resp.status})`);
+        }
+        
+        await refetch();
+      } catch (e) {
+        console.error('Error al activar visitador:', e);
+      }
+    }
+  };
 
   // Aplicar filtros y búsqueda
   const dataFiltrada = useMemo(() => {
@@ -429,6 +322,21 @@ const VisitadoresAdmin = () => {
       });
     }
     
+    // Ordenar por estado: activos primero, inactivos al final
+    filtered.sort((a, b) => {
+      const statusA = String(a.status).toLowerCase();
+      const statusB = String(b.status).toLowerCase();
+      
+      // Si ambos tienen el mismo estado, mantener orden original
+      if (statusA === statusB) return 0;
+      
+      // Activos primero (activo = 0, inactivo = 1)
+      if (statusA === 'activo' && statusB === 'inactivo') return -1;
+      if (statusA === 'inactivo' && statusB === 'activo') return 1;
+      
+      return 0;
+    });
+    
     return filtered;
   }, [visitadoresData, proveedorSeleccionado, fechaInicio, fechaFin, busqueda]);
 
@@ -442,6 +350,171 @@ const VisitadoresAdmin = () => {
     data: dataFiltrada,
     sortKeyMap
   });
+
+  // Eliminar visitador
+  const eliminarVisitador = async () => {
+    if (!visitadorAEliminar) return;
+    try {
+      const resp = await fetch(`http://localhost:3000/visitadores/${visitadorAEliminar.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': getToken() ? `Bearer ${getToken()}` : '',
+        }
+      });
+      if (!resp.ok) throw new Error('Error al eliminar');
+      await refetch();
+      closeAdvertencia();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // Cargar datos al formulario al abrir editar
+  useEffect(() => {
+    if (visitadorAEditar) {
+      // Buscar el visitador en los datos normalizados para obtener la estructura correcta
+      const visitadorNormalizado = visitadoresData.find(v => v.id === visitadorAEditar.id) || visitadorAEditar;
+      
+      // Formatear la fecha para el input de fecha (formato YYYY-MM-DD)
+      let fechaFormateada = '';
+      if (visitadorNormalizado.fecha_nacimientoISO) {
+        const fecha = new Date(visitadorNormalizado.fecha_nacimientoISO);
+        if (!isNaN(fecha.getTime())) {
+          fechaFormateada = fecha.toISOString().split('T')[0];
+        }
+      }
+      
+      setFormVisitador({
+        nombre: visitadorNormalizado.nombre || '',
+        apellido: visitadorNormalizado.apellido || '',
+        correo: visitadorNormalizado.correo || '',
+        telefono_fijo: visitadorNormalizado.telefono_fijo || '',
+        telefono_movil: visitadorNormalizado.telefono_movil || '',
+        fecha_nacimiento: fechaFormateada,
+        proveedor_id: visitadorNormalizado.proveedor_id || '',
+        contrasena: '',
+        documento: visitadorNormalizado.documento
+          ? { url: visitadorNormalizado.documento, nombre: 'Documento actual' }
+          : null
+      });
+    }
+  }, [visitadorAEditar, visitadoresData]);
+
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormVisitador(prev => ({ ...prev, [name]: name === 'proveedor_id' ? Number(value) : value }));
+  };
+
+  const actualizarVisitador = async () => {
+    // Validaciones
+    if (!visitadorAEditar) {
+      return;
+    }
+
+    if (!getToken()) {
+      return;
+    }
+
+    // Validar campos requeridos
+    if (!formVisitador.nombre?.trim()) {
+      return;
+    }
+
+    if (!formVisitador.apellido?.trim()) {
+      return;
+    }
+
+    if (!formVisitador.correo?.trim()) {
+      return;
+    }
+
+    // Validar formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formVisitador.correo?.trim())) {
+      return;
+    }
+
+    // Buscar el visitador original para obtener los IDs necesarios
+    const maybeArrays = [
+      visitadoresResponse?.data?.items,
+      visitadoresResponse?.data?.rows,
+      visitadoresResponse?.data,
+      visitadoresResponse?.items,
+      visitadoresResponse?.rows,
+      visitadoresResponse?.visitadores,
+      visitadoresResponse?.results,
+      visitadoresResponse,
+    ];
+    const listaOriginal = maybeArrays.find(arr => Array.isArray(arr)) || [];
+    const visitadorOriginal = listaOriginal.find(v => v.id === visitadorAEditar.id);
+
+    if (!visitadorOriginal || !visitadorOriginal.usuario) {
+      return;
+    }
+
+    const { usuario } = visitadorOriginal;
+    const telefonoFijo = formVisitador.telefono_fijo?.trim();
+    const telefonoMovil = formVisitador.telefono_movil?.trim();
+
+    // Formatear la fecha de nacimiento correctamente
+    let fechanacimientoFormateada = usuario.fechanacimiento; // Usar la fecha original por defecto
+    
+    if (formVisitador.fecha_nacimiento) {
+      // Si hay una nueva fecha, convertirla al formato ISO
+      const fecha = new Date(formVisitador.fecha_nacimiento);
+      if (!isNaN(fecha.getTime())) {
+        fechanacimientoFormateada = fecha.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+      }
+    }
+
+    const updateData = {
+      proveedor_id: Number(formVisitador.proveedor_id) || null,
+      usuario: {
+        id: Number(usuario.id),
+        nombre: formVisitador.nombre.trim(),
+        apellidos: formVisitador.apellido.trim(),
+        email: formVisitador.correo.trim(),
+        fechanacimiento: fechanacimientoFormateada,
+        rol_id: usuario.rol_id,
+        status: usuario.status,
+        contrasena: "unchanged" // No cambiar contraseña en edición
+      },
+      telefonos: [
+        ...(telefonoFijo ? [{
+          id: visitadorOriginal.telefonos?.find(t => t.tipo === 'fijo')?.id ?? null,
+          numero: telefonoFijo,
+          tipo: 'fijo'
+        }] : []),
+        ...(telefonoMovil ? [{
+          id: visitadorOriginal.telefonos?.find(t => t.tipo === 'móvil')?.id ?? null,
+          numero: telefonoMovil,
+          tipo: 'móvil'
+        }] : [])
+      ]
+    };
+
+    try {
+      const resp = await fetch(`http://localhost:3000/visitadores/${visitadorAEditar.id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${getToken()}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData),
+      });
+
+      if (!resp.ok) {
+        const errorText = await resp.text();
+        throw new Error(errorText || `Error al actualizar (HTTP ${resp.status})`);
+      }
+
+      await resp.json();
+      await refetch();
+      closeEditarVisitador();
+    } catch (e) {
+      console.error("Error al actualizar visitador:", e);
+    }
+  };
 
   return (
     <div className={styles.contenedorGeneral}>
