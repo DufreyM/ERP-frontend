@@ -110,6 +110,12 @@ body {
     opacity: 0.4;
 }
 
+.transparent {
+    color: #5a60a5;
+    opacity: 0;
+
+}
+
 .red {
     color: #bf4242;
     display: flex;
@@ -148,8 +154,13 @@ body {
     opacity: 0.5;
 }
 
+.groupCross.transparent .colored {
+    color: transparent;
+    opacity: 0;
+}
+
 .groupCross.orange .colored {
-    color: orange;
+    color: rgb(227, 158, 31);
     opacity: 0.5;
 }
 

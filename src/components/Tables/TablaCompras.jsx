@@ -2,6 +2,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCirclePlus, faTrash, faCircleMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import styles from './Table.module.css'; // (opcional, para tus estilos personalizados)
 import ButtonIcon from '../ButtonIcon/ButtonIcon';
+import DatePicker from 'react-datepicker';
 
 export const TablaCompras = ({ 
   productosDisponibles,
@@ -9,9 +10,11 @@ export const TablaCompras = ({
   setLineas
 
 }) => {
-  
-  const productoYaAgregado = (productoId) => {
-    return lineas.some(linea => parseInt(linea.productoId) === parseInt(productoId));
+
+  const productoYaAgregado = (productoId, indexActual) => {
+    return lineas.some((linea, i) => {
+      return i !== indexActual && parseInt(linea.productoId) === parseInt(productoId);
+    });
   };
 
   const productosRestantes = productosDisponibles.filter(
@@ -25,21 +28,24 @@ export const TablaCompras = ({
   const agregarLinea = () => {
     if (productosRestantes.length === 0) return;
 
+    const nuevaLinea = {
+      id: Date.now(),
+      productoId: '',
+      nombre: '',
+      cantidad: 1,
+      precio_costo: 0,
+      precio_venta: 0,
+      lote: '',
+      fecha_vencimiento: null,
+      subtotal: 0
+    };
+    //console.log("Agregando nueva línea:", nuevaLinea);
+
     setLineas([
       ...lineas,
-      {
-        id: Date.now(),
-        productoId: '',
-        nombre: '',
-        cantidad: 1,
-        precio_unitario: 0,
-        descuento: 0,
-        subtotal: 0
-      }
+      nuevaLinea
     ]);
   };
-
-
 
   // Elimina una fila
   const eliminarLinea = (index) => {
@@ -48,41 +54,60 @@ export const TablaCompras = ({
     setLineas(nuevasLineas);
   };
 
-  // Actualiza valores al cambiar inputs
+
   const actualizarLinea = (index, campo, valor) => {
-  const nuevasLineas = [...lineas];
-  const linea = nuevasLineas[index];
+    const nuevasLineas = [...lineas];
+    const linea = {...nuevasLineas[index]};
 
-  if (campo === 'productoId') {
-    const producto = productosDisponibles.find(p => p.id === parseInt(valor));
-    if (producto) {
-      linea.productoId = producto.id;
-      linea.nombre = producto.nombre;
-      linea.precio_unitario = producto.precio;
-      linea.stock_actual = producto.stock_actual; // Guardamos stock en la línea
+    if (campo === 'productoId') {
+      const idNumerico = parseInt(valor);
+      if (isNaN(idNumerico)) {
+        linea.productoId = '';
+        linea.nombre = '';
+      } else {
+        const producto = productosDisponibles.find(p => p.id === idNumerico);
+        if (producto) {
+          linea.productoId = producto.id;
+          linea.nombre = producto.nombre;
+          linea.precio_costo = producto.preciocosto || linea.precio_costo;
+          linea.precio_venta = producto.precioventa || linea.precio_venta;
+        }
+      }
+    } else {
+      linea[campo] = valor;
     }
-  } else if (campo === 'cantidad') {
-    const cantidad = parseInt(valor) || 1;
-    const maxStock = parseInt(linea.stock_actual) || Infinity;
-    linea.cantidad = Math.min(cantidad, maxStock); // Limita la cantidad
-  } else {
-    linea[campo] = valor;
-  }
 
-  // Cálculo del subtotal
-  const cantidad = parseFloat(linea.cantidad) || 0;
-  const precio = parseFloat(linea.precio_unitario) || 0;
-  const descuento = parseFloat(linea.descuento) || 0;
-  const subtotal = (cantidad * precio) - descuento;
-  linea.subtotal = subtotal;
+    const cantidad = parseFloat(linea.cantidad) || 0;
+    const precioCosto = parseFloat(linea.precio_costo) || 0;
+    linea.subtotal = cantidad * precioCosto;
 
-  setLineas(nuevasLineas);
-};
+    nuevasLineas[index] = linea;
+    setLineas(nuevasLineas);
+  };
 
- 
 
-  
 
+  const handleChangeProducto = (index, value) => {
+    const idNumerico = parseInt(value);
+    const productoSeleccionado = productosDisponibles.find(p => p.id === idNumerico);
+    if (productoSeleccionado) {
+      //console.log("Seleccionado (en onChange):", productoSeleccionado.nombre);
+      // Actualizá la línea en una sola pasada para evitar problemas de estado
+      setLineas(prev => prev.map((l, idx) => {
+        if (idx !== index) return l;
+        const cantidad = parseFloat(l.cantidad) || 1;
+        const precio_costo = productoSeleccionado.preciocosto || 0;
+        return {
+          ...l,
+          productoId: productoSeleccionado.id,    // numérico en el objeto
+          nombre: productoSeleccionado.nombre,
+          precio_costo,
+          precio_venta: productoSeleccionado.precioventa || 0,
+          subtotal: cantidad * precio_costo
+        };
+      }));
+    }
+  };
 
   const totalFactura = lineas.reduce((acc, linea) => acc + linea.subtotal, 0);
 
@@ -91,7 +116,7 @@ export const TablaCompras = ({
       
 
       <div className={styles.total}>
-        <strong className={styles.totalText}>Total de venta: Q{totalFactura.toFixed(2)}</strong>
+        <strong className={styles.totalText}>Total de compra: Q{totalFactura.toFixed(2)}</strong>
         <ButtonIcon 
           solid = {true}
           icon = {faPlus}
@@ -100,8 +125,6 @@ export const TablaCompras = ({
           disabled={!puedeAgregarMas}
 
         ></ButtonIcon>
-
-        
       </div>
 
       {productosRestantes.length === 0 && (
@@ -112,127 +135,123 @@ export const TablaCompras = ({
       )}
       
       
-      <table className={`${styles.TableStyle} ${styles.TablaVentas}`}>
+      <table className={`${styles.TableStyle} ${styles.TablaCompras}`}>
         <thead className={styles.theadStyleFactura}>
           <tr className={styles.thStyleFactura}>
             <th>No</th>
             <th>Producto</th>
             <th>Cantidad</th>
-            <th>Precio Unitario</th>
-            <th>Descuento (Q)</th>
-            <th>IVA (12%)</th>
-            <th>Subtotal</th>
+            <th>Lote</th>
+            <th>Fecha de vencimiento</th>
+            <th>Precio de costo(Q)</th>
+            <th>Precio de venta (Q)</th>
+            <th>Subtotal (costo)</th>
             <th>Eliminar</th>
           </tr>
         </thead>
-        <tbody className={styles.tbodyStyle}>
-          {lineas.map((linea, i) => (
-            <tr key={linea.id}>
-              <td>{i + 1}</td>
 
-              <td  className={styles.thStyle}>
-                <select
-                  value={linea.productoId}
-                  onChange={(e) => actualizarLinea(i, 'productoId', e.target.value)}
-                >
-                  <option value="">Seleccionar</option>
-                  {productosDisponibles.map((producto) => {
-                    const yaUsado = productoYaAgregado(producto.id) && producto.id !== parseInt(linea.productoId);
-                   
-                    const deshabilitado = (yaUsado) && producto.id !== parseInt(linea.productoId);
 
-                    return (
-                      <option
-                        key={producto.id}
-                        value={producto.id}
-                        disabled={deshabilitado}
-                      >
-                        {producto.nombre}
-                      </option>
-                    );
-                  })}
+       <tbody className={styles.tbodyStyle}>
+        {lineas.map((linea, i) => (
+          <tr key={linea.id}>
+            <td>{i + 1}</td>
 
-                </select>
-              </td>
-              <td>
-                {/**Input de cantidad */}
+            {/* Producto */}
+            <td className={styles.thStyle}>
+                            
+              <select
+                value={String(linea.productoId || '')} // forzamos string
+                onChange={(e) => {
+                  //console.log('Seleccionado (en onChange):', e.target.value);
+                  handleChangeProducto(i, e.target.value);
+                }}
+              >
+                <option value="">Seleccionar</option>
+                {productosDisponibles.map((producto) => {
+                  const yaUsado = productoYaAgregado(producto.id, i) && producto.id !== parseInt(linea.productoId);
+                  const deshabilitado = yaUsado;
+                  return (
+                    <option
+                      key={producto.id}
+                      value={String(producto.id)} // value string
+                      disabled={deshabilitado}
+                    >
+                      {producto.nombre}
+                    </option>
+                  );
+                })}
+              </select>
 
-                <div className={styles.inputCantidadWrapper}>
-                  <button
-                    type="button"
-                    onClick={() => actualizarLinea(i, 'cantidad', Math.max(1, parseInt(linea.cantidad) - 1))}
-                    className={styles.botonCantidadFacturaVenta}
-                  >
-                    <FontAwesomeIcon 
-                      icon={faCircleMinus}
-                      className={styles.IconPlusMin}
-                    ></FontAwesomeIcon>
-                  </button>
+            </td>
 
-                  <input
-                    type="number"
-                    min="1"
-                    value={linea.cantidad}
-                    onChange={(e) => actualizarLinea(i, 'cantidad', e.target.value)}
-                    className={styles.InputTableFactura}
-                  />
+            {/* Cantidad */}
+            <td>
+              <input
+                className={styles.InputTableFactura}
+                type="number"
+                min="1"
+                value={linea.cantidad}
+                onChange={(e) => actualizarLinea(i, 'cantidad', e.target.value)}
+              />
+            </td>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const maxStock = parseInt(linea.stock_actual) || Infinity;
-                      const nuevaCantidad = Math.min(parseInt(linea.cantidad) + 1, maxStock);
-                      actualizarLinea(i, 'cantidad', nuevaCantidad);
-                    }}
-                    className={styles.botonCantidadFacturaVenta}
-                  >
+            {/* Lote */}
+            <td>
+              <input
+                className={styles.InputTableFactura}
+                type="text"
+                placeholder="Lote"
+                value={linea.lote || ''}
+                onChange={(e) => actualizarLinea(i, 'lote', e.target.value)}
+              />
+            </td>
 
-                    
-                    <FontAwesomeIcon 
-                      icon={faCirclePlus}
-                      className={styles.IconPlusMin}
-                    ></FontAwesomeIcon>
-                  </button>
-      
-                </div>
-                {linea.cantidad >= linea.stock_actual && (
-                      <small style={{ color: "red" }}>Stock máximo alcanzado</small>
-                    )}
-              </td>
-              
-              <td>Q{parseFloat(linea.precio_unitario).toFixed(2)}</td>
-              <td>
-                <input
-                  className={styles.InputTableFactura}
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={linea.descuento}
-                  onChange={(e) => actualizarLinea(i, 'descuento', e.target.value)}
-                />
-              </td>
+            <td>
+            
+              <DatePicker
+                selected={linea.fecha_vencimiento}
+                onChange={(date) => actualizarLinea(i, 'fecha_vencimiento', date)}
+                dateFormat="dd/MM/yyyy"
+                placeholderText="Fecha"
+                className={`${styles.InputTableFactura2} ${styles.fechaInput}`} // usa tu clase existente para mantener estilos
+              />
+            </td>
 
-              <td>
-                  Q{(
-                    parseFloat(linea.precio_unitario) -
-                    parseFloat(linea.precio_unitario) / 1.12
-                  ).toFixed(2)}
-                </td>
-                              
-              <td>Q{linea.subtotal.toFixed(2)}</td>
-              <td >
-                <button onClick={() => eliminarLinea(i)}
-                className={styles.buttonDeleteTable}
-                  >
-                  <FontAwesomeIcon 
-                    icon={faTrash}
-                    className={styles.IconStyle2}
-                  ></FontAwesomeIcon>
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
+            {/* Precio costo */}
+            <td>
+              <input
+                className={styles.InputTableFactura}
+                type="number"
+                min="0.01"
+                value={linea.precio_costo}
+                onChange={(e) => actualizarLinea(i, 'precio_costo', e.target.value)}
+              />
+            </td>
+
+            {/* Precio venta */}
+            <td>
+              <input
+                className={styles.InputTableFactura}
+                type="number"
+                min="0.01"
+                value={linea.precio_venta}
+                onChange={(e) => actualizarLinea(i, 'precio_venta', e.target.value)}
+              />
+            </td>
+
+            {/* Subtotal (costo) */}
+            <td>Q{(linea.subtotal || 0).toFixed(2)}</td>
+
+            {/* Eliminar */}
+            <td>
+              <button onClick={() => eliminarLinea(i)} className={styles.buttonDeleteTable}>
+                <FontAwesomeIcon icon={faTrash} className={styles.IconStyle2} />
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+
       </table>
 
       

@@ -33,8 +33,8 @@ const Ventas = () => {
     const { data, loading, error } = useFetch(url, {headers: { 'Authorization': `Bearer ${token}` }}, [token, localSeleccionado]);
    
     const datosVentas = Array.isArray(data) ? data : [];    //Se guardan los datos en un array
-    console.log("datosVentas");
-    console.log(datosVentas);
+    //console.log("datosVentas");
+    //console.log(datosVentas);
 
     
  
@@ -188,8 +188,6 @@ const Ventas = () => {
   }
 
   
-
-   
 
 
   const resetFiltros = () => {

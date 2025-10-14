@@ -38,12 +38,13 @@
 .inputCantidadWrapper{
   display: flex;
   flex-direction: row;
-  align-items: center;    
+  align-items: center;   
+  justify-content: center; 
   gap: 5px;
 }
 
 .InputTableFactura{
-  display: flex;
+  
   border: none;
 
   background-color: #e6e7ec89;
@@ -54,6 +55,7 @@
   border-radius: 10px;
   width: 100%;
 }
+
 
 .botonAgregar{
   display: flex;
@@ -83,11 +85,20 @@
 
 .configuracionTexto {
   text-align: left;
+  white-space: normal !important;
+  vertical-align: top !important;
+  overflow: visible;
+  text-overflow: clip;
+  max-width: 200px;
+
+
 }
 
 .configuracionNumeros {
-  width: 100%;
+
+  max-width: 100px;
   text-align: right !important;
+  vertical-align: top !important;
   /* font-family: 'Consolas', 'Courier New', monospace;
   font-weight:lighter !important; */
 }
@@ -341,6 +352,130 @@ h3 {
   background-color: #e3e6f0;
   max-width: 60px;
   text-align: center;
+}
+
+
+
+
+/* ESTILOS SOLO PARA LA TABLA DE VENTAS */
+.TablaCompras {
+  background-color: #f8f9fc; /* un fondo diferente para identificarla */
+  
+  border-radius: 10px;
+}
+
+.TablaCompras th,
+.TablaCompras td {
+  padding: 0.8rem 0.5rem;
+
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+}
+
+.TablaCompras thead {
+  background-color: #5a60a5;
+  color: white;
+   /* position: sticky;
+  top: 0;
+  z-index: 2; */
+} 
+
+.TablaCompras tbody tr:hover {
+  background-color: #dce0f3;
+}
+
+.TablaCompras select,
+.TablaCompras input {
+  font-size: 14px;
+  padding: 4px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.TablaCompras .buttonDeleteTable {
+  color: #c52e2c;
+  cursor: pointer;
+}
+
+.TablaCompras .InputTableFactura2 {
+  display: flex;
+  border: none;
+
+  background-color: #e3e6f0;
+  min-width: 100px;
+
+  text-align: center;
+  justify-content: center;
+  border-radius: 5px;
+
+  max-width: 100px !important;
+
+ 
+}
+
+
+.TablaCompras .InputTableFactura {
+  background-color: #e3e6f0;
+  max-width: 60px;
+  text-align: center;
+}
+
+.selectCVContainer {
+  position: relative;
+  display: block;
+}
+
+.selectCVInput {
+  width: 100%;
+  min-width: 200px;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  background: white;
+  cursor: pointer;
+  font-family:Arial, Helvetica, sans-serif;
+  font-size: 14px;
+}
+
+.selectCVDropdown {
+  position: absolute;
+  background: white;
+  border: 1px solid #ccc;
+  border-top: none;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 9999;
+  font-family:Arial, Helvetica, sans-serif;
+  font-size: 14px;
+}
+
+.selectCVOption {
+  padding: 8px 10px;
+  cursor: pointer;
+  font-family:Arial, Helvetica, sans-serif;
+  font-size: 14px;
+}
+
+.selectCVOption:hover {
+  background-color: #eee;
+  font-family:Arial, Helvetica, sans-serif;
+  font-size: 14px;
+}
+
+.disabled {
+  color: #aaa;
+  pointer-events: none;
+  font-family:Arial, Helvetica, sans-serif;
+  font-size: 14px;
+}
+
+.noOptions {
+  padding: 8px 10px;
+  color: #888;
+  font-family:Arial, Helvetica, sans-serif;
+  font-size: 14px;
 }
 
 

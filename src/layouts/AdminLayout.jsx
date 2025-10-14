@@ -29,19 +29,41 @@ export default function AdminLayout() {
   const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false);
 
   const variantMap = {
+    
     "/admin/dashboard": "blue",
     "/admin/mi-perfil": "blue",
     "/admin/archivos": "orange",
-    "/admin/calendario": "yellow",
+    "/admin/historial-vc": "transparent",
+    "/admin/configurar-ec": "blue",
+    "/admin/inventario": "blue",
+    "/admin/calendario": "transparent",
+    "/admin/visitadores-medicos": "blue",
+ 
+  };
+
+  const variantMapPositionMirrored = {
+    "/admin/dashboard": false,
+    "/admin/mi-perfil": false,
+    "/admin/archivos": true,
+    "/admin/configurar-ec": true,
+    "/admin/inventario": true,
+    "/admin/visitadores-medicos": true,
+
   };
 
   const variant = variantMap[pathname] || "default";
+  const mirrored = variantMapPositionMirrored[pathname] || false;
+
   const [selectedLocal, setSelectedLocal] = useState(0);
   const locales = ["Local 1", "Local 2"];
 
   console.log("AdminLayout renderizado; selectedLocal:", selectedLocal);
   return (
-    <BackgroundCross variant={variantMap[pathname] || "default"} className="admin-background">
+    <BackgroundCross 
+      variant={variantMap[pathname] || "default"} 
+      mirrored={mirrored} 
+      className="admin-background"
+    >
       <div className={`admin-layout ${rightPanelCollapsed ? 'right-collapsed' : ''}`}>
         <Navbar items={adminItems} />
         <main

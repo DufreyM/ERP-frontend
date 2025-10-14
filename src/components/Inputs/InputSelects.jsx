@@ -14,7 +14,7 @@ const InputSelects = ({
     opcions
 }) => {
     const [abierto, setAbierto] = useState(false);
-    console.log("VALUE:", value, "Opcions:", opcions);
+    //console.log("VALUE:", value, "Opcions:", opcions);
     
 
     return (
