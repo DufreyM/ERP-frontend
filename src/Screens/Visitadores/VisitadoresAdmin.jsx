@@ -11,8 +11,10 @@ import OrderBy from "../../components/OrderBy/OrderBy";
 import { useOrderBy } from "../../hooks/useOrderBy";
 import { useFetch } from "../../utils/useFetch";
 import { getToken } from "../../services/authService";
-import { faUser, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faSearch, faEnvelope, faCalendar, faPhone } from '@fortawesome/free-solid-svg-icons';
 import InputSearch from "../../components/Inputs/InputSearch";
+import InputSelects from "../../components/Inputs/InputSelects";
+import InputDates from "../../components/Inputs/InputDates";
 
 const VisitadoresAdmin = () => {
   const { selectedLocal } = useOutletContext();
@@ -135,29 +137,42 @@ const VisitadoresAdmin = () => {
   const closeEditarVisitador = () => {
     setEditarVisitador(false);
     setVisitadorAEditar(null);
+    // Limpiar formulario al cerrar
+    setFormVisitador({
+      nombre: '',
+      apellido: '',
+      correo: '',
+      telefono_fijo: '',
+      telefono_movil: '',
+      fecha_nacimiento: '',
+      proveedor_id: '',
+      contrasena: '',
+      documento: null
+    });
   };
 
 
   // Cargar datos al formulario al abrir editar
   useEffect(() => {
-  if (visitadorAEditar) {
-    setFormVisitador({
-      nombre: visitadorAEditar.usuario?.nombre || '',
-      apellido: visitadorAEditar.usuario?.apellidos || '',
-      correo: visitadorAEditar.usuario?.email || '',
-      telefono_fijo: visitadorAEditar.telefonos?.find(t => t.tipo === 'fijo')?.numero || '',
-      telefono_movil: visitadorAEditar.telefonos?.find(t => t.tipo === 'móvil')?.numero || '',
-      fecha_nacimiento: visitadorAEditar.usuario?.fechanacimiento
-        ? visitadorAEditar.usuario.fechanacimiento.slice(0, 10)
-        : '',
-      proveedor_id: visitadorAEditar.proveedor_id || '',
-      contrasena: '',
-      documento: visitadorAEditar.documento_url
-        ? { url: visitadorAEditar.documento_url, nombre: visitadorAEditar.documento_nombre }
-        : null
-    });
-  }
-}, [visitadorAEditar]);
+    if (visitadorAEditar) {
+      console.log('Cargando datos del visitador:', visitadorAEditar);
+      setFormVisitador({
+        nombre: visitadorAEditar.usuario?.nombre || '',
+        apellido: visitadorAEditar.usuario?.apellidos || '',
+        correo: visitadorAEditar.usuario?.email || '',
+        telefono_fijo: visitadorAEditar.telefonos?.find(t => t.tipo === 'fijo')?.numero || '',
+        telefono_movil: visitadorAEditar.telefonos?.find(t => t.tipo === 'móvil')?.numero || '',
+        fecha_nacimiento: visitadorAEditar.usuario?.fechanacimiento
+          ? visitadorAEditar.usuario.fechanacimiento.slice(0, 10)
+          : '',
+        proveedor_id: visitadorAEditar.proveedor_id || '',
+        contrasena: '',
+        documento: visitadorAEditar.documento_url
+          ? { url: visitadorAEditar.documento_url, nombre: visitadorAEditar.documento_nombre }
+          : null
+      });
+    }
+  }, [visitadorAEditar]);
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -166,66 +181,98 @@ const VisitadoresAdmin = () => {
 
 
   const actualizarVisitador = async () => {
-  if (!visitadorAEditar || !visitadorAEditar.usuario) {
-    alert("El visitador no tiene datos de usuario cargados.");
-    return;
-  }
-
-  const { usuario } = visitadorAEditar;
-
-  const telefonoFijo = formVisitador.telefono_fijo?.trim();
-  const telefonoMovil = formVisitador.telefono_movil?.trim();
-
-  const updateData = {
-    proveedor_id: Number(formVisitador.proveedor_id) || null,
-    usuario: {
-      id: Number(usuario.id),
-      nombre: formVisitador.nombre?.trim() || usuario.nombre,
-      apellidos: formVisitador.apellido?.trim() || usuario.apellidos,
-      email: formVisitador.correo?.trim() || usuario.email,
-      fechanacimiento: formVisitador.fecha_nacimiento || usuario.fechanacimiento,
-      rol_id: usuario.rol_id,
-      status: usuario.status,
-      contrasena: usuario.contrasena || "unchanged"
-    },
-    telefonos: [
-      ...(telefonoFijo ? [{
-        id: visitadorAEditar.telefonos?.find(t => t.tipo === 'fijo')?.id ?? null,
-        numero: telefonoFijo,
-        tipo: 'fijo'
-      }] : []),
-      ...(telefonoMovil ? [{
-        id: visitadorAEditar.telefonos?.find(t => t.tipo === 'móvil')?.id ?? null,
-        numero: telefonoMovil,
-        tipo: 'móvil'
-      }] : [])
-    ]
-  };
-
-  console.log("Payload enviado:", updateData);
-
-  try {
-    const resp = await fetch(`http://localhost:3000/visitadores/${visitadorAEditar.id}`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': getToken() ? `Bearer ${getToken()}` : '',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(updateData),
-    });
-
-    if (!resp.ok) {
-      const errorText = await resp.text();
-      throw new Error(errorText || `Error al actualizar (HTTP ${resp.status})`);
+    // Validaciones
+    if (!visitadorAEditar || !visitadorAEditar.usuario) {
+      alert("El visitador no tiene datos de usuario cargados.");
+      return;
     }
 
-    await refetch();
-    closeEditarVisitador();
-  } catch (e) {
-    console.error("❌ Error al actualizar visitador:", e);
-    alert(`No se pudo actualizar el visitador. ${e.message || ''}`);
-  }
-};
+    if (!getToken()) {
+      alert('No autorizado. Inicie sesión para continuar.');
+      return;
+    }
+
+    // Validar campos requeridos
+    if (!formVisitador.nombre?.trim()) {
+      alert('El nombre es obligatorio.');
+      return;
+    }
+
+    if (!formVisitador.apellido?.trim()) {
+      alert('Los apellidos son obligatorios.');
+      return;
+    }
+
+    if (!formVisitador.correo?.trim()) {
+      alert('El correo electrónico es obligatorio.');
+      return;
+    }
+
+    // Validar formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formVisitador.correo?.trim())) {
+      alert('Por favor ingrese un correo electrónico válido.');
+      return;
+    }
+
+    const { usuario } = visitadorAEditar;
+
+    const telefonoFijo = formVisitador.telefono_fijo?.trim();
+    const telefonoMovil = formVisitador.telefono_movil?.trim();
+
+    const updateData = {
+      proveedor_id: Number(formVisitador.proveedor_id) || null,
+      usuario: {
+        id: Number(usuario.id),
+        nombre: formVisitador.nombre.trim(),
+        apellidos: formVisitador.apellido.trim(),
+        email: formVisitador.correo.trim(),
+        fechanacimiento: formVisitador.fecha_nacimiento || usuario.fechanacimiento,
+        rol_id: usuario.rol_id,
+        status: usuario.status,
+        contrasena: "unchanged" // No cambiar contraseña en edición
+      },
+      telefonos: [
+        ...(telefonoFijo ? [{
+          id: visitadorAEditar.telefonos?.find(t => t.tipo === 'fijo')?.id ?? null,
+          numero: telefonoFijo,
+          tipo: 'fijo'
+        }] : []),
+        ...(telefonoMovil ? [{
+          id: visitadorAEditar.telefonos?.find(t => t.tipo === 'móvil')?.id ?? null,
+          numero: telefonoMovil,
+          tipo: 'móvil'
+        }] : [])
+      ]
+    };
+
+    console.log("Payload enviado:", updateData);
+
+    try {
+      const resp = await fetch(`http://localhost:3000/visitadores/${visitadorAEditar.id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${getToken()}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData),
+      });
+
+      if (!resp.ok) {
+        const errorText = await resp.text();
+        throw new Error(errorText || `Error al actualizar (HTTP ${resp.status})`);
+      }
+
+      const result = await resp.json();
+      console.log('Visitador actualizado:', result);
+      await refetch();
+      closeEditarVisitador();
+      alert('Visitador actualizado correctamente');
+    } catch (e) {
+      console.error("❌ Error al actualizar visitador:", e);
+      alert(`No se pudo actualizar el visitador. ${e.message || ''}`);
+    }
+  };
 
   // Eliminar visitador
   const eliminarVisitador = async () => {
@@ -248,24 +295,31 @@ const VisitadoresAdmin = () => {
 
   // Toggle status activo/inactivo
   const onToggleStatus = async (visitador) => {
-  const original = visitadoresData.find(v => v.id === visitador.id) || visitador;
-  const nuevoStatus = String(original.status).toLowerCase() === 'activo' ? 'deactivate' : 'activate';
+    const original = visitadoresData.find(v => v.id === visitador.id) || visitador;
+    const nuevoStatus = String(original.status).toLowerCase() === 'activo' ? 'deactivate' : 'activate';
 
-  try {
-    const resp = await fetch(`http://localhost:3000/visitadores/${original.id}/${nuevoStatus}`, {
-      method: 'PATCH',
-      headers: {
-        'Authorization': getToken() ? `Bearer ${getToken()}` : '',
-        'Content-Type': 'application/json'
+    try {
+      const resp = await fetch(`http://localhost:3000/visitadores/${original.id}/${nuevoStatus}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': getToken() ? `Bearer ${getToken()}` : '',
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!resp.ok) {
+        const errorText = await resp.text();
+        throw new Error(errorText || `Error al cambiar estado (HTTP ${resp.status})`);
       }
-    });
-    if (!resp.ok) throw new Error('Error al cambiar estado');
-    await refetch();
-  } catch (e) {
-    console.error(e);
-    alert('No se pudo cambiar el estado');
-  }
-};
+      
+      const result = await resp.json();
+      console.log('Estado cambiado:', result);
+      await refetch();
+    } catch (e) {
+      console.error('Error al cambiar estado:', e);
+      alert(`No se pudo cambiar el estado: ${e.message}`);
+    }
+  };
 
 
 
@@ -488,18 +542,70 @@ const VisitadoresAdmin = () => {
         onClick={actualizarVisitador}
       >
         <div className={styles.modalContenido}>
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px',maxWidth:600,margin:'0 auto'}}>
-            <input name="nombre" value={formVisitador.nombre} onChange={handleFormChange} placeholder="Nombre" />
-            <input name="apellido" value={formVisitador.apellido} onChange={handleFormChange} placeholder="Apellido" />
-            <input name="correo" value={formVisitador.correo} onChange={handleFormChange} placeholder="Correo" />
-            <input name="telefono_fijo" value={formVisitador.telefono_fijo} onChange={handleFormChange} placeholder="Teléfono Fijo" />
-            <input name="telefono_movil" value={formVisitador.telefono_movil} onChange={handleFormChange} placeholder="Teléfono Móvil" />
-            <input name="fecha_nacimiento" type="date" value={formVisitador.fecha_nacimiento} onChange={handleFormChange} />
-            <select name="proveedor_id" value={formVisitador.proveedor_id} onChange={handleFormChange}>
-              <option value="">Seleccionar proveedor</option>
-              {opcionesProveedores.map(p => <option key={p.id} value={p.id}>{p.nombre}</option>)}
-            </select>
-            <input name="documento" type="file" accept=".pdf" onChange={(e) => setFormVisitador(prev => ({...prev, documento: e.target.files[0]}))} />
+          <div style={{display:'grid',gridTemplateColumns:'1fr',gap:'12px',maxWidth:560,margin:'0 auto', width:'100%'}}>
+            <IconoInput
+              icono={faUser}
+              name="nombre"
+              value={formVisitador.nombre}
+              onChange={handleFormChange}
+              placeholder="Nombre"
+              type="text"
+            />
+            <IconoInput
+              icono={faUser}
+              name="apellido"
+              value={formVisitador.apellido}
+              onChange={handleFormChange}
+              placeholder="Apellidos"
+              type="text"
+            />
+            <IconoInput
+              icono={faEnvelope}
+              name="correo"
+              value={formVisitador.correo}
+              onChange={handleFormChange}
+              placeholder="Correo electrónico"
+              type="email"
+            />
+            <IconoInput
+              icono={faPhone}
+              name="telefono_fijo"
+              value={formVisitador.telefono_fijo}
+              onChange={handleFormChange}
+              placeholder="Teléfono Fijo"
+              type="text"
+            />
+            <IconoInput
+              icono={faPhone}
+              name="telefono_movil"
+              value={formVisitador.telefono_movil}
+              onChange={handleFormChange}
+              placeholder="Teléfono Móvil"
+              type="text"
+            />
+            <InputDates
+              icono={faCalendar}
+              placeholder="Fecha de nacimiento"
+              selected={formVisitador.fecha_nacimiento ? new Date(formVisitador.fecha_nacimiento) : null}
+              onChange={(date) => setFormVisitador(prev => ({...prev, fecha_nacimiento: date ? date.toISOString().slice(0,10) : ''}))}
+            />
+            <InputSelects
+              icono={faUser}
+              placeholder="Proveedor"
+              name="proveedor_id"
+              value={formVisitador.proveedor_id}
+              onChange={handleFormChange}
+              opcions={opcionesProveedores.map(p => ({ value: p.id, label: p.nombre }))}
+            />
+            <IconoInput
+              icono={faUser}
+              name="documento"
+              value=""
+              onChange={(e) => setFormVisitador(prev => ({...prev, documento: e.target.files[0]}))}
+              placeholder="Documento PDF"
+              type="file"
+              accept=".pdf"
+            />
           </div>
         </div>
       </Popup>
