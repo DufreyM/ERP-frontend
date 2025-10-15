@@ -1,0 +1,59 @@
+/* StyleElements.css 
+Conforma la modificación los elementos como el logo y los iconos y algunos elementos visuales
+Autor: Melisa
+Ultima modificación: 22/4/2025 
+*/
+
+.disposicion {
+    display: flex;
+    width: 100vw;
+    justify-content: center;
+    align-items: center;
+}
+
+.encabezado{
+    width: 420px;
+    display: flex; 
+    justify-content: space-between;
+    align-items: center;
+}
+
+.contenedor1{
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    height: 150px;
+    width: 400px;
+    z-index: 0;
+}
+.contenedor{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 200px;
+    height: 100px;
+}
+
+.isotipo {
+    height: 150px;
+    width: auto;
+    z-index: 1;
+}
+
+.logotipo {
+    height: 80px;
+    width: auto;
+    z-index: 0;
+}
+
+.titulo {
+    margin: 0;  
+    padding: 0; 
+    font-family: 'Segoe UI';
+    font-size: 30px;
+    font-weight: bold;
+    color: #5a60a5;
+    text-align: center;
+    z-index: 1;
+}
