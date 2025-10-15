@@ -47,7 +47,7 @@ export const CalendarScreen= () =>{
     const token = getToken();                       //Se solicita el tocken del inicio de sesión ya que es solicitado en el fetch
     const { selectedLocal } = useOutletContext();   //Se llama al contexto (En qué local se está)
     const localSeleccionado = selectedLocal + 1 ;   //Se suma 1 ya que el indice empieza en 0, pero en la base de datos comienza con 1
-    const url = `http://localhost:3000/api/calendario?local_id=${localSeleccionado}`;   //url para los eventos dependiendo del local
+    const url = `${import.meta.env.VITE_API_URL}/api/calendario?local_id=${localSeleccionado}`;   //url para los eventos dependiendo del local
 
     //Se llama a traer la función useFetch (utils/useFetch) que retorna la carga de datos, y existe la opción de forzar un refetch manual en caso de modificaciones a los eventos.
     const { data, loading, error, refetch } = useFetch(url, {

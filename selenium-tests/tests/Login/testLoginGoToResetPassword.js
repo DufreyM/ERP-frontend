@@ -6,7 +6,7 @@ async function testLoginGoToResertPassword() {
   console.log("📌 Navegar a la pantalla de visitadores médicos:");
 
   try {
-    await driver.get("http://localhost:3001");
+    await driver.get(`${import.meta.env.VITE_API_URL}`);
 
     // Esperar el body para confirmar que cargó la página
     await driver.wait(until.elementLocated(By.tagName('body')), 5000);

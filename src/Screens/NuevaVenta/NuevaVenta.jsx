@@ -26,7 +26,7 @@ const NuevaVenta = () => {
   const token = getToken(); 
   const { selectedLocal } = useOutletContext();
   const localSeleccionado = selectedLocal + 1 ;
-  const {data: productos, loading, error } = useFetch(`http://localhost:3000/api/productos/con-stock?local_id=${localSeleccionado}`, {
+  const {data: productos, loading, error } = useFetch(`${import.meta.env.VITE_API_URL}/api/productos/con-stock?local_id=${localSeleccionado}`, {
       headers: {'Authorization': `Bearer ${token}`}
   });
 
@@ -117,7 +117,7 @@ const NuevaVenta = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:3000/clientes?nit=${nitCliente}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/clientes?nit=${nitCliente}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -202,7 +202,7 @@ const NuevaVenta = () => {
       }
 
 
-    const response = await fetch("http://localhost:3000/ventas", {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/ventas`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

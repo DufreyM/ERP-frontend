@@ -121,7 +121,7 @@ const Visitadores = () => {
             console.log('JSON stringificado:', JSON.stringify(visitadorData, null, 2));
             console.log('Datos de prueba:', testData);
 
-            const response = await fetch(`http://localhost:3000/visitadores`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/visitadores`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

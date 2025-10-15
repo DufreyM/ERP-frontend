@@ -27,7 +27,7 @@ const NuevaCompra = () => {
   const token = getToken(); 
   const { selectedLocal } = useOutletContext();
   const localSeleccionado = selectedLocal + 1 ;
-  const {data: productos, loading, error } = useFetch(`http://localhost:3000/api/productos/con-stock?local_id=${localSeleccionado}`, {
+  const {data: productos, loading, error } = useFetch(`${import.meta.env.VITE_API_URL}/api/productos/con-stock?local_id=${localSeleccionado}`, {
       headers: {'Authorization': `Bearer ${token}`}
   });
   const [lineas, setLineas] = useState([]);
@@ -52,7 +52,7 @@ const NuevaCompra = () => {
 
 
   //proveedores
-  const {data: proveedores, loadingP, errorP } = useFetch(`http://localhost:3000/api/proveedor`, {
+  const {data: proveedores, loadingP, errorP } = useFetch(`${import.meta.env.VITE_API_URL}/api/proveedor`, {
       headers: {'Authorization': `Bearer ${token}`}
   });
     const [agregandoProveedor, setAgregandoProveedor] = useState(false);
@@ -106,7 +106,7 @@ const NuevaCompra = () => {
       };
       
 
-      const response = await fetch("http://localhost:3000/api/proveedor", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/proveedor`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -380,7 +380,7 @@ const NuevaCompra = () => {
   try {
       
       
-    const res = await fetch('http://localhost:3000/compras', {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/compras`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

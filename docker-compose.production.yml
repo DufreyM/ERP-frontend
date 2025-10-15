@@ -1,0 +1,11 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+    container_name: react_vite_frontend_prod
+    ports:
+      - "3001:80"
+    environment:
+      VITE_API_URL: ${VITE_API_URL}
+    restart: unless-stopped

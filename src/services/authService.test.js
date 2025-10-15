@@ -31,7 +31,7 @@ describe('Auth Module', () => {
 
     const result = await login('test@example.com', '123456');
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:3000/auth/login', expect.objectContaining({
+    expect(global.fetch).toHaveBeenCalledWith(`${import.meta.env.VITE_API_URL}/auth/login`, expect.objectContaining({
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: 'test@example.com', contrasena: '123456' })
@@ -61,7 +61,7 @@ describe('Auth Module', () => {
 
     const data = await fetchProtectedData();
 
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:3000/protected', {
+    expect(global.fetch).toHaveBeenCalledWith(`${import.meta.env.VITE_API_URL}/protected`, {
       headers: { Authorization: 'Bearer test-token' }
     });
     expect(data).toEqual({ data: 'protected' });

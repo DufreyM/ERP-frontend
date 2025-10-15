@@ -34,7 +34,7 @@ const MiPerfil = () => {
   const [isEditing, setIsEditing] = useState(false);
   const fileInputRef = useRef(null);
 
-  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+  const API_BASE_URL = `${import.meta.env.VITE_API_URL}`
 
   // Función para obtener el rol del usuario desde el token
   const getUserRole = () => {

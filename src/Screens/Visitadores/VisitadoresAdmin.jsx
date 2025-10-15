@@ -54,7 +54,7 @@ const VisitadoresAdmin = () => {
     if (page) params.set('page', String(page));
     if (limit) params.set('limit', String(limit));
     
-    return `http://localhost:3000/visitadores?${params.toString()}`;
+    return `${import.meta.env.VITE_API_URL}/visitadores?${params.toString()}`;
   }, [shouldFetch, localSeleccionado, proveedorSeleccionado, statusSeleccionado, page, limit]);
 
   // Memoizar las opciones de headers para evitar recreación
@@ -251,7 +251,7 @@ const VisitadoresAdmin = () => {
     if (esActivo) {
       // Cambiar de activo a inactivo = PATCH deactivate
       try {
-        const resp = await fetch(`http://localhost:3000/visitadores/${original.id}/deactivate`, {
+        const resp = await fetch(`${import.meta.env.VITE_API_URL}/visitadores/${original.id}/deactivate`, {
           method: 'PATCH',
           headers: {
             'Authorization': getToken() ? `Bearer ${getToken()}` : '',
@@ -271,7 +271,7 @@ const VisitadoresAdmin = () => {
     } else {
       // Cambiar de inactivo a activo = PATCH activate
       try {
-        const resp = await fetch(`http://localhost:3000/visitadores/${original.id}/activate`, {
+        const resp = await fetch(`${import.meta.env.VITE_API_URL}/visitadores/${original.id}/activate`, {
           method: 'PATCH',
           headers: {
             'Authorization': getToken() ? `Bearer ${getToken()}` : '',
@@ -355,7 +355,7 @@ const VisitadoresAdmin = () => {
   const eliminarVisitador = async () => {
     if (!visitadorAEliminar) return;
     try {
-      const resp = await fetch(`http://localhost:3000/visitadores/${visitadorAEliminar.id}`, {
+      const resp = await fetch(`${import.meta.env.VITE_API_URL}/visitadores/${visitadorAEliminar.id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': getToken() ? `Bearer ${getToken()}` : '',
@@ -494,7 +494,7 @@ const VisitadoresAdmin = () => {
     };
 
     try {
-      const resp = await fetch(`http://localhost:3000/visitadores/${visitadorAEditar.id}`, {
+      const resp = await fetch(`${import.meta.env.VITE_API_URL}/visitadores/${visitadorAEditar.id}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${getToken()}`,

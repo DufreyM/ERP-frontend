@@ -1,7 +1,5 @@
-const API_BASE_URL = 'http://localhost:3000';
-
 export async function login(email, password) {
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -37,7 +35,7 @@ export async function fetchProtectedData() {
         throw new Error('No authentication token found');
     }
 
-    const response = await fetch(`${API_BASE_URL}/protected`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/protected`, {
         headers: {
             'Authorization': `Bearer ${token}`
         }
@@ -56,7 +54,7 @@ export async function changePassword(currentPassword, newPassword) {
         throw new Error('No authentication token found');
     }
 
-    const response = await fetch(`${API_BASE_URL}/auth/change-password`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/change-password`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

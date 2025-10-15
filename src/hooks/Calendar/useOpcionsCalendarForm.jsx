@@ -30,13 +30,13 @@ export const useOpcionsCalendarForm = (localSeleccionado, token) => {
   const [opcionesVisitadores, setOpcionesVisitadores] = useState([]);
 
   useEffect(() => { 
-    getOptions("http://localhost:3000/api/calendario/tipos-evento", i => ({ value: i.id, label: i.nombre }))
+    getOptions(`${import.meta.env.VITE_API_URL}/api/calendario/tipos-evento`, i => ({ value: i.id, label: i.nombre }))
       .then(setOpcionesTipoRecordatorio);
 
-    getOptions("http://localhost:3000/api/calendario/estados", i => ({ value: i.id, label: i.nombre }))
+    getOptions(`${import.meta.env.VITE_API_URL}/api/calendario/estados`, i => ({ value: i.id, label: i.nombre }))
       .then(setOpcionesEstados);
       
-    getOptionsToken(`http://localhost:3000/visitadores/por-local/${localSeleccionado}`, i => ({ value: i.id, label: i.nombre }), token)
+    getOptionsToken(`${import.meta.env.VITE_API_URL}/visitadores/por-local/${localSeleccionado}`, i => ({ value: i.id, label: i.nombre }), token)
       .then(setOpcionesVisitadores);
   }, [localSeleccionado]);
 

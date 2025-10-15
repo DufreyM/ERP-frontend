@@ -26,7 +26,7 @@ const Compras = () => {
     const { selectedLocal } = useOutletContext();   //Se llama al contexto (En qué local se está)
     const localSeleccionado = selectedLocal >= 0 ? selectedLocal + 1 : null;   //Se suma 1 ya que el indice empieza en 0, pero en la base de datos comienza con 1
     const url = localSeleccionado
-    ? `http://localhost:3000/compras?local_id=${localSeleccionado}`
+    ? `${import.meta.env.VITE_API_URL}/compras?local_id=${localSeleccionado}`
     : null;  //url para los eventos dependiendo del local
 
     //Se llama a traer la función useFetch (utils/useFetch) que retorna la carga de datos, y existe la opción de forzar un refetch manual en caso de modificaciones a los eventos.

@@ -32,7 +32,7 @@ export const useOpcionesUsuarioDinamicos = ({
         if (!data || data.length === 0) return;
         //if (!data || !tipoUserKeyMap) return;
 
-        getOptions("http://localhost:3000/api/roles", item => ({
+        getOptions(`${import.meta.env.VITE_API_URL}/api/roles`, item => ({
             value: item.id,
             label: item.nombre,
 

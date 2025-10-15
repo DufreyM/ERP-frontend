@@ -50,7 +50,7 @@ const EmpleadosClientes = () => {
 
   const token = getToken();
   const shouldFetch = Boolean(token);
-  const empleadosUrl = shouldFetch ? `http://localhost:3000/api/empleados?${params.toString()}` : null;
+  const empleadosUrl = shouldFetch ? `${import.meta.env.VITE_API_URL}/api/empleados?${params.toString()}` : null;
   const { data: empleadosResponse, loading, error, refetch } = useFetch(
     empleadosUrl,
     {
@@ -196,7 +196,7 @@ const EmpleadosClientes = () => {
       return;
     }
     try {
-      const resp = await fetch('http://localhost:3000/api/empleados', {
+      const resp = await fetch(`${import.meta.env.VITE_API_URL}/api/empleados`, {
         method: 'POST',
         headers: {
           'Authorization': getToken() ? `Bearer ${getToken()}` : '',
@@ -237,7 +237,7 @@ const EmpleadosClientes = () => {
         if (val !== undefined && val !== null && String(val) !== '') acc[key] = val;
         return acc;
       }, {});
-      const resp = await fetch(`http://localhost:3000/api/empleados/${empleadoAEditar.id}`, {
+      const resp = await fetch(`${import.meta.env.VITE_API_URL}/api/empleados/${empleadoAEditar.id}`, {
         method: 'PATCH',
         headers: {
           'Authorization': getToken() ? `Bearer ${getToken()}` : '',
@@ -262,7 +262,7 @@ const EmpleadosClientes = () => {
   const eliminarEmpleado = async () => {
     if (!empleadoAEliminar) return;
     try {
-      const resp = await fetch(`http://localhost:3000/api/empleados/${empleadoAEliminar.id}`, {
+      const resp = await fetch(`${import.meta.env.VITE_API_URL}/api/empleados/${empleadoAEliminar.id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': getToken() ? `Bearer ${getToken()}` : '',
@@ -282,7 +282,7 @@ const EmpleadosClientes = () => {
     const original = empleadosData?.find?.((e) => e.id === empleado.id) || empleado;
     const nuevoStatus = (String(original.status).toLowerCase() === 'activo' || original.status === true) ? 'inactivo' : 'activo';
     try {
-      const resp = await fetch(`http://localhost:3000/api/empleados/${original.id}`, {
+      const resp = await fetch(`${import.meta.env.VITE_API_URL}/api/empleados/${original.id}`, {
         method: 'PATCH',
         headers: {
           'Authorization': getToken() ? `Bearer ${getToken()}` : '',

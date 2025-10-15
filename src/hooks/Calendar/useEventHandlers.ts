@@ -21,6 +21,17 @@ Autor: Melisa
 Última modificación: 17/08/2025
 */
 
+declare global {
+  interface ImportMeta {
+    readonly env: {
+      VITE_API_URL: string;
+    };
+  }
+}
+
+const apiUrl = import.meta.env.VITE_API_URL;
+
+
 interface EventoDatos {
   titulo: string;
   tipo_evento_id: number;
@@ -78,7 +89,7 @@ const obtenerHoraDesdeFecha = (fechaISO: string): string => {
    */
 const crearEvento = async (datosEvento: EventoDatos) => {
     try {
-      const response = await fetch('http://localhost:3000/api/calendario', {
+      const response = await fetch(`${apiUrl}/api/calendario`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -109,7 +120,7 @@ const crearEvento = async (datosEvento: EventoDatos) => {
    */
   const actualizarEvento = async (idEvento: number, datosActualizados: EventoDatos) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/calendario/${idEvento}`, {
+      const response = await fetch(`${apiUrl}/api/calendario/${idEvento}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -141,7 +152,7 @@ const crearEvento = async (datosEvento: EventoDatos) => {
    */
   const HandleEliminarEvento = async (idEvento: number) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/calendario/${idEvento}/marcar-eliminado`, {
+      const response = await fetch(`${apiUrl}/api/calendario/${idEvento}/marcar-eliminado`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,

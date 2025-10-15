@@ -1,7 +1,7 @@
 const { By } = require('selenium-webdriver');
 
 async function loginFlow(driver, username, password) {
-    await driver.get('http://localhost:3001');
+    await driver.get(`${import.meta.env.VITE_API_URL}`);
 
     await driver.findElement(By.css('input[placeholder="Correo"]')).sendKeys(username);
     await driver.findElement(By.css('input[placeholder="Contraseña"]')).sendKeys(password);

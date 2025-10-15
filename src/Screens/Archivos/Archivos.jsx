@@ -30,7 +30,7 @@ const ArchivosScreen = () => {
   const localSeleccionado = selectedLocal + 1 ;
      
   const token = getToken();
-  const {data, loading, error } = useFetch(`http://localhost:3000/documentos-locales?local_id=${localSeleccionado}` , {
+  const {data, loading, error } = useFetch(`${import.meta.env.VITE_API_URL}/documentos-locales?local_id=${localSeleccionado}` , {
       headers: {'Authorization': `Bearer ${token}`}
   });
 
@@ -111,7 +111,7 @@ const ArchivosScreen = () => {
       formData.append('vencimiento', datos.vencimiento);
       formData.append('archivo', datos.archivo); // es un File, no un string
 
-      const response = await fetch('http://localhost:3000/documentos-locales', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/documentos-locales`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -170,7 +170,7 @@ const ArchivosScreen = () => {
 
   const eliminarDocumento = async (id) => {
     try {
-      const response = await fetch(`http://localhost:3000/documentos-locales/${id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/documentos-locales/${id}`, {
         method: 'DELETE',
       });
 
@@ -205,7 +205,7 @@ const ArchivosScreen = () => {
   };
 
   const editarDocumento = async (id, datos) => {
-    const response = await fetch(`http://localhost:3000/documentos-locales/${id}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/documentos-locales/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
