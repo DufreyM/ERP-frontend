@@ -5,9 +5,11 @@ import PopupButton from '../../components/Popup/Popup';
 import styles from './InventarioScreen.module.css';
 import ButtonText from '../../components/ButtonText/ButtonText';
 import ButtonForm from '../../components/ButtonForm/ButtonForm';
+import ButtonHeaders from '../../components/ButtonHeaders/ButtonHeaders';
+import FormTrasladoMedicamentos from '../../components/Forms/FormTrasladoMedicamentos';
 import { useOutletContext } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import OrderBy from '../../components/OrderBy/OrderBy.jsx';
 import { useOrderBy } from '../../hooks/useOrderBy.js';
 import { useFiltroGeneral } from '../../hooks/useFiltroGeneral.js';
@@ -26,6 +28,7 @@ const InventarioScreen = () => {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showTrasladoForm, setShowTrasladoForm] = useState(false);
 
 
   const token = getToken();
@@ -109,6 +112,44 @@ const InventarioScreen = () => {
       alert('Error al eliminar el producto');
     } finally {
       setDeleting(false);
+    }
+  };
+
+  // Función para abrir el formulario de traslado
+  const openTrasladoForm = () => {
+    setShowTrasladoForm(true);
+  };
+
+  // Función para cerrar el formulario de traslado
+  const closeTrasladoForm = () => {
+    setShowTrasladoForm(false);
+  };
+
+  // Función para manejar el éxito del traslado
+  const handleTrasladoSuccess = (result) => {
+    console.log('Traslado completado:', result);
+    // Recargar los productos para reflejar el cambio de stock
+    if (selectedLocal !== undefined && selectedLocal !== null) {
+      setLoading(true);
+      const tokenActual = token;
+      if (tokenActual) {
+        fetch(`${API_BASE_URL}/api/productos/con-stock?local_id=${selectedLocal + 1}`, {
+          headers: {
+            'Authorization': `Bearer ${tokenActual}`,
+          },
+        })
+          .then(res => res.json())
+          .then(data => {
+            const productosArray = Array.isArray(data) ? data : [];
+            setProductos(productosArray);
+            setProductosOriginales(productosArray);
+            setLoading(false);
+          })
+          .catch(() => {
+            setError('Error al recargar productos');
+            setLoading(false);
+          });
+      }
     }
   };
 
@@ -275,6 +316,11 @@ const InventarioScreen = () => {
           selectedOption={sortOption}
           onChange={setSortOption}
         ></OrderBy>
+
+        <ButtonHeaders 
+          text="Trasladar Medicamento"
+          onClick={openTrasladoForm}
+        />
       </div>
       
       <FiltroResumen
@@ -381,6 +427,15 @@ const InventarioScreen = () => {
           </div>
         </PopupButton>
       )}
+
+      {/* Formulario de traslado de medicamentos */}
+      <FormTrasladoMedicamentos
+        isOpen={showTrasladoForm}
+        onClose={closeTrasladoForm}
+        productosDisponibles={productosConvertidos}
+        localActual={selectedLocal + 1}
+        onSuccess={handleTrasladoSuccess}
+      />
     </div>
   );
 };
