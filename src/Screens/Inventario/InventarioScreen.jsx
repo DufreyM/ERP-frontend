@@ -28,6 +28,7 @@ const InventarioScreen = () => {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showTrasladoForm, setShowTrasladoForm] = useState(false);
 
 
   const token = getToken();
