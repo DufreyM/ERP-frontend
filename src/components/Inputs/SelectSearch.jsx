@@ -73,10 +73,14 @@ const SelectSearch = ({
           className={styles.inputStyle}
           placeholder={placeholder}
           value={isOpen ? search : selectedOption?.label || ""}
-      onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => setSearch(e.target.value)}
           onFocus={() => !disabled && setIsOpen(true)}
           disabled={disabled}
           readOnly={disabled}
+          //D???
+          style={{
+            paddingRight: icono ? '60px' : '40px'
+          }}
         />
 
         {/* Íconos */}
@@ -88,10 +92,22 @@ const SelectSearch = ({
             transform: "translateY(-50%)",
             display: "flex",
             gap: "6px",
+            alignItems: "center", //D???
           }}
         >
           {icono && (
-            <span className={styles.iconoStyles}>
+            //<span className={styles.iconoStyles}> MMM
+            <span style={{ //D???
+              position: "absolute",
+              left: "-30px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              cursor: "pointer",
+              pointerEvents: "none",
+              userSelect: "none",
+              color: "#5a60a5",
+              zIndex: 3,
+            }}>
               <FontAwesomeIcon icon={icono} style={{ color: error ? "red" : "#5a60a5" }} />
             </span>
           )}
