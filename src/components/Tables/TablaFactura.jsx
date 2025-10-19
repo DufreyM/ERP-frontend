@@ -122,7 +122,7 @@ export const TablaFactura = ({
             <th>Producto</th>
             <th>Cantidad</th>
             <th>Precio Unitario</th>
-            <th>Descuento (Q)</th>
+            {/* <th>Descuento (Q)</th> */}
             <th>IVA (12%)</th>
             <th>Subtotal</th>
             <th>Eliminar</th>
@@ -222,7 +222,7 @@ export const TablaFactura = ({
               </td>
               
               <td>Q{parseFloat(linea.precio_unitario).toFixed(2)}</td>
-              <td>
+              {/* <td>
                 <input
                   className={styles.InputTableFactura}
                   type="number"
@@ -231,7 +231,7 @@ export const TablaFactura = ({
                   value={linea.descuento}
                   onChange={(e) => actualizarLinea(i, 'descuento', e.target.value)}
                 />
-              </td>
+              </td> */}
 
               <td>
                   Q{(

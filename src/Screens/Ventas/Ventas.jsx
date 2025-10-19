@@ -72,7 +72,7 @@ const Ventas = () => {
     { key: 'producto', titulo: 'Producto', type: 'texto' }, 
     { key: 'cantidad', titulo: 'Cantidad', type: 'numero' },     
     { key: 'precio_unitario', titulo: 'Precio Unitario (Q)', type: 'numero' },
-    { key: 'descuento', titulo: 'Descuento (Q)', type: 'numero' },
+    //{ key: 'descuento', titulo: 'Descuento (Q)', type: 'numero' },
     { key: 'total', titulo: 'Total (Q)', type: 'numero' },
    
     ];
