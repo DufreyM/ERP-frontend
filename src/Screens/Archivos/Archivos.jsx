@@ -171,7 +171,12 @@ const ArchivosScreen = () => {
   const eliminarDocumento = async (id) => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/documentos-locales/${id}`, {
+       
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          // No pongas Content-Type, fetch lo hace con FormData automáticamente
+        },
       });
 
       if (!response.ok) {
