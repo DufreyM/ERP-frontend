@@ -159,9 +159,11 @@ const ArchivosScreen = () => {
       try {
         const respuesta = await subirDocumento(tokenActual, datos);
         console.log('Documento subido:', respuesta);
+      
 
         closeNuevo(); // si tienes un popup para cerrarlo
         //setNotificacion('Documento subido con éxito');
+        window.location.reload();
       } catch (error) {
         console.error('Error al subir documento:', error);
         setErrorMessage('Ocurrió un error al subir el documento.');
