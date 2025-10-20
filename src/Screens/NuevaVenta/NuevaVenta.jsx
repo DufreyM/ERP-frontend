@@ -407,7 +407,7 @@ const NuevaVenta = () => {
 
                 <div>
                   <div className={styles.selectPagoWrapper}>
-                   
+                   bun 
                     <div className={styles.botonesVenta}> 
                       <ButtonHeaders
                         text="Cancelar Venta"

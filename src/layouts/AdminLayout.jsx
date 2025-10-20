@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 import Navbar from '../components/Navbar/Navbar.jsx';
-import RightPanel from "../components/RightPanel/RightPanel.jsx";
+//import RightPanel from "../components/RightPanel/RightPanel.jsx";
 import "./AdminLayout.css";
 import {useState} from "react";
 import { useLocation } from 'react-router-dom';
@@ -22,11 +22,10 @@ const adminItems = [
 
 
 
-
 export default function AdminLayout() {
   const { pathname } = useLocation();
  
-  const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false);
+  //const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false);
 
   const variantMap = {
     
@@ -64,7 +63,7 @@ export default function AdminLayout() {
       mirrored={mirrored} 
       className="admin-background"
     >
-      <div className={`admin-layout ${rightPanelCollapsed ? 'right-collapsed' : ''}`}>
+      <div className={`admin-layout right-collapsed' : ''}`}>
         <Navbar items={adminItems} />
         <main
           className="admin-content"
@@ -75,12 +74,14 @@ export default function AdminLayout() {
             selectedLocal={selectedLocal}
             onSelect={setSelectedLocal}
           />
-          <Outlet context={{ selectedLocal, rightPanelCollapsed}} />
+          <Outlet context={{ selectedLocal,
+            //  rightPanelCollapsed
+             }} />
         </main>
-        <RightPanel
+        {/* <RightPanel
           collapsed={rightPanelCollapsed}
           setCollapsed={setRightPanelCollapsed}
-        />
+        /> */}
       </div>
     </BackgroundCross>
   );
