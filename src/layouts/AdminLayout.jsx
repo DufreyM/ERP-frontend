@@ -23,6 +23,8 @@ const adminItems = [
 
 
 export default function AdminLayout() {
+ 
+
   const { pathname } = useLocation();
  
   //const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false);
@@ -72,7 +74,12 @@ export default function AdminLayout() {
   const variant = variantMap[pathname] || "default";
   const mirrored = variantMapPositionMirrored[pathname] || false;
 
-  const [selectedLocal, setSelectedLocal] = useState(0);
+  //pestañas de locales y guardar configuración de en donde estás
+  const [selectedLocal, setSelectedLocal] = useState(() => {
+    const storedLocal = localStorage.getItem("selectedLocal");
+    return storedLocal !== null ? parseInt(storedLocal) : 0;
+  });
+
   const locales = ["Local 1", "Local 2"];
 
   console.log("AdminLayout renderizado; selectedLocal:", selectedLocal);
@@ -92,7 +99,10 @@ export default function AdminLayout() {
           <TabsLocales
             locales={locales}
             selectedLocal={selectedLocal}
-            onSelect={setSelectedLocal}
+            onSelect={(index) => {
+              setSelectedLocal(index);
+              localStorage.setItem("selectedLocal", index);
+            }}
           />
           )}
 

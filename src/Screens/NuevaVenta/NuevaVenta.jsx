@@ -406,24 +406,23 @@ const NuevaVenta = () => {
                 </div>
 
                 <div>
-                  <div className={styles.selectPagoWrapper}>
-                   bun 
-                    <div className={styles.botonesVenta}> 
-                      <ButtonHeaders
-                        text="Cancelar Venta"
-                        onClick={openEliminarEvento}
-                        red={true}
-                      />
+                  
+                 
+                <div className={styles.botonesVenta}> 
+                  <ButtonHeaders
+                    text="Cancelar Venta"
+                    onClick={openEliminarEvento}
+                    red={true}
+                  />
 
-                      <ButtonHeaders
-                        text="Confirmar venta"
-                        onClick={handleConfirmarVenta}
-                      />
-                    </div>
-                    
-                  </div>
-                    
+                  <ButtonHeaders
+                    text="Confirmar venta"
+                    onClick={handleConfirmarVenta}
+                  />
                 </div>
+                    
+                 
+              </div>
 
             </article>
 
