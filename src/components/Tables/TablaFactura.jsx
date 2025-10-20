@@ -53,34 +53,41 @@ export const TablaFactura = ({
 
   // Actualiza valores al cambiar inputs
   const actualizarLinea = (index, campo, valor) => {
-  const nuevasLineas = [...lineas];
-  const linea = nuevasLineas[index];
+    const nuevasLineas = [...lineas];
+    const linea = nuevasLineas[index];
 
-  if (campo === 'productoId') {
-    const producto = productosDisponibles.find(p => p.id === parseInt(valor));
-    if (producto) {
-      linea.productoId = producto.id;
-      linea.nombre = producto.nombre;
-      linea.precio_unitario = producto.precio;
-      linea.stock_actual = producto.stock_actual; // Guardamos stock en la línea
+    if (campo === 'productoId') {
+      const producto = productosDisponibles.find(p => p.id === parseInt(valor));
+      if (producto) {
+        linea.productoId = producto.id;
+        linea.nombre = producto.nombre;
+        linea.precio_unitario = producto.precio;
+        linea.stock_actual = producto.stock_actual; // Guardamos stock en la línea
+      }
+    } else if (campo === 'cantidad') {
+     
+
+        if (valor === "") {
+        linea.cantidad = ""; // Deja vacío mientras escribe
+      } else {
+        let cantidad = parseInt(valor);
+        if (isNaN(cantidad)) cantidad = 1;
+
+        const maxStock = parseInt(linea.stock_actual) || Infinity;
+        linea.cantidad = Math.min(cantidad, maxStock);
+      }
+    } else {
+      linea[campo] = valor;
     }
-  } else if (campo === 'cantidad') {
-    const cantidad = parseInt(valor) || 1;
-    const maxStock = parseInt(linea.stock_actual) || Infinity;
-    linea.cantidad = Math.min(cantidad, maxStock); // Limita la cantidad
-  } else {
-    linea[campo] = valor;
-  }
 
-  // Cálculo del subtotal
-  const cantidad = parseFloat(linea.cantidad) || 0;
-  const precio = parseFloat(linea.precio_unitario) || 0;
-  const descuento = parseFloat(linea.descuento) || 0;
-  const subtotal = (cantidad * precio) - descuento;
-  linea.subtotal = subtotal;
+    // Cálculo del subtotal
+    const cantidad = parseFloat(linea.cantidad) || 0;
+    const precio = parseFloat(linea.precio_unitario) || 0;
+    const descuento = parseFloat(linea.descuento) || 0;
+    linea.subtotal = !isNaN(cantidad) ? (cantidad * precio) - descuento : 0;
 
-  setLineas(nuevasLineas);
-};
+    setLineas(nuevasLineas);
+  };
 
  
 
@@ -193,8 +200,17 @@ export const TablaFactura = ({
                   <input
                     type="number"
                     min="1"
-                    value={linea.cantidad}
-                    onChange={(e) => actualizarLinea(i, 'cantidad', e.target.value)}
+                    value={linea.cantidad === "" ? "" : linea.cantidad}
+                    onChange={(e) => actualizarLinea(i, "cantidad", e.target.value)}
+                    //en caso no se escriba nada se corrige
+                    onBlur={(e) => {
+                      // Validar solo cuando se termine de editar
+                      const value = parseInt(e.target.value);
+                      if (isNaN(value) || value < 1) {
+                        actualizarLinea(i, "cantidad", 1); // Restaurar a 1 si está vacío o inválido
+                      }
+                    }}
+                                      
                     className={styles.InputTableFactura}
                   />
 

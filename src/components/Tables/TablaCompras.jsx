@@ -190,8 +190,13 @@ export const TablaCompras = ({
                 className={styles.InputTableFactura}
                 type="number"
                 min="1"
-                value={linea.cantidad}
-                onChange={(e) => actualizarLinea(i, 'cantidad', e.target.value)}
+                value={linea.cantidad === 0 ? "" : linea.cantidad}
+                  onChange={(e) => actualizarLinea(i, 'cantidad', e.target.value)}
+                  onBlur={(e) => {
+                    if (e.target.value === "" || parseInt(e.target.value) < 1) {
+                      actualizarLinea(i, 'cantidad', 1); // Valor por defecto
+                    }
+                }}
               />
             </td>
 
