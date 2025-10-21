@@ -124,7 +124,7 @@ const ChangePassword = () => {
                 onClick={() => togglePasswordVisibility('current')}
               >
                 <FontAwesomeIcon 
-                  icon={showPasswords.current ? faEyeSlash : faEye} 
+                  icon={showPasswords.current ? faEye : faEyeSlash} 
                   className={styles.eyeIcon}
                 />
               </button>
@@ -149,7 +149,7 @@ const ChangePassword = () => {
                 onClick={() => togglePasswordVisibility('new')}
               >
                 <FontAwesomeIcon 
-                  icon={showPasswords.new ? faEyeSlash : faEye} 
+                  icon={showPasswords.new ? faEye : faEyeSlash} 
                   className={styles.eyeIcon}
                 />
               </button>
@@ -174,7 +174,7 @@ const ChangePassword = () => {
                 onClick={() => togglePasswordVisibility('confirm')}
               >
                 <FontAwesomeIcon 
-                  icon={showPasswords.confirm ? faEyeSlash : faEye} 
+                  icon={showPasswords.confirm ? faEye : faEyeSlash} 
                   className={styles.eyeIcon}
                 />
               </button>
