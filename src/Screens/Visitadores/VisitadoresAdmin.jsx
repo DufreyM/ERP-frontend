@@ -623,6 +623,7 @@ const VisitadoresAdmin = () => {
               onChange={handleFormChange}
               placeholder="Nombre"
               type="text"
+              formatoAa={true}
             />
             <IconoInput
               icono={faUser}
@@ -631,6 +632,7 @@ const VisitadoresAdmin = () => {
               onChange={handleFormChange}
               placeholder="Apellidos"
               type="text"
+              formatoAa={true}
             />
             <IconoInput
               icono={faEnvelope}

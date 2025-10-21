@@ -359,6 +359,7 @@ const NuevaVenta = () => {
                               placeholder={"Nombre del receptor"}
                               value={nombreClienteManual}
                               onChange={(e) => setNombreClienteManual(e.target.value)}
+                              formatoAa={true}
                             />
                           )}
                           

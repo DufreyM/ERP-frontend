@@ -522,6 +522,7 @@ return(
                               type="text"
                               value={nuevoProveedorNombre}
                               onChange={handleNuevoProveedorNombre}
+                              formatoAa={true}
                             />
                             <button
                               onClick={() => setAgregandoProveedor(false)}

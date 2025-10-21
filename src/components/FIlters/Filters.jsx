@@ -245,6 +245,7 @@ const Filters = ({
                       icono = {faCalendar}
                       value={fechaInicio ? fechaInicio.toLocaleDateString() : ""}
                       onChange={(e) => handleInputFecha(e.target.value)}
+                      placeholder={"DD-MM-YYYY"}
                     
                     ></IconoInput>
 
@@ -258,6 +259,7 @@ const Filters = ({
                       endDate={fechaFin}
                       selectsStart
                       calendarClassName="calendario-pequeno"
+
                     ></DatePicker>
 
                   </div>  
@@ -268,6 +270,7 @@ const Filters = ({
                       icono = {faCalendar}
                       value={fechaFin ? fechaFin.toLocaleDateString() : ""}
                       onChange={(e) => handleInputFecha(e.target.value)}
+                      placeholder={"DD-MM-YYYY"}
                     ></IconoInput>
 
 

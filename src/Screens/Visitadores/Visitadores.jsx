@@ -220,6 +220,7 @@ const Visitadores = () => {
                     value={nombre}
                     onChange={(e) => setNombre(e.target.value)}
                     name="nombre"
+                    formatoAa={true}
                 />
                 <IconoInput
                     icono={faUser}
@@ -227,6 +228,7 @@ const Visitadores = () => {
                     value={apellido}
                     onChange={(e) => setApellido(e.target.value)}
                     name="apellido"
+                    formatoAa={true}
                 />
                 <InputPassword
                     showPassword={showPassword}
@@ -331,7 +333,7 @@ const Visitadores = () => {
                     value={proveedor}
                     onChange={(e) => setProveedor(e.target.value)}
                     name="proveedor"
-                />
+                                />
                 
 
                 {/* Input para subir documentos PDF */}

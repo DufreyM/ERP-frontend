@@ -555,6 +555,7 @@ const EmpleadosClientes = () => {
               onChange={handleFormChange}
               placeholder="Nombre"
               type="text"
+              formatoAa={true}
             />
             <IconoInput
               icono={faUser}
@@ -563,6 +564,7 @@ const EmpleadosClientes = () => {
               onChange={handleFormChange}
               placeholder="Apellidos"
               type="text"
+              formatoAa={true}
             />
             <IconoInput
               icono={faEnvelope}

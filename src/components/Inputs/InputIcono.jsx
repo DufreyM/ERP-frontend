@@ -27,11 +27,38 @@ const IconoInput = ({
     error = false,
     name = "",
     disabled=false,
-    onFocus
+    onFocus,
+    formatoAa = false,
 }) => {
+
+    // Handler que filtra si está activo formatoAa
+    const handleChange = (e) => {
+        let inputValue = e.target.value;
+
+        // Si el formatoAa está activo, filtramos antes de mandarlo
+        if (formatoAa) {
+            inputValue = inputValue.replace(/[^A-Za-zÁÉÍÓÚáéíóúÜüÑñ\s]/g, "");
+        }
+
+        // Siempre usamos el onChange del padre, pero modificando el value si corresponde
+        onChange({
+            ...e,
+            target: {
+                ...e.target,
+                value: inputValue,
+                name: name
+
+            }
+        });
+        onChange(nuevoEvento);
+
+        
+    };
     
 
     return (
+
+        
         <div className={`${styles.contenedorInput} ${error ? styles.errorInput :''}`}>
 
             <input
@@ -39,7 +66,7 @@ const IconoInput = ({
                 type= {type}
                 value= {value}
                 name = {name}
-                onChange={onChange}
+                onChange={handleChange}
                 placeholder= {placeholder}
                 disabled = {disabled}
                 onFocus={onFocus}
