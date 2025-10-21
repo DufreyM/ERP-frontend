@@ -405,6 +405,7 @@ const MiPerfil = () => {
                 onChange={handleChange}
                 type="text"
                 name="nombre"
+                formatoAa={true}
               />
             ) : (
               <span className={styles.infoValue}>{formData.nombre || "No especificado"}</span>
@@ -421,6 +422,7 @@ const MiPerfil = () => {
                 onChange={handleChange}
                 type="text"
                 name="apellidos"
+                formatoAa={true}
               />
             ) : (
               <span className={styles.infoValue}>{formData.apellidos || "No especificado"}</span>

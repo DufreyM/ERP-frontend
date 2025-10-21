@@ -26,10 +26,10 @@ const InputDates = ({
 
             <DatePicker
                
-                placeholderText = {placeholder}
+                placeholderText = {`DD-MM-YYYY | ${placeholder} `}
                 selected = {selected}
                 onChange={onChange}
-                dateFormat="yyyy-MM-dd"  
+                dateFormat="dd-MM-yyyy"  
                 minDate={minDate} 
 
                 className={styles.inputStyleDate}

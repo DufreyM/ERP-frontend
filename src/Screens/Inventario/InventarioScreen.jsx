@@ -278,6 +278,7 @@ const InventarioScreen = () => {
             onChange={handleSearchInputChange}
             type="text"
             name="medicamento"
+            
           />
         </div>
       

@@ -190,8 +190,13 @@ export const TablaCompras = ({
                 className={styles.InputTableFactura}
                 type="number"
                 min="1"
-                value={linea.cantidad}
-                onChange={(e) => actualizarLinea(i, 'cantidad', e.target.value)}
+                value={linea.cantidad === 0 ? "" : linea.cantidad}
+                  onChange={(e) => actualizarLinea(i, 'cantidad', e.target.value)}
+                  onBlur={(e) => {
+                    if (e.target.value === "" || parseInt(e.target.value) < 1) {
+                      actualizarLinea(i, 'cantidad', 1); // Valor por defecto
+                    }
+                }}
               />
             </td>
 
@@ -212,7 +217,7 @@ export const TablaCompras = ({
                 selected={linea.fecha_vencimiento}
                 onChange={(date) => actualizarLinea(i, 'fecha_vencimiento', date)}
                 dateFormat="dd/MM/yyyy"
-                placeholderText="Fecha"
+                placeholderText="DD/MM/YYYY"
                 className={`${styles.InputTableFactura2} ${styles.fechaInput}`} // usa tu clase existente para mantener estilos
               />
             </td>
@@ -223,8 +228,14 @@ export const TablaCompras = ({
                 className={styles.InputTableFactura}
                 type="number"
                 min="0.01"
-                value={linea.precio_costo}
+                value={linea.precio_costo === 0 ? "" : linea.precio_costo}
                 onChange={(e) => actualizarLinea(i, 'precio_costo', e.target.value)}
+                onBlur={(e) => {
+                  const valor = parseFloat(e.target.value);
+                  if (isNaN(valor) || valor < 0.01) {
+                    actualizarLinea(i, 'precio_costo', 0.01);
+                  }
+                }}
               />
             </td>
 
@@ -234,8 +245,14 @@ export const TablaCompras = ({
                 className={styles.InputTableFactura}
                 type="number"
                 min="0.01"
-                value={linea.precio_venta}
+                value={linea.precio_venta === 0 ? "" : linea.precio_venta}
                 onChange={(e) => actualizarLinea(i, 'precio_venta', e.target.value)}
+                onBlur={(e) => {
+                  const valor = parseFloat(e.target.value);
+                  if (isNaN(valor) || valor < 0.01) {
+                    actualizarLinea(i, 'precio_venta', 0.01);
+                  }
+                }}
               />
             </td>
 
