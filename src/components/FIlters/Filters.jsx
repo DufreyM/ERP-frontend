@@ -3,7 +3,6 @@ import { faMagnifyingGlassDollar,faFilter, faGear, faUser,faFilterCircleXmark, f
 import styles from "./Filters.module.css";
 import { useState, useRef, useEffect } from "react";
 import InputSelects from "../Inputs/InputSelects";
-import InputDates from "../Inputs/InputDates";
 import IconoInput from "../Inputs/InputIcono";
 import ButtonDisplay from "../ButtonDisplay/ButtonDisplay";
 import DatePicker from "react-datepicker";

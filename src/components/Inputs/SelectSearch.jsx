@@ -13,6 +13,7 @@ const SelectSearch = ({
   icono,
   error = false,
   disabled = false,
+  popup = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -88,26 +89,17 @@ const SelectSearch = ({
           style={{
             position: "absolute",
             right: "10px",
-            top: "50%",
+            top: "17px",
             transform: "translateY(-50%)",
             display: "flex",
             gap: "6px",
-            alignItems: "center", //D???
+            //Daniela no me muevas los styles, si ocupas algo hacelo con un variable
           }}
         >
           {icono && (
-            //<span className={styles.iconoStyles}> MMM
-            <span style={{ //D???
-              position: "absolute",
-              left: "-30px",
-              top: "50%",
-              transform: "translateY(-50%)",
-              cursor: "pointer",
-              pointerEvents: "none",
-              userSelect: "none",
-              color: "#5a60a5",
-              zIndex: 3,
-            }}>
+            //Daniela no me muevas lstyles.iconoStylesos styles 
+            <span className={popup ? styles.iconoPopupStyle : styles.iconoStyles}>
+           
               <FontAwesomeIcon icon={icono} style={{ color: error ? "red" : "#5a60a5" }} />
             </span>
           )}

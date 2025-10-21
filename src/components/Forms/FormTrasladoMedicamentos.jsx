@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPills, faArrowRight, faBuilding } from '@fortawesome/free-solid-svg-icons';
+import { faPills, faSearch,faHouseMedical, faBuilding } from '@fortawesome/free-solid-svg-icons';
 import IconoInput from '../Inputs/InputIcono';
 import SelectSearch from '../Inputs/SelectSearch';
 import InputSelects from '../Inputs/InputSelects';
@@ -211,10 +211,12 @@ const FormTrasladoMedicamentos = ({
               Medicamento
             </label>
             <SelectSearch
+              icono = {faSearch}
               options={opcionesMedicamentos}
               value={formData.producto_id}
               onChange={handleMedicamentoChange}
               placeholder="Buscar medicamento..."
+              popup = {true}
             />
           </div>
 
