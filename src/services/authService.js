@@ -15,11 +15,6 @@ export async function login(email, password) {
     return await response.json();
 }
 
-
-export function storeToken(token) {
-    localStorage.setItem('jwtToken', token);
-}
-
 export function getToken() {
     return localStorage.getItem('jwtToken');
 }
@@ -27,6 +22,40 @@ export function getToken() {
 export function removeToken() {
     localStorage.removeItem('jwtToken');
 }
+
+
+
+// //LOGICA de token vencido
+// export function isTokenExpired(token) {
+//     if (!token) return true;
+
+//     try {
+//         const base64Url = token.split('.')[1];
+//         const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+//         const jsonPayload = JSON.parse(atob(base64));
+//         const { exp } = jsonPayload;
+
+//         // Comparar fecha actual con expiración del token
+//         return exp * 1000 < Date.now();
+//     } catch (error) {
+//         console.error('Error al decodificar el token:', error);
+//         return true; // Por seguridad, asumimos que está expirado si falla
+//     }
+// }
+
+
+
+
+// export function isAuthenticated() {
+//     const token = getToken();
+//     return token && !isTokenExpired(token);
+// }
+
+
+export function storeToken(token) {
+    localStorage.setItem('jwtToken', token);
+}
+
 
 export async function fetchProtectedData() {
     const token = getToken();

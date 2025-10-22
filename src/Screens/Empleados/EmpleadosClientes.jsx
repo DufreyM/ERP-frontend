@@ -30,6 +30,19 @@ const EmpleadosClientes = () => {
     return `${dia}-${mes}-${año}`;
   };
 
+  //Maneja las noticiaciones de creación eliminación o edición de un estado
+  const [notificacion, setNotificacion] = useState('');
+  useEffect(() => {
+      if (notificacion) {
+          const timer = setTimeout(() => {
+          setNotificacion('');
+          }, 2500); // se quita en 2.5 segundos
+
+          return () => clearTimeout(timer);
+      }
+  }, [notificacion]);
+
+
   // Estados para filtros
   const [busqueda, setBusqueda] = useState('');
   const [rolSeleccionado, setRolSeleccionado] = useState("");
@@ -184,17 +197,85 @@ const EmpleadosClientes = () => {
     setFormEmpleado(prev => ({ ...prev, [name]: name === 'rol_id' || name === 'id_local' ? Number(value) : value }));
   };
 
+  const validarEmpleado = (formEmpleado, { requiereContrasena = false } = {}) => {
+
+    if (!getToken()) {
+      return 'No autorizado. Inicie sesión para continuar.';
+    }
+
+    if (!formEmpleado.nombre || !formEmpleado.apellidos) {
+      return 'Complete el campo de nombre y apellidos.';
+    }
+
+    if (formEmpleado.nombre.trim().length < 2 || formEmpleado.apellidos.trim().length < 2) {
+      return 'Nombre y apellidos deben tener al menos 2 letras.';
+    }
+
+
+    if (!formEmpleado.email) {
+      return 'Complete el campo con el correo del empleado.';
+    }
+
+    const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formEmpleado.email);
+    if (!emailValido) {
+      return 'El correo ingresado no tiene un formato válido.';
+    }
+
+    if (requiereContrasena && !formEmpleado.contrasena) {
+      return 'Complete el campo de contraseña, no olvide anotarla.';
+    }
+
+    if (requiereContrasena && formEmpleado.contrasena.length < 8) {
+      return 'La contraseña debe tener al menos 8 caracteres.';
+    }
+
+    if (!formEmpleado.fechanacimiento) {
+      return 'Complete el campo de fecha de nacimiento.';
+    }
+
+    const hoy = new Date();
+    const fechaNacimiento = new Date(formEmpleado.fechanacimiento);
+    const hace18Anios = new Date(hoy.getFullYear() - 18, hoy.getMonth(), hoy.getDate());
+
+    if (isNaN(fechaNacimiento.getTime())) {
+      return 'La fecha de nacimiento no es válida.';
+    }
+
+    if (fechaNacimiento.getFullYear() < 1900) {
+      return 'La fecha de nacimiento es inválida.';
+    }
+
+    const esMayorDeEdad = fechaNacimiento <= hace18Anios;
+    if (!esMayorDeEdad) {
+      return 'El empleado debe tener al menos 18 años de edad.';
+    }
+
+    if (!formEmpleado.id_local) {
+      return 'Seleccione el local de trabajo del usuario.';
+    }
+
+    if (!formEmpleado.rol_id) {
+      return 'Seleccione un rol para el nuevo usuario.';
+    }
+
+    if (!formEmpleado.status) {
+      return 'Seleccione el status del empleado.';
+    }
+
+    return null; // todo bien
+  };
+
+
   // Crear empleado
   const crearEmpleado = async () => {
-    // Validaciones mínimas en frontend
-    if (!getToken()) {
-      alert('No autorizado. Inicie sesión para continuar.');
-      return;
-    }
-    if (!formEmpleado.nombre || !formEmpleado.apellidos || !formEmpleado.email || !formEmpleado.contrasena || !formEmpleado.fechanacimiento) {
-      alert('Complete nombre, apellidos, email, contraseña y fecha de nacimiento.');
-      return;
-    }
+    
+    const error = validarEmpleado(formEmpleado, { requiereContrasena: true });
+      if (error) {
+        setNotificacion(error);
+        return;
+      }
+      
+
     try {
       const resp = await fetch(`${import.meta.env.VITE_API_URL}/api/empleados`, {
         method: 'POST',
@@ -229,6 +310,13 @@ const EmpleadosClientes = () => {
   // Actualizar empleado
   const actualizarEmpleado = async () => {
     if (!empleadoAEditar) return;
+
+    const error = validarEmpleado(formEmpleado);
+    if (error) {
+      setNotificacion(error);
+      return;
+    }
+      
     try {
       // Solo campos permitidos y no vacíos
       const camposPermitidos = ['nombre', 'apellidos', 'rol_id', 'email', 'status', 'id_local', 'fechanacimiento'];
@@ -375,6 +463,11 @@ const EmpleadosClientes = () => {
 
   return (
     <div className={styles.contenedorGeneral}>
+      {notificacion && (
+          <div className="toast">
+              {notificacion}
+          </div>
+      )}
       <div className={styles.contenedorEncabezado}>
         <div className={styles.contenedorTitle}>
           <SimpleTitle text="Empleados y Clientes" />
