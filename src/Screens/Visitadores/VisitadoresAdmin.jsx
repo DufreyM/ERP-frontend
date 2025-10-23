@@ -48,7 +48,6 @@ const VisitadoresAdmin = () => {
     if (!shouldFetch) return null;
     
     const params = new URLSearchParams();
-    params.set('id_local', String(localSeleccionado));
     if (proveedorSeleccionado) params.set('proveedor_id', String(proveedorSeleccionado));
     if (statusSeleccionado) params.set('status', statusSeleccionado);
     if (page) params.set('page', String(page));
@@ -212,6 +211,9 @@ const VisitadoresAdmin = () => {
     const lista = maybeArrays.find(arr => Array.isArray(arr)) || [];
     
     return lista.map((v) => {
+      // Debug: mostrar datos del visitador
+      console.log('Visitador recibido del backend:', v);
+      
       // Extraer teléfonos fijo y móvil de la relación telefonos
       const telefonos = v.telefonos || [];
       const telefonoFijo = telefonos.find(t => t.tipo === 'fijo')?.numero || '';
@@ -228,7 +230,7 @@ const VisitadoresAdmin = () => {
         fecha_nacimientoISO: v.usuario?.fechanacimiento || '',
         proveedor_id: v.proveedor_id || '',
         proveedor: v.proveedor?.nombre || v.proveedor?.razon_social || (v.proveedor_id ? `ID ${v.proveedor_id}` : ''),
-        documento: v.documento_url || '',
+        documento: v.documento_url || v.documentos?.[0]?.nombre || '',
         status: v.usuario?.status || 'inactivo'
       };
     });
@@ -368,6 +370,20 @@ const VisitadoresAdmin = () => {
       console.error(e);
     }
   };
+
+  // Escuchar eventos de creación de visitadores para refrescar la lista
+  useEffect(() => {
+    const handleVisitadorCreado = () => {
+      console.log('Nuevo visitador creado, refrescando lista...');
+      refetch();
+    };
+
+    window.addEventListener('visitadorCreado', handleVisitadorCreado);
+    
+    return () => {
+      window.removeEventListener('visitadorCreado', handleVisitadorCreado);
+    };
+  }, [refetch]);
 
   // Cargar datos al formulario al abrir editar
   useEffect(() => {
