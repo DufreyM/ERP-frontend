@@ -78,6 +78,20 @@ const NuevaVenta = () => {
   const [tipoPago, setTipoPago] = useState("efectivo");
   const [mostrarInputNombreManual, setMostrarInputNombreManual] = useState(false)
  
+  const calcularTotalVenta = () => {
+  return lineas.reduce((total, linea) => {
+    const precio = parseFloat(linea.precio || 0);
+    const cantidad = parseInt(linea.cantidad || 0);
+    return total + precio * cantidad;
+  }, 0);
+};
+
+const validarNit = (nit) => {
+  const regex = /^[A-Za-z0-9]+(-?[A-Za-z0-9]+)?$/; 
+  return regex.test(nit);
+};
+
+
   useEffect(() => {
     const datosGuardados = localStorage.getItem(ventaKey);
     if (datosGuardados) {
@@ -128,7 +142,15 @@ const NuevaVenta = () => {
     }
   }, [lineas, tipoCliente, nitCliente, nombreClienteManual, tipoPago, ventaKey, datosCargados]);
 
+// 🔒 Si el tipo de cliente es CF y supera Q2500, cambia automáticamente a registrado
+useEffect(() => {
+  const totalVenta = calcularTotalVenta();
 
+  if (tipoCliente === "cf" && totalVenta > 2500) {
+    setTipoCliente("registrado");
+    setNotificacion("Se desactivó 'Consumidor Final' porque el total supera Q2500. Ingresa un NIT válido.");
+  }
+}, [lineas, tipoCliente]);
 
 
   const handleNitCliente = (e) => {
@@ -174,62 +196,71 @@ const NuevaVenta = () => {
     }
   };
 
-  const handleConfirmarVenta = async () => {
-    try {
-      if (lineas.length === 0) {
-        setNotificacion('Debe agregar al menos un producto'); 
-       
-        return;
-      }
+ const handleConfirmarVenta = async () => {
+  try {
+    const totalVenta = calcularTotalVenta();
 
-      // Validar que todos los productos estén seleccionados
-      const algunaLineaSinProducto = lineas.some(
-        (linea) => !linea.productoId || linea.productoId === ""
-      );
+    // 1️⃣ Bloquear CF si total > 2500
+    if (tipoCliente === "cf" && totalVenta > 2500) {
+      setNotificacion("Para ventas mayores a Q2500 es necesario ingresar un NIT válido.");
+      return;
+    }
 
-      if (algunaLineaSinProducto) {
-        setNotificacion("Por favor selecciona un producto en todas las líneas de la factura."); 
-        return;
-      }
+    // 2️⃣ Validar formato del NIT si no es CF
+    if (tipoCliente === "registrado" && nitCliente && !validarNit(nitCliente)) {
+      setNotificacion("El NIT ingresado no cumple con el formato válido (solo letras, números o guion).");
+      return;
+    }
 
-      const detalles = lineas.map(linea => ({
-        producto_id: parseInt(linea.productoId),
-        cantidad: parseInt(linea.cantidad)
-      }));
+    // 3️⃣ Validar que haya productos
+    if (lineas.length === 0) {
+      setNotificacion("Debe agregar al menos un producto");
+      return;
+    }
 
-      let body = {
-        tipo_pago: tipoPago,
-        detalles,
-        local_id: localSeleccionado
+    // 4️⃣ Validar que todos los productos estén seleccionados
+    const algunaLineaSinProducto = lineas.some(
+      (linea) => !linea.productoId || linea.productoId === ""
+    );
+    if (algunaLineaSinProducto) {
+      setNotificacion("Por favor selecciona un producto en todas las líneas de la factura."); 
+      return;
+    }
 
+    // 5️⃣ Armar el payload de la venta
+    const detalles = lineas.map(linea => ({
+      producto_id: parseInt(linea.productoId),
+      cantidad: parseInt(linea.cantidad)
+    }));
+
+    let body = {
+      tipo_pago: tipoPago,
+      detalles,
+      local_id: localSeleccionado
+    };
+
+    if (tipoCliente === "cf") {
+      body.cliente = {
+        nit: "CF",
+        nombre: "Consumidor Final",
       };
-
-      if (tipoCliente === "cf") {
-        body.cliente = {
-          nit: "CF",
-          nombre: "Consumidor Final",
-         
-        };
-      } else if (datosCliente) {
-        // Cliente encontrado
-        body.cliente_id = datosCliente.id;
-      } else {
-        // Cliente manual
-        if (!nitCliente || !nombreClienteManual) {
-          
-          setNotificacion("Por favor ingresa NIT y nombre del cliente.");
-          return;
-        }
-
-        body.cliente = {
-          nit: nitCliente,
-          nombre: nombreClienteManual,
-          direccion: "",   // opcional
-          correo: null        // opcional
-        };
+    } else if (datosCliente) {
+      body.cliente_id = datosCliente.id;
+    } else {
+      if (!nitCliente || !nombreClienteManual) {
+        setNotificacion("Por favor ingresa NIT y nombre del cliente.");
+        return;
       }
 
+      body.cliente = {
+        nit: nitCliente,
+        nombre: nombreClienteManual,
+        direccion: "",
+        correo: null
+      };
+    }
 
+    // 6️⃣ Enviar al backend
     const response = await fetch(`${import.meta.env.VITE_API_URL}/ventas`, {
       method: "POST",
       headers: {
@@ -241,24 +272,21 @@ const NuevaVenta = () => {
 
     if (!response.ok) {
       const errorText = await response.text();
-  console.error("Error del servidor:", errorText);
-  throw new Error("Error al crear la venta");
-  console.log("Payload enviado:", body);
+      console.error("Error del servidor:", errorText);
+      throw new Error("Error al crear la venta");
     }
 
     const result = await response.json();
-    //console.log("Venta registrada correctamente:", result);
     setNotificacion("¡Venta registrada con éxito!");
     localStorage.removeItem(ventaKey);
+    navigate(-1);
 
-
-    // Redirigir o resetear formulario
-    navigate(-1); 
   } catch (error) {
     console.error(error.message);
     setNotificacion("Ocurrió un error al registrar la venta.");
   }
 };
+
 
 
 //que no se pierdan los datos al refrescar
@@ -306,16 +334,26 @@ const NuevaVenta = () => {
                       Cliente registrado
                     </label>
 
-                    <label className={tipoCliente === "cf" ? styles.selected : ""}>
-                      <input
-                        type="radio"
-                        name="tipoCliente"
-                        value="cf"
-                        checked={tipoCliente === "cf"}
-                        onChange={() => setTipoCliente("cf")}
-                      />
-                      Consumidor Final
-                    </label>
+                    <label
+  className={`${tipoCliente === "cf" ? styles.selected : ""} ${calcularTotalVenta() > 2500 ? styles.disabledOption : ""}`}
+>
+  <input
+    type="radio"
+    name="tipoCliente"
+    value="cf"
+    checked={tipoCliente === "cf"}
+    onChange={() => {
+      if (calcularTotalVenta() > 250) {
+        setNotificacion("No se puede seleccionar CF en ventas mayores a Q2500.");
+        return;
+      }
+      setTipoCliente("cf");
+    }}
+    disabled={calcularTotalVenta() > 2500}
+  />
+  Consumidor Final
+</label>
+
                   </div>
 
 
