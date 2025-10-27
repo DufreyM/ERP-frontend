@@ -217,13 +217,18 @@ const Visitadores = () => {
             console.log('Enviando datos del visitador:', visitadorData);
             console.log('JSON stringificado:', JSON.stringify(visitadorData, null, 2));
 
+            const formData = new FormData();
+            formData.append('data', JSON.stringify(visitadorData));
+
+            documentos.forEach((doc, i) => {
+                formData.append(`documentos`, doc);
+            });
+
             const response = await fetch(`${import.meta.env.VITE_API_URL}/visitadores`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(visitadorData)
+                body: formData, // no pongas Content-Type, fetch lo genera solo
             });
+
 
             let responseData;
             try {

@@ -88,7 +88,6 @@ const VisitadoresAdmin = () => {
     { key: 'email', titulo: 'Correo Electrónico' },
     { key: 'telefono_fijo', titulo: 'Teléfono Fijo' },
     { key: 'telefono_movil', titulo: 'Teléfono Móvil' },
-    { key: 'fecha_nacimiento', titulo: 'Fecha de Nacimiento' },
     { key: 'proveedor', titulo: 'Proveedor' },
     { key: 'documento', titulo: 'Documento' },
     { key: 'status', titulo: 'Estado' },
