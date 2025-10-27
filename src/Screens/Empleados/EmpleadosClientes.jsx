@@ -16,10 +16,12 @@ import { faUser, faSearch, faEnvelope, faCalendar } from '@fortawesome/free-soli
 import InputSearch from "../../components/Inputs/InputSearch";
 import InputSelects from "../../components/Inputs/InputSelects";
 import InputDates from "../../components/Inputs/InputDates";
+import { useCheckToken } from "../../utils/checkToken";
 
 const EmpleadosClientes = () => {
   const { selectedLocal } = useOutletContext();
   const localSeleccionado = selectedLocal + 1;
+  const checkToken = useCheckToken();
   
 
   // Función para formatear fecha
@@ -295,6 +297,8 @@ const EmpleadosClientes = () => {
           fechanacimiento: formEmpleado.fechanacimiento,
         })
       });
+      if (!checkToken(resp)) return; //Para redirigir a login cuando el token expiró
+
       if (!resp.ok) {
         let serverMsg = '';
         try { serverMsg = (await resp.json())?.error || (await resp.json())?.message || ''; } catch {}
@@ -334,6 +338,8 @@ const EmpleadosClientes = () => {
         },
         body: JSON.stringify(payload)
       });
+      if (!checkToken(resp)) return; //Para redirigir a login cuando el token expiró
+
       if (!resp.ok) {
         let serverMsg = '';
         try { serverMsg = (await resp.json())?.error || (await resp.json())?.message || ''; } catch {}
@@ -357,6 +363,8 @@ const EmpleadosClientes = () => {
           'Authorization': getToken() ? `Bearer ${getToken()}` : '',
         }
       });
+      if (!checkToken(resp)) return; //Para redirigir a login cuando el token expiró
+
       if (!resp.ok) throw new Error('Error al eliminar');
       await refetch();
       closeAdvertencia();
@@ -379,6 +387,8 @@ const EmpleadosClientes = () => {
         },
         body: JSON.stringify({ status: nuevoStatus })
       });
+      if (!checkToken(resp)) return; //Para redirigir a login cuando el token expiró
+
       if (!resp.ok) throw new Error('Error al cambiar estado');
       await refetch();
     } catch (e) {
