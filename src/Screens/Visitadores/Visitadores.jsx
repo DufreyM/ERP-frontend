@@ -1,16 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import BackgroundCross from '../../components/BackgroundCross/BackgroundCross';
 import IconoInput from '../../components/Inputs/InputIcono';
 import InputPassword from '../../components/Inputs/InputPassword';
 import ButtonForm from '../../components/ButtonForm/ButtonForm';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faLock, faEnvelope, faPhone, faFilePdf, faPlus, faPen } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faLock, faEnvelope, faPhone, faFilePdf, faPlus, faPen, faHouseMedical, faTimes, faLocationDot } from '@fortawesome/free-solid-svg-icons';
 import Isotipo from '../../assets/svg/isotipoEconofarma.svg'; 
 import { useNavigate } from 'react-router-dom';
 import ButtonText from '../../components/ButtonText/ButtonText';
 import ButtonIcon from '../../components/ButtonIcon/ButtonIcon';
 import { add } from 'date-fns';
 import InputFile from '../../components/Inputs/InputFile';
+import SelectSearch from '../../components/Inputs/SelectSearch';
+import { useFetch } from '../../utils/useFetch';
+import { getToken } from '../../services/authService';
 
 const Visitadores = () => {
     const [nombre, setNombre] = useState('');
@@ -19,7 +22,7 @@ const Visitadores = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState('');
     const [telefonos, setTelefonos] = useState([{ numero: '', tipo: 'móvil' }]);
-    const [proveedor, setProveedor] = useState('');
+    const [proveedorSeleccionadoId, setProveedorSeleccionadoId] = useState('');
     const [fechaNacimiento, setFechaNacimiento] = useState('');
     const [documentos, setDocumentos] = useState([]);
     const [error, setError] = useState('');
@@ -27,8 +30,59 @@ const Visitadores = () => {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
+    // Obtener proveedores
+    const token = getToken();
+    const { data: proveedores, loading: loadingProveedores } = useFetch(
+        `${import.meta.env.VITE_API_URL}/api/proveedor`,
+        {
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+        }
+    );
+
+    // Estados para agregar proveedor nuevo
+    const [agregandoProveedor, setAgregandoProveedor] = useState(false);
+    const [nuevoProveedorNombre, setNuevoProveedorNombre] = useState('');
+    const [nuevoProveedorTelefono, setNuevoProveedorTelefono] = useState('');
+    const [nuevoProveedorCorreo, setNuevoProveedorCorreo] = useState('');
+    const [nuevoProveedorDireccion, setNuevoProveedorDireccion] = useState('');
+
+    // Opciones de proveedores para el select (igual que NuevaCompra)
+    const opcionesProveedores = useMemo(() => {
+        if (!Array.isArray(proveedores)) return [];
+        return proveedores.map(proveedor => ({
+            value: String(proveedor.id),
+            label: proveedor.nombre,
+            ...proveedor
+        }));
+    }, [proveedores]);
+
+    const proveedorSeleccionado = useMemo(() => {
+        return opcionesProveedores.find(p => p.value === proveedorSeleccionadoId) || null;
+    }, [proveedorSeleccionadoId, opcionesProveedores]);
+
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
+    };
+
+    // Handlers para nuevo proveedor (igual que NuevaCompra)
+    const handleNuevoProveedorNombre = (e) => {
+        setNuevoProveedorNombre(e.target.value);
+        setError('');
+    };
+
+    const handleNuevoProveedorTelefono = (e) => {
+        setNuevoProveedorTelefono(e.target.value);
+        setError('');
+    };
+
+    const handleNuevoProveedorCorreo = (e) => {
+        setNuevoProveedorCorreo(e.target.value);
+        setError('');
+    };
+
+    const handleNuevoProveedorDireccion = (e) => {
+        setNuevoProveedorDireccion(e.target.value);
+        setError('');
     };
 
     // Funciones para manejar teléfonos
@@ -62,13 +116,65 @@ const Visitadores = () => {
         setError('');
     };
 
+    // Función para agregar proveedor nuevo (igual que NuevaCompra)
+    const handleAgregarProveedor = async () => {
+        try {
+            // Validaciones básicas
+            if (!nuevoProveedorNombre || !nuevoProveedorTelefono || !nuevoProveedorCorreo || !nuevoProveedorDireccion) {
+                setError("Por favor, completa todos los campos del proveedor.");
+                return;
+            }
+
+            const nuevoProveedor = {
+                nombre: nuevoProveedorNombre,
+                direccion: nuevoProveedorDireccion,
+                correo: nuevoProveedorCorreo,
+                telefonos: [
+                    {numero: nuevoProveedorTelefono, tipo: "fijo"}
+                ]
+            };
+
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/proveedor`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(nuevoProveedor)
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error("Error al agregar proveedor:", errorText);
+                throw new Error("Error al registrar proveedor.");
+            }
+
+            const result = await response.json();
+            setMessage("¡Proveedor agregado correctamente!");
+            
+            // Selecciona el proveedor recién creado
+            setProveedorSeleccionadoId(String(result.id));
+
+            // Limpia formulario de proveedor nuevo
+            setNuevoProveedorNombre('');
+            setNuevoProveedorTelefono('');
+            setNuevoProveedorCorreo('');
+            setNuevoProveedorDireccion('');
+            setAgregandoProveedor(false);
+
+        } catch (error) {
+            console.error(error.message);
+            setError("Ocurrió un error al registrar el proveedor.");
+        }
+    };
+
     const handleSubmit = async () => {
         setError('');
         setMessage('');
         setLoading(true);
 
         // Validar campos requeridos
-        if (!nombre.trim() || !apellido.trim() || !email.trim() || !proveedor.trim() || !fechaNacimiento) {
+        if (!nombre.trim() || !apellido.trim() || !email.trim() || !proveedorSeleccionadoId || !fechaNacimiento) {
             setError('Por favor, completa todos los campos requeridos.');
             setLoading(false);
             return;
@@ -91,42 +197,36 @@ const Visitadores = () => {
         }
 
         try {
-            // Preparar datos según la estructura esperada por el backend
-            // El backend usará insertGraph para crear las relaciones
+            // Preparar datos según la estructura especificada por el usuario
             const visitadorData = {
-                proveedor_id: 1, // ID temporal, el backend debería manejar esto
+                proveedor_id: parseInt(proveedorSeleccionadoId), // Usar el ID del proveedor seleccionado
                 usuario: {
                     nombre: nombre.trim(),
                     apellidos: apellido.trim(),
-                    rol_id: 3, // Asumimos que 3 es el rol de visitador médico
                     email: email.trim(),
-                    status: 'inactivo', // Inicialmente inactivo hasta aprobación
-                    contrasena: password, // El backend debería manejar el hash
-                    fechanacimiento: fechaNacimiento
+                    fechanacimiento: fechaNacimiento,
+                    rol_id: 5, // Rol de visitador médico según especificación
+                    contrasena: password
                 },
                 telefonos: telefonosCompletos.map(t => ({
                     numero: t.numero.trim(),
                     tipo: t.tipo
-                })) // Array de objetos con numero y tipo
-            };
-
-            // Prueba con estructura más simple para debug
-            const testData = {
-                proveedor_id: 1, // ID temporal para prueba
-                usuario_id: 1,   // ID temporal para prueba
-                telefonos: telefonosCompletos.map(t => `${t.numero.trim()} (${t.tipo})`)
+                }))
             };
 
             console.log('Enviando datos del visitador:', visitadorData);
             console.log('JSON stringificado:', JSON.stringify(visitadorData, null, 2));
-            console.log('Datos de prueba:', testData);
+
+            const formData = new FormData();
+            formData.append('data', JSON.stringify(visitadorData));
+
+            if (documentos.length > 0) {
+            formData.append('documento', documentos[0]); // nombre correcto para el backend
+            }
 
             const response = await fetch(`${import.meta.env.VITE_API_URL}/visitadores`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(testData) // Usando datos de prueba temporalmente
+            method: 'POST',
+            body: formData,
             });
 
             let responseData;
@@ -157,13 +257,23 @@ const Visitadores = () => {
 
             setMessage('Solicitud enviada correctamente. El administrador revisará tu solicitud.');
             
+            // Notificar que se creó un nuevo visitador para actualizar la lista en admin
+            window.dispatchEvent(new CustomEvent('visitadorCreado', { 
+                detail: { visitadorData } 
+            }));
+            
             // Limpiar formulario después del éxito
             setNombre('');
             setApellido('');
             setPassword('');
             setEmail('');
             setTelefonos([{ numero: '', tipo: 'móvil' }]);
-            setProveedor('');
+            setProveedorSeleccionadoId('');
+            setAgregandoProveedor(false);
+            setNuevoProveedorNombre('');
+            setNuevoProveedorTelefono('');
+            setNuevoProveedorCorreo('');
+            setNuevoProveedorDireccion('');
             setFechaNacimiento('');
             setDocumentos([]);
 
@@ -327,13 +437,108 @@ const Visitadores = () => {
                     name="fechaNacimiento"
                     type="date"
                 />
-                <IconoInput
-                    icono={faUser}
-                    placeholder="Nombre del Proveedor"
-                    value={proveedor}
-                    onChange={(e) => setProveedor(e.target.value)}
-                    name="proveedor"
+                {/* Campo de Proveedor con funcionalidad de agregar nuevo */}
+                <div style={{ width: '100%', maxWidth: '400px', marginBottom: '16px' }}>
+                    <label style={{ 
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        color: '#5a60a5',
+                        fontFamily: 'Segoe UI',
+                        fontWeight: 'bold',
+                        marginBottom: '10px',
+                    }}>
+                        Proveedor
+                    </label>
+                    
+                    {/* Si está en modo "agregar proveedor nuevo" */}
+                    {agregandoProveedor ? (
+                        <>
+                            <div style={{ display: 'flex', gap: '8px', marginBottom: '8px', alignItems: 'start' }}>
+                                <IconoInput
+                                    icono={faHouseMedical}
+                                    placeholder="Nombre del nuevo proveedor"
+                                    type="text"
+                                    value={nuevoProveedorNombre}
+                                    onChange={handleNuevoProveedorNombre}
+                                    formatoAa={true}
                                 />
+                                <button
+                                    onClick={() => setAgregandoProveedor(false)}
+                                    style={{
+                                        background: '#e74c3c',
+                                        border: 'none',
+                                        borderRadius: '4px',
+                                        color: 'white',
+                                        padding: '8px 12px',
+                                        cursor: 'pointer',
+                                        fontSize: '12px'
+                                    }}
+                                >
+                                    <FontAwesomeIcon icon={faTimes} />
+                                </button>
+                            </div>
+
+                            <IconoInput 
+                                icono={faPhone} 
+                                placeholder="Teléfono del proveedor" 
+                                type="text" 
+                                value={nuevoProveedorTelefono}
+                                onChange={handleNuevoProveedorTelefono}
+                            />
+
+                            <IconoInput 
+                                icono={faEnvelope} 
+                                placeholder="Correo del proveedor" 
+                                type="email" 
+                                value={nuevoProveedorCorreo}
+                                onChange={handleNuevoProveedorCorreo}
+                            />
+
+                            <IconoInput 
+                                icono={faLocationDot} 
+                                placeholder="Dirección del proveedor" 
+                                type="text" 
+                                value={nuevoProveedorDireccion}
+                                onChange={handleNuevoProveedorDireccion}
+                            />
+
+                            <ButtonForm
+                                text="Agregar proveedor"
+                                onClick={handleAgregarProveedor}
+                            />
+                        </>
+                    ) : (
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'start' }}>
+                            <SelectSearch
+                                icono={faHouseMedical}
+                                placeholder="Nombre del proveedor"
+                                value={proveedorSeleccionadoId}
+                                onChange={(value) => setProveedorSeleccionadoId(value)}
+                                type="text"
+                                options={opcionesProveedores}
+                                tableStyle={false}
+                            />
+                            <button
+                                onClick={() => {
+                                    setAgregandoProveedor(true);
+                                    setProveedorSeleccionadoId(''); // limpia el select si vas a agregar
+                                }}
+                                style={{
+                                    background: '#5a60a5',
+                                    border: 'none',
+                                    borderRadius: '4px',
+                                    color: 'white',
+                                    padding: '8px 12px',
+                                    cursor: 'pointer',
+                                    fontSize: '12px'
+                                }}
+                            >
+                                <FontAwesomeIcon icon={faPlus} />
+                            </button>
+                        </div>
+                    )}
+                </div>
                 
 
                 {/* Input para subir documentos PDF */}

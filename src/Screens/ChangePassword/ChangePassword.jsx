@@ -26,6 +26,8 @@ const ChangePassword = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  const [passwordErrors, setPasswordErrors] = useState([]);
+  const [passwordMatchError, setPasswordMatchError] = useState('');
   const navigate = useNavigate();
 
   const togglePasswordVisibility = (field) => {
@@ -33,6 +35,29 @@ const ChangePassword = () => {
       ...prev,
       [field]: !prev[field]
     }));
+  };
+
+  // Función para validar la fortaleza de la contraseña
+  const validatePasswordStrength = (password) => {
+    const errors = [];
+    
+    if (password.length < 8) {
+      errors.push('Mínimo 8 caracteres');
+    }
+    
+    if (!/[A-Z]/.test(password)) {
+      errors.push('Al menos una mayúscula');
+    }
+    
+    if (!/[a-z]/.test(password)) {
+      errors.push('Al menos una minúscula');
+    }
+    
+    if (!/[0-9]/.test(password) && !/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+      errors.push('Al menos un número o símbolo');
+    }
+    
+    return errors;
   };
 
   const handleChange = (e) => {
@@ -46,21 +71,56 @@ const ChangePassword = () => {
     if (error) {
       setError('');
     }
+    
+    // Validar contraseña nueva en tiempo real
+    if (name === 'newPassword') {
+      const errors = validatePasswordStrength(value);
+      setPasswordErrors(errors);
+    }
+    
+    // Validar coincidencia de contraseñas en tiempo real
+    if (name === 'confirmPassword' || name === 'newPassword') {
+      // Usar los valores actualizados después del setState
+      const updatedFormData = {
+        ...formData,
+        [name]: value
+      };
+      
+      if (updatedFormData.newPassword && updatedFormData.confirmPassword) {
+        if (updatedFormData.newPassword !== updatedFormData.confirmPassword) {
+          setPasswordMatchError('Las contraseñas no coinciden');
+        } else {
+          setPasswordMatchError('');
+        }
+      } else {
+        setPasswordMatchError('');
+      }
+    }
   };
 
   const validatePasswords = () => {
+    const strengthErrors = validatePasswordStrength(formData.newPassword);
+    
+    if (strengthErrors.length > 0) {
+      setError('La contraseña no cumple con los requisitos de seguridad');
+      return false;
+    }
+    
     if (formData.newPassword !== formData.confirmPassword) {
       setError('Las contraseñas no coinciden');
       return false;
     }
+    
     return true;
   };
 
   const isFormValid = () => {
+    const strengthErrors = validatePasswordStrength(formData.newPassword);
     return formData.currentPassword && 
            formData.newPassword && 
            formData.confirmPassword && 
-           formData.newPassword === formData.confirmPassword;
+           formData.newPassword === formData.confirmPassword &&
+           strengthErrors.length === 0;
   };
 
   const handleSubmit = async () => {
@@ -124,7 +184,7 @@ const ChangePassword = () => {
                 onClick={() => togglePasswordVisibility('current')}
               >
                 <FontAwesomeIcon 
-                  icon={showPasswords.current ? faEyeSlash : faEye} 
+                  icon={showPasswords.current ? faEye : faEyeSlash} 
                   className={styles.eyeIcon}
                 />
               </button>
@@ -149,11 +209,25 @@ const ChangePassword = () => {
                 onClick={() => togglePasswordVisibility('new')}
               >
                 <FontAwesomeIcon 
-                  icon={showPasswords.new ? faEyeSlash : faEye} 
+                  icon={showPasswords.new ? faEye : faEyeSlash} 
                   className={styles.eyeIcon}
                 />
               </button>
             </div>
+            
+            {/* Mensajes de validación de contraseña */}
+            {formData.newPassword && passwordErrors.length > 0 && (
+              <div className={styles.passwordValidationContainer}>
+                <div className={styles.passwordValidationTitle}>Requisitos de contraseña:</div>
+                <ul className={styles.passwordValidationList}>
+                  {passwordErrors.map((error, index) => (
+                    <li key={index} className={styles.passwordValidationError}>
+                      {error}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
 
           {/* Confirmar contraseña */}
@@ -174,11 +248,18 @@ const ChangePassword = () => {
                 onClick={() => togglePasswordVisibility('confirm')}
               >
                 <FontAwesomeIcon 
-                  icon={showPasswords.confirm ? faEyeSlash : faEye} 
+                  icon={showPasswords.confirm ? faEye : faEyeSlash} 
                   className={styles.eyeIcon}
                 />
               </button>
             </div>
+            
+            {/* Mensaje de error de coincidencia */}
+            {passwordMatchError && (
+              <div className={styles.passwordMatchError}>
+                {passwordMatchError}
+              </div>
+            )}
           </div>
 
           {/* Mensaje de error */}
