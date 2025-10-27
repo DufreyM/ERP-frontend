@@ -9,7 +9,10 @@ export const useCheckToken = () => {
     if (response.status === 401 || response.status === 403) {
       console.warn("⚠️ Token inválido o expirado. Cerrando sesión...");
       logout();
-      navigate("/", { replace: true });
+      setTimeout(() => {
+        navigate("/", { replace: true });
+      }, 0);
+
       return false;
     }
     return true;

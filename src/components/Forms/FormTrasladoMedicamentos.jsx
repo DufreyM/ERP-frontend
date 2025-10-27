@@ -6,6 +6,7 @@ import SelectSearch from '../Inputs/SelectSearch';
 import InputSelects from '../Inputs/InputSelects';
 import ButtonHeaders from '../ButtonHeaders/ButtonHeaders';
 import { getToken } from '../../services/authService';
+import { useCheckToken } from '../../utils/checkToken';
 
 const FormTrasladoMedicamentos = ({ 
   isOpen, 
@@ -14,6 +15,8 @@ const FormTrasladoMedicamentos = ({
   localActual,
   onSuccess 
 }) => {
+
+  const checkToken = useCheckToken();
   const [formData, setFormData] = useState({
     producto_id: '',
     cantidad: '',
@@ -37,6 +40,8 @@ const FormTrasladoMedicamentos = ({
             'Authorization': `Bearer ${token}`,
           },
         });
+
+        if (!checkToken(response)) return;
 
         if (response.ok) {
           const data = await response.json();
@@ -144,6 +149,8 @@ const FormTrasladoMedicamentos = ({
         },
         body: JSON.stringify(transferenciaData)
       });
+
+      if (!checkToken(response)) return;
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));

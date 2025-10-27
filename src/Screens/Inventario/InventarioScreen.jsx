@@ -17,6 +17,7 @@ import Filters from '../../components/FIlters/Filters.jsx';
 import FiltroResumen from '../../components/FIlters/FiltroResumen/FiltroResumen.jsx';
 import { getToken } from '../../services/authService';
 import { useFetch } from '../../utils/useFetch.jsx';
+import { useCheckToken } from '../../utils/checkToken.js';
 
 
 const InventarioScreen = () => {
@@ -30,7 +31,7 @@ const InventarioScreen = () => {
   const [deleting, setDeleting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [showTrasladoForm, setShowTrasladoForm] = useState(false);
-
+  const checkToken = useCheckToken();
 
   const token = getToken();
   const API_BASE_URL = `${import.meta.env.VITE_API_URL}`
@@ -77,6 +78,7 @@ const InventarioScreen = () => {
           'Authorization': `Bearer ${tokenActual}`,
         },
       });
+      if (!checkToken(response)) return;
       setProductos(productos.filter(p => p.codigo !== productoSeleccionado.codigo));
       setProductoSeleccionado(null);
       setShowConfirmDelete(false);
@@ -111,8 +113,11 @@ const InventarioScreen = () => {
             'Authorization': `Bearer ${tokenActual}`,
           },
         })
-          .then(res => res.json())
-          .then(data => {
+          .then(async (res) => {
+            if (!checkToken(res)) return;
+          
+
+            const data = await res.json();
             const productosArray = Array.isArray(data) ? data : [];
             setProductos(productosArray);
             setProductosOriginales(productosArray);
@@ -122,6 +127,7 @@ const InventarioScreen = () => {
             setError('Error al recargar productos');
             setLoading(false);
           });
+          
       }
     }
   };
