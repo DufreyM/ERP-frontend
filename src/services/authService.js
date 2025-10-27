@@ -1,60 +1,33 @@
+// services/authService.js
 export async function login(email, password) {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email, contrasena: password }) 
-    });
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, contrasena: password }),
+  });
 
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Error en la solicitud de inicio de sesión');
-    }
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Error en el inicio de sesión");
+  }
 
-    return await response.json();
+  return await response.json(); // <-- esto debe incluir el token
 }
 
 export function getToken() {
-    return localStorage.getItem('jwtToken');
+  return localStorage.getItem("jwtToken");
+}
+
+export function storeToken(token) {
+  localStorage.setItem("jwtToken", token);
 }
 
 export function removeToken() {
-    localStorage.removeItem('jwtToken');
+  localStorage.removeItem("jwtToken");
 }
 
 
 
-// //LOGICA de token vencido
-// export function isTokenExpired(token) {
-//     if (!token) return true;
-
-//     try {
-//         const base64Url = token.split('.')[1];
-//         const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-//         const jsonPayload = JSON.parse(atob(base64));
-//         const { exp } = jsonPayload;
-
-//         // Comparar fecha actual con expiración del token
-//         return exp * 1000 < Date.now();
-//     } catch (error) {
-//         console.error('Error al decodificar el token:', error);
-//         return true; // Por seguridad, asumimos que está expirado si falla
-//     }
-// }
-
-
-
-
-// export function isAuthenticated() {
-//     const token = getToken();
-//     return token && !isTokenExpired(token);
-// }
-
-
-export function storeToken(token) {
-    localStorage.setItem('jwtToken', token);
-}
 
 
 export async function fetchProtectedData() {

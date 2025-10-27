@@ -16,6 +16,7 @@ import { useFiltroGeneral } from '../../hooks/useFiltroGeneral.js';
 import Filters from '../../components/FIlters/Filters.jsx';
 import FiltroResumen from '../../components/FIlters/FiltroResumen/FiltroResumen.jsx';
 import { getToken } from '../../services/authService';
+import { useFetch } from '../../utils/useFetch.jsx';
 
 
 const InventarioScreen = () => {
@@ -32,45 +33,21 @@ const InventarioScreen = () => {
 
 
   const token = getToken();
-  const getPayloadFromToken = (token) => {
-    try {
-      return JSON.parse(atob(token.split('.')[1]));
-    } catch (error) {
-      console.error("Token inválido", error);
-      return null;
-    }
-  };
-
   const API_BASE_URL = `${import.meta.env.VITE_API_URL}`
 
-  useEffect(() => {
-    if (selectedLocal !== undefined && selectedLocal !== null) {
-      setLoading(true);
-      const tokenActual = token;
-      if (!tokenActual) {
-        setError('No se encontró el token de autenticación');
-        setLoading(false);
-        return;
-      }
+  const { data: productosData, refetch } = useFetch(
+    `${API_BASE_URL}/api/productos/con-stock?local_id=${selectedLocal + 1}`,
+    {}, 
+    [selectedLocal]
+  );
 
-      fetch(`${API_BASE_URL}/api/productos/con-stock?local_id=${selectedLocal + 1}`, {
-        headers: {
-          'Authorization': `Bearer ${tokenActual}`,
-        },
-      })
-        .then(res => res.json())
-        .then(data => {
-          const productosArray = Array.isArray(data) ? data : [];
-          setProductos(productosArray);
-          setProductosOriginales(productosArray);
-          setLoading(false);
-        })
-        .catch(() => {
-          setError('Error al cargar productos');
-          setLoading(false);
-        });
+  useEffect(() => {
+    if (productosData) {
+      setProductos(productosData);
+      setProductosOriginales(productosData);
     }
-  }, [selectedLocal, token]);
+  }, [productosData]);
+
 
   const handleSearchInputChange = (e) => {
     const value = e.target.value;
@@ -92,13 +69,8 @@ const InventarioScreen = () => {
     if (!productoSeleccionado) return;
     setDeleting(true);
     try {
-      const tokenActual = token;
-      if (!tokenActual) {
-        alert('No se encontró el token de autenticación');
-        setDeleting(false);
-        return;
-      }
-
+      const tokenActual = getToken();
+      
       await fetch(`${API_BASE_URL}/api/productos/${productoSeleccionado.codigo}`, { 
         method: 'DELETE',
         headers: {
@@ -128,6 +100,7 @@ const InventarioScreen = () => {
   // Función para manejar el éxito del traslado
   const handleTrasladoSuccess = (result) => {
     console.log('Traslado completado:', result);
+    refetch();
     // Recargar los productos para reflejar el cambio de stock
     if (selectedLocal !== undefined && selectedLocal !== null) {
       setLoading(true);
