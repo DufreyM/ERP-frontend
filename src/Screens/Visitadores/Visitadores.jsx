@@ -220,15 +220,14 @@ const Visitadores = () => {
             const formData = new FormData();
             formData.append('data', JSON.stringify(visitadorData));
 
-            documentos.forEach((doc, i) => {
-                formData.append(`documentos`, doc);
-            });
+            if (documentos.length > 0) {
+            formData.append('documento', documentos[0]); // nombre correcto para el backend
+            }
 
             const response = await fetch(`${import.meta.env.VITE_API_URL}/visitadores`, {
-                method: 'POST',
-                body: formData, // no pongas Content-Type, fetch lo genera solo
+            method: 'POST',
+            body: formData,
             });
-
 
             let responseData;
             try {
