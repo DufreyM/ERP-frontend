@@ -9,6 +9,7 @@ import { useState, useEffect} from "react";
 import { useFetch } from "../../utils/useFetch.jsx";
 import { getToken } from "../../services/authService.js";
 import Popup from "../../components/Popup/Popup.jsx";
+import { useCheckToken } from "../../utils/checkToken.js";
 
 
 
@@ -21,6 +22,8 @@ const NuevaVenta = () => {
 
   //productos
   const token = getToken(); 
+  const checkToken = useCheckToken();
+  
   const { selectedLocal } = useOutletContext();
   const localSeleccionado = selectedLocal + 1 ;
   //Separacion de memoria entre locales
@@ -150,6 +153,7 @@ const NuevaVenta = () => {
           'Authorization': `Bearer ${token}`
         }
       });
+      if (!checkToken(response)) return;
 
     
       
@@ -238,6 +242,8 @@ const NuevaVenta = () => {
       },
       body: JSON.stringify(body)
     });
+
+    if (!checkToken(response)) return;
 
     if (!response.ok) {
       const errorText = await response.text();

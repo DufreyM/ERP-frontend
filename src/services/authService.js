@@ -1,3 +1,5 @@
+import { useCheckToken } from "../utils/checkToken";
+
 // services/authService.js
 export async function login(email, password) {
   const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
@@ -51,10 +53,9 @@ export async function fetchProtectedData() {
 }
 
 export async function changePassword(currentPassword, newPassword) {
+    
+  
     const token = getToken();
-    if (!token) {
-        throw new Error('No authentication token found');
-    }
 
     const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/change-password`, {
         method: 'POST',
@@ -64,6 +65,15 @@ export async function changePassword(currentPassword, newPassword) {
         },
         body: JSON.stringify({ currentPassword, newPassword })
     });
+
+    if (response.status === 401 || response.status === 403) {
+      const text = await response.text().catch(()=>null);
+      const err = new Error(text || 'Unauthorized');
+      err.status = response.status;
+      throw err;
+    }
+   
+    
 
     if (!response.ok) {
         let message = 'Error al cambiar la contraseña';

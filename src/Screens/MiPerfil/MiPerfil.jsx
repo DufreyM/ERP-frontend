@@ -25,6 +25,7 @@ const MiPerfil = () => {
     fechanacimiento: null,
   });
 
+ 
   const token = getToken();
 
   const [originalData, setOriginalData] = useState(null);
@@ -118,6 +119,7 @@ const MiPerfil = () => {
         },
         body: formData
       });
+      if (!checkToken(response)) return;
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -188,6 +190,7 @@ const MiPerfil = () => {
         }
         
       });
+
 
       if (!token) {
         console.warn("No hay token, no reviso expiración");
@@ -267,6 +270,7 @@ const MiPerfil = () => {
             'Content-Type': 'application/json'
           }
         }); 
+        if (!checkToken(response)) return;
         
         console.log('Connection test response:', response.status);
       } catch (error) {
