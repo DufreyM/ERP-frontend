@@ -9,8 +9,11 @@ import Isotipo from '../../assets/svg/isotipoEconofarma.svg';
 import { useNavigate } from 'react-router-dom';
 import styles from './ChangePassword.module.css';
 import { changePassword } from '../../services/authService';
+import { useCheckToken } from '../../utils/checkToken';
 
 const ChangePassword = () => {
+  const checkToken = useCheckToken();
+  
   const [formData, setFormData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -141,7 +144,24 @@ const ChangePassword = () => {
         navigate('/admin/mi-perfil');
       }, 1500);
     } catch (err) {
+      if (err?.status === 401 || err?.status === 403) {
+        if (typeof checkToken === 'function') {
+          const handled = await checkToken({ status: err.status });
+          if (!handled) return;
+        } else {
+          logout();
+          navigate('/', { replace: true });
+          return;
+        }
+      }
+
+      if (err.status === 500) {
+        setError("Ocurrió un error interno del servidor, pero la contraseña podría haberse cambiado correctamente. Intenta iniciar sesión de nuevo.");
+        console.log("Ocurrió un error interno del servidor, pero la contraseña podría haberse cambiado correctamente. Intenta iniciar sesión de nuevo.");
+      }
+
       setError(err?.message || 'Error al cambiar la contraseña');
+      } finally {
       setLoading(false);
     }
   };

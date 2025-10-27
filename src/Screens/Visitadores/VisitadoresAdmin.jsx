@@ -16,6 +16,7 @@ import { faUser, faSearch, faEnvelope, faCalendar, faPhone, faHouseMedical } fro
 import InputSearch from "../../components/Inputs/InputSearch";
 import InputDates from "../../components/Inputs/InputDates";
 import SelectSearch from "../../components/Inputs/SelectSearch";
+import { useCheckToken } from "../../utils/checkToken";
 // Función para formatear fecha
 const formatearFecha = (fechaISO) => {
   if (!fechaISO) return 'No disponible';
@@ -34,6 +35,7 @@ const VisitadoresAdmin = () => {
   // Mover token y fetch de proveedores dentro del componente (evita duplicados/scope)
   const token = getToken();
   const shouldFetch = Boolean(token);
+  const checkToken = useCheckToken();
 
   // Obtener proveedores (usa token ya definido)
   const { data: proveedores, loading: loadingProveedores } = useFetch(
@@ -100,6 +102,7 @@ const VisitadoresAdmin = () => {
     ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
     'Content-Type': 'application/json',
   }), [token]);
+  
 
   const { data: visitadoresResponse, loading, error, refetch } = useFetch(
     visitadoresUrl,
@@ -252,6 +255,8 @@ const VisitadoresAdmin = () => {
         },
         body: JSON.stringify(data)
       });
+      if (!checkToken(response)) return;
+
 
       console.log('Response status:', response.status);
       if (!response.ok) {
@@ -278,6 +283,7 @@ const VisitadoresAdmin = () => {
           'Authorization': `Bearer ${token}`
         }
       });
+      if (!checkToken(response)) return;
 
       if (!response.ok) throw new Error('Error al eliminar');
 
@@ -299,7 +305,8 @@ const VisitadoresAdmin = () => {
           'Authorization': `Bearer ${token}`
         }
       });
-
+      if (!checkToken(response)) return;
+      
       if (!response.ok) throw new Error('Error al cambiar estado');
 
       await refetch();

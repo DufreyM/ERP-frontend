@@ -20,6 +20,7 @@ import IconoInput from '../../components/Inputs/InputIcono';
 import InputPassword from '../../components/Inputs/InputPassword';
 import ButtonText from '../../components/ButtonText/ButtonText';
 import Header from './Header';
+import { useAuth } from '../../hooks/Auth/useAuth';
 
 const LoginScreen = () => {
     const [email, setEmail] = useState('');
@@ -27,6 +28,7 @@ const LoginScreen = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate(); // Hook para redirigir
+    const { login } = useAuth();
     
     
     const handleVisitador = () => {
@@ -52,8 +54,9 @@ const LoginScreen = () => {
     };
 
 
-    const handleLogin = async () => {
+    const handleLogin = async (e) => {
         // Validación de campos vacíos
+        e.preventDefault(); 
         if (!email || !password) {
 
             setErrorMessage('Por favor, completa todos los campos');
@@ -66,7 +69,7 @@ const LoginScreen = () => {
             const { token } = data;
 
             // Almacenar el token en localStorage
-            storeToken(token);
+            //storeToken(token);
 
             // Decodificar el token para obtener el rol y el nombre del usuario
             const payload = JSON.parse(atob(token.split('.')[1]));

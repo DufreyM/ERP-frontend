@@ -141,6 +141,8 @@ const RegisterScreen = () =>  {
             body: JSON.stringify(payload),
         });
 
+        if (!checkToken(response)) return;
+        
         const data = await response.json();
 
         if (!response.ok) {

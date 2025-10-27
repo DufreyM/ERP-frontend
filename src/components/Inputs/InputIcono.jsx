@@ -50,7 +50,7 @@ const IconoInput = ({
 
             }
         });
-        onChange(nuevoEvento);
+  
 
         
     };

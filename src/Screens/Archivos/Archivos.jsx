@@ -23,11 +23,13 @@ import { useOrderBy } from "../../hooks/useOrderBy";
 import { useFiltroGeneral } from "../../hooks/useFiltroGeneral";
 import { useOpcionesUsuarioDinamicos } from "../../hooks/useOpcionesUsuariosDinamico";
 import FiltroResumen from "../../components/FIlters/FiltroResumen/FiltroResumen";
+import { useCheckToken } from "../../utils/checkToken";
 
 
 const ArchivosScreen = () => {
   const { selectedLocal } = useOutletContext();
   const localSeleccionado = selectedLocal + 1 ;
+  const checkToken = useCheckToken();
      
   const token = getToken();
   const {data, loading, error } = useFetch(`${import.meta.env.VITE_API_URL}/documentos-locales?local_id=${localSeleccionado}` , {
@@ -104,6 +106,7 @@ const ArchivosScreen = () => {
 
     //Nuevo archivo
     const subirDocumento = async (token, datos) => {
+      
       const formData = new FormData();
       formData.append('nombre', datos.nombre);
       formData.append('usuario_id', datos.usuario_id);
@@ -119,6 +122,8 @@ const ArchivosScreen = () => {
         },
         body: formData
       });
+
+      if (!checkToken(response)) return;
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -171,6 +176,7 @@ const ArchivosScreen = () => {
     };
 
   const eliminarDocumento = async (id) => {
+ 
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/documentos-locales/${id}`, {
        
@@ -180,6 +186,8 @@ const ArchivosScreen = () => {
           // No pongas Content-Type, fetch lo hace con FormData automáticamente
         },
       });
+
+      if (!checkToken(response)) return;
 
       if (!response.ok) {
         throw new Error('Error al eliminar el documento');
@@ -212,6 +220,7 @@ const ArchivosScreen = () => {
   };
 
   const editarDocumento = async (id, datos) => {
+    
     const response = await fetch(`${import.meta.env.VITE_API_URL}/documentos-locales/${id}`, {
       method: 'PUT',
       headers: {
@@ -220,6 +229,8 @@ const ArchivosScreen = () => {
       },
       body: JSON.stringify(datos),
     });
+
+    if (!checkToken(response)) return;
 
     if (!response.ok) {
       const errorText = await response.text();

@@ -13,6 +13,7 @@ import ButtonText from "../../components/ButtonText/ButtonText";
 import Popup from "../../components/Popup/Popup";
 import { useEventHandlers } from "../../hooks/Calendar/useEventHandlers";
 import SelectSearch from "../../components/Inputs/SelectSearch";
+import { useCheckToken } from "../../utils/checkToken";
 
 const NuevaCompra = () => {
 
@@ -23,6 +24,7 @@ const NuevaCompra = () => {
 
   //productos
   const token = getToken(); 
+  const checkToken = useCheckToken();
   const { selectedLocal } = useOutletContext();
   const localSeleccionado = selectedLocal + 1 ;
   //Separacion de memoria entre locales
@@ -114,6 +116,7 @@ const NuevaCompra = () => {
         },
         body: JSON.stringify(nuevoProveedor)
       });
+      if (!checkToken(response)) return;
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -344,7 +347,7 @@ const NuevaCompra = () => {
       precio_venta: parseFloat(linea.precio_venta),
       lote: linea.lote,
       fecha_vencimiento: linea.fecha_vencimiento
-        ? linea.fecha_vencimiento.toISOString().split('T')[0]
+        ? new Date(linea.fecha_vencimiento).toISOString().split('T')[0]
         : null
     }));
 
@@ -403,6 +406,7 @@ const NuevaCompra = () => {
       },
       body: JSON.stringify(payload)
     });
+    if (!checkToken(res)) return;
 
     if (!res.ok) {
       const errData = await res.json();
