@@ -7,7 +7,7 @@ export const useCheckToken = () => {
 
   const checkToken = (response) => {
     if (response.status === 401 || response.status === 403) {
-      console.warn("⚠️ Token inválido o expirado. Cerrando sesión...");
+      console.warn("Token inválido o expirado. Cerrando sesión...");
       logout();
       navigate("/", { replace: true });
       return false;

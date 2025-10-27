@@ -47,7 +47,7 @@ export const useFetch = (url, options = {}, dependencies = []) => {
       const response = await fetch(url, { ...options, headers });
 
       if (response.status === 401 || response.status === 403) {
-        console.warn("⚠️ Token inválido o expirado. Cerrando sesión...");
+        console.warn("Token inválido o expirado. Cerrando sesión...");
         logout(); 
         navigate("/", { replace: true }); // manda al login
         return;

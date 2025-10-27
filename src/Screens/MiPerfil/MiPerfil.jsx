@@ -190,7 +190,8 @@ const MiPerfil = () => {
         }
         
       });
-
+      
+      if (!checkToken(response)) return;
 
       if (!token) {
         console.warn("No hay token, no reviso expiración");
@@ -270,7 +271,8 @@ const MiPerfil = () => {
             'Content-Type': 'application/json'
           }
         }); 
-        if (!checkToken(response)) return;
+        //arreglar la cosa esa y luego descomentar esto
+        //if (!checkToken(response)) return;
         
         console.log('Connection test response:', response.status);
       } catch (error) {
@@ -325,6 +327,7 @@ const MiPerfil = () => {
         },
         body: JSON.stringify(updateData)
       });
+      
 
        if (!token) {
         console.warn("No hay token, no reviso expiración");

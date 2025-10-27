@@ -258,6 +258,8 @@ const VisitadoresAdmin = () => {
             'Content-Type': 'application/json'
           }
         });
+
+        if (!checkToken(resp)) return;
         
         if (!resp.ok) {
           const errorText = await resp.text();
@@ -278,6 +280,8 @@ const VisitadoresAdmin = () => {
             'Content-Type': 'application/json'
           }
         });
+
+        if (!checkToken(resp)) return;
         
         if (!resp.ok) {
           const errorText = await resp.text();
@@ -361,6 +365,7 @@ const VisitadoresAdmin = () => {
           'Authorization': getToken() ? `Bearer ${getToken()}` : '',
         }
       });
+      if (!checkToken(resp)) return;
       if (!resp.ok) throw new Error('Error al eliminar');
       await refetch();
       closeAdvertencia();
@@ -502,6 +507,8 @@ const VisitadoresAdmin = () => {
         },
         body: JSON.stringify(updateData),
       });
+
+      if (!checkToken(resp)) return;
 
       if (!resp.ok) {
         const errorText = await resp.text();

@@ -81,7 +81,9 @@ export async function changePassword(currentPassword, newPassword) {
             const data = await response.json();
             message = data?.error || data?.message || message;
         } catch (_) {}
-        throw new Error(message);
+        const error = new Error(message);
+        error.status = response.status; 
+        throw error;
     }
 
     return await response.json();

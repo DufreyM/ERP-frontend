@@ -97,6 +97,7 @@ const ChangePassword = () => {
 
       if (err.status === 500) {
         setError("Ocurrió un error interno del servidor, pero la contraseña podría haberse cambiado correctamente. Intenta iniciar sesión de nuevo.");
+        console.log("Ocurrió un error interno del servidor, pero la contraseña podría haberse cambiado correctamente. Intenta iniciar sesión de nuevo.");
       }
 
       setError(err?.message || 'Error al cambiar la contraseña');
