@@ -75,6 +75,7 @@ const Ventas = () => {
     { key: 'cliente', titulo: 'Cliente', type: 'texto' },
     { key: 'tipo_pago', titulo: 'Forma de pago',type: 'texto' },
     { key: 'producto', titulo: 'Producto', type: 'texto' }, 
+    { key: 'lote', titulo: 'Lote', type: 'texto'},
     { key: 'cantidad', titulo: 'Cantidad', type: 'numero' },     
     { key: 'precio_unitario', titulo: 'Precio Unitario (Q)', type: 'numero' },
     //{ key: 'descuento', titulo: 'Descuento (Q)', type: 'numero' },
