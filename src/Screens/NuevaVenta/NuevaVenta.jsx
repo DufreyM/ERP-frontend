@@ -12,8 +12,6 @@ import Popup from "../../components/Popup/Popup.jsx";
 import { useCheckToken } from "../../utils/checkToken.js";
 
 
-
-
 const NuevaVenta = () => {
   const navigate = useNavigate();
   const volver = () => {
@@ -51,9 +49,20 @@ const NuevaVenta = () => {
     setDatosCargados(false);
   }, [selectedLocal]);
 
+  //bloquear cf cuando la venta sea mayor a 2500
+  const [totalFactura, setTotalFactura] = useState(0);
+  const [bloquearCF, setBloquearCF] = useState(false);
 
-
-  
+  useEffect(() => {
+   
+    if (totalFactura > 2500) {
+      setNotificacion('No se puede vender como Consumidor Final, el total supera Q2500'); 
+      setBloquearCF(true);
+      if (tipoCliente === "cf") setTipoCliente("registrado");
+    } else {
+      setBloquearCF(false);
+    }
+  }, [totalFactura]);
 
 
 
@@ -318,7 +327,14 @@ const NuevaVenta = () => {
                         name="tipoCliente"
                         value="cf"
                         checked={tipoCliente === "cf"}
-                        onChange={() => setTipoCliente("cf")}
+                        onChange={() => {
+                          if (bloquearCF) {
+                            setNotificacion("No se puede vender como Consumidor Final, el total supera Q2500.00");
+                          } else {
+                            setTipoCliente("cf");
+                          }
+                        }}
+                        
                       />
                       Consumidor Final
                     </label>
@@ -416,6 +432,7 @@ const NuevaVenta = () => {
                       productosDisponibles = {productosFiltrados}
                       lineas={lineas}
                       setLineas={setLineas}
+                      setTotalFactura={setTotalFactura}
                     ></TablaFactura>
             
                 </div>

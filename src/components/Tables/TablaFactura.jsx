@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCirclePlus, faTrash, faCircleMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 import styles from './Table.module.css'; 
@@ -9,7 +9,8 @@ import SelectSearchCV from '../Inputs/SelectSearchCV';
 export const TablaFactura = ({ 
   productosDisponibles,
   lineas,
-  setLineas
+  setLineas,
+  setTotalFactura
 
 }) => {
   
@@ -95,6 +96,9 @@ export const TablaFactura = ({
 
 
   const totalFactura = lineas.reduce((acc, linea) => acc + linea.subtotal, 0);
+  useEffect(() => {
+    setTotalFactura(totalFactura);
+  }, [totalFactura]);
 
   return (
     <div className={styles.divTable}>
