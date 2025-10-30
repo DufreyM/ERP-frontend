@@ -17,7 +17,6 @@ import Filters from '../../components/FIlters/Filters.jsx';
 import FiltroResumen from '../../components/FIlters/FiltroResumen/FiltroResumen.jsx';
 import { getToken } from '../../services/authService';
 import { useFetch } from '../../utils/useFetch.jsx';
-import { useCheckToken } from '../../utils/checkToken.js';
 import SelectSearch from '../../components/Inputs/SelectSearch';
 
 
@@ -64,7 +63,6 @@ const InventarioScreen = () => {
   };
 
   const API_BASE_URL = `${import.meta.env.VITE_API_URL}`
-  const checkToken = useCheckToken();
 
   // Cargar proveedores (como en Visitadores.jsx)
   const { data: proveedores } = useFetch(
@@ -264,7 +262,7 @@ const InventarioScreen = () => {
           body: JSON.stringify(jsonPayload)
         });
       }
-      if (!checkToken(resp)) return;
+      // respuesta manejada abajo
       if (!resp.ok) {
         let serverMsg = `HTTP ${resp.status}`;
         try {
@@ -764,7 +762,7 @@ const InventarioScreen = () => {
                 onChange={handleProductoChange}
                 placeholder="Analgésico y antipirético de uso común"
                 rows={1}
-                style={{ width:'100%', padding:'10px', border:'2px solid #5a60a5', borderRadius:'4px', color:'#000', resize:'none' }}
+                style={{ width:'100%', padding:'10px', border:'2px solid  #cccccc8e', borderRadius:'4px', color:'#000', resize:'none' }}
               />
             </div>
             <div>
