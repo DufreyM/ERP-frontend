@@ -18,6 +18,7 @@ import FiltroResumen from '../../components/FIlters/FiltroResumen/FiltroResumen.
 import { getToken } from '../../services/authService';
 import { useFetch } from '../../utils/useFetch.jsx';
 import { useCheckToken } from '../../utils/checkToken.js';
+import SelectSearch from '../../components/Inputs/SelectSearch';
 
 
 const InventarioScreen = () => {
@@ -31,7 +32,26 @@ const InventarioScreen = () => {
   const [deleting, setDeleting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [showTrasladoForm, setShowTrasladoForm] = useState(false);
-  const checkToken = useCheckToken();
+  const [nuevoProductoOpen, setNuevoProductoOpen] = useState(false);
+  const [notificacion, setNotificacion] = useState('');
+
+  const [formProducto, setFormProducto] = useState({
+    nombre: '',
+    presentacion: '',
+    proveedor_id: '',
+    precioventa: '',
+    preciocosto: '',
+    receta: '', // 'true' | 'false'
+    stock_minimo: '',
+    detalles: ''
+  });
+  const [imagenFile, setImagenFile] = useState(null);
+  const [agregandoProveedor, setAgregandoProveedor] = useState(false);
+  const [nuevoProveedorNombre, setNuevoProveedorNombre] = useState('');
+  const [nuevoProveedorTelefono, setNuevoProveedorTelefono] = useState('');
+  const [nuevoProveedorCorreo, setNuevoProveedorCorreo] = useState('');
+  const [nuevoProveedorDireccion, setNuevoProveedorDireccion] = useState('');
+  const [proveedorSeleccionadoId, setProveedorSeleccionadoId] = useState('');
 
   const token = getToken();
   const getPayloadFromToken = (token) => {
@@ -44,6 +64,18 @@ const InventarioScreen = () => {
   };
 
   const API_BASE_URL = `${import.meta.env.VITE_API_URL}`
+  const checkToken = useCheckToken();
+
+  // Cargar proveedores (como en Visitadores.jsx)
+  const { data: proveedores } = useFetch(
+    `${API_BASE_URL}/api/proveedor`,
+    { headers: token ? { 'Authorization': `Bearer ${token}` } : {} }
+  );
+  const opcionesProveedores = React.useMemo(() => {
+    if (!Array.isArray(proveedores)) return [];
+    return proveedores.map(p => ({ value: String(p.id), label: p.nombre, ...p }));
+  }, [proveedores]);
+  
 
   const { data: productosData, refetch } = useFetch(
     `${API_BASE_URL}/api/productos/con-stock?local_id=${selectedLocal + 1}`,
@@ -113,7 +145,7 @@ const InventarioScreen = () => {
           'Authorization': `Bearer ${tokenActual}`,
         },
       });
-      if (!checkToken(response)) return;
+      // Nota: checkToken ya se maneja donde corresponde
       setProductos(productos.filter(p => p.codigo !== productoSeleccionado.codigo));
       setProductoSeleccionado(null);
       setShowConfirmDelete(false);
