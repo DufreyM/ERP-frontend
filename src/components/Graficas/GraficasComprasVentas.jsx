@@ -46,7 +46,7 @@ export default function VentasComprasChart({
                 new Date(m + "-01").toLocaleString("es-ES", { month: "short" })
             ),
         },
-        yAxis: { type: "value", name: "Monto ($)" },
+        yAxis: { type: "value", name: "Monto (Q)" },
         series: [
             {
                 name: "Ventas",

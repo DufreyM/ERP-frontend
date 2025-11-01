@@ -19,7 +19,7 @@ export default function VentasLineChart({
             new Date(d.mes).toLocaleString("es-ES", { month: "short" })
         ),
         },
-        yAxis: { type: "value", name: "Total ventas ($)" },
+        yAxis: { type: "value", name: "Total ventas (Q)" },
         series: [
         {
             name: "Ventas",
@@ -27,7 +27,7 @@ export default function VentasLineChart({
             data: data.map((d) => d.total_ventas),
             smooth: true,
             areaStyle: { color: "rgba(99, 102, 241, 0.2)" },
-            lineStyle: { color: "#6366f1", width: 3 },
+            lineStyle: { color: "#5a60a5", width: 3 },
             symbol: "circle",
             symbolSize: 8,
         },

@@ -21,7 +21,7 @@ export default function TopProductosChart({
             name: "Ventas",
             type: "bar",
             data: data.map((d) => d.total_vendida),
-            itemStyle: { color: "#4e79a7" },
+            itemStyle: { color: "#5a60a5" },
             label: {
             show: true,
             position: "right",

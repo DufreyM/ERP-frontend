@@ -82,6 +82,7 @@ const Dashboard = () => {
             ></SimpleTitle>
             <div className={styles.filaGraficas}>
                 <BaseGraficas
+                    titulo ={""}
                     data={datosVentas12Meses || []}
                     loading={loading12Meses}
                     error={error12Meses}

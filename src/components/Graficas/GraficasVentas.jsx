@@ -11,12 +11,14 @@ const BaseGraficas = ({
     data,
     loading,
     error,
-    nameGrafic
+    nameGrafic,
+    titulo
 }) => {
 
   
     return(
         <div className={styles.baseGraficas}>
+            
 
 
             {/* ⏳ Estado de carga */}
@@ -61,21 +63,26 @@ const BaseGraficas = ({
                 ) : (
                     // ✅ Datos disponibles → mostrar gráficas
                     <>
-                    {nameGrafic === "ventas-compras" && (
-                        <VentasComprasChart data={data} />
-                    )}
+                        <p  className={styles.tituloGraficas}>{titulo}</p>
 
-                    {nameGrafic === "ventas-12-meses" && (
-                        <VentasLineChart data={data} />
-                    )}
+                        <div className={styles.contenedorGraficas}>
 
-                    {nameGrafic === "top-productos" && (
-                        <TopProductosChart data={data} />
-                    )}
+                            {nameGrafic === "ventas-compras" && (
+                                <VentasComprasChart data={data} />
+                            )}
 
-                    {nameGrafic === "top-clientes" && (
-                        <TopClientesChart data={data} />
-                    )}
+                            {nameGrafic === "ventas-12-meses" && (
+                                <VentasLineChart data={data} />
+                            )}
+
+                            {nameGrafic === "top-productos" && (
+                                <TopProductosChart data={data} />
+                            )}
+
+                            {nameGrafic === "top-clientes" && (
+                                <TopClientesChart data={data} />
+                            )}
+                        </div>
 
                     {/* Aquí puedes agregar más tipos si tienes más gráficas */}
                     </>
