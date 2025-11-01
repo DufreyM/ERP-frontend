@@ -30,7 +30,8 @@ export default function AdminLayout() {
   //const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false);
   //colores del fondo :D
   const variantMap = {
-    "/admin/dashboard": "blue",
+    "/admin/": "transparent",
+    "/admin/dashboard": "transparent",
     "/admin/mi-perfil": "blue",
     "/admin/archivos": "orange",
     "/admin/historial-vc": "transparent",
