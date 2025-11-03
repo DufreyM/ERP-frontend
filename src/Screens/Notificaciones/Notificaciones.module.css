@@ -1,0 +1,155 @@
+.notificacionesContainer {
+  padding: 24px;
+  min-height: 100vh;
+}
+
+.buscadorContainer {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+  margin-top: 24px;
+}
+
+.loading {
+  color: #1e40af;
+  font-weight: bold;
+  margin: 24px 0;
+  text-align: center;
+}
+
+.error {
+  color: #dc2626;
+  font-weight: bold;
+  margin: 24px 0;
+  text-align: center;
+}
+
+.contenido {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.seccion {
+  margin-bottom: 32px;
+}
+
+.tituloSeccion {
+  color: #5a60a5;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.listaNotificaciones {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.notificacionPendiente {
+  background: #f1f5f9;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  position: relative;
+  transition: box-shadow 0.2s;
+}
+
+.notificacionPendiente:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.notificacionCompletada {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  position: relative;
+  border: 1px solid #e2e8f0;
+  transition: box-shadow 0.2s;
+}
+
+.notificacionCompletada:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.notificacionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  gap: 16px;
+}
+
+.titulo {
+  color: #1e40af;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0;
+  flex: 1;
+}
+
+.fecha {
+  color: #64748b;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.detalles {
+  color: #475569;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0 0 16px 0;
+}
+
+.notificacionFooter {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.botonesContainer {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.botonBorrar {
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s;
+}
+
+.botonBorrar:hover {
+  background: #b91c1c;
+}
+
+.botonBorrar:active {
+  background: #991b1b;
+}
+
+.sinNotificaciones {
+  text-align: center;
+  color: #64748b;
+  font-size: 1.1rem;
+  padding: 48px 24px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px dashed #cbd5e1;
+}
+
