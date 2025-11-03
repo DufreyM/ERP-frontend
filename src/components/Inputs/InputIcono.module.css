@@ -179,7 +179,7 @@
 
 .iconoPopupStyle{
   position: absolute;
-    left: 73px;
+    left: 1%;
     top: 50%;
     transform: translateY(-50%) translateX(-355px);
     cursor: pointer;

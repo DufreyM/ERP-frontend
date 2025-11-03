@@ -9,7 +9,6 @@ import Isotipo from '../../assets/svg/isotipoEconofarma.svg';
 import { useNavigate } from 'react-router-dom';
 import ButtonText from '../../components/ButtonText/ButtonText';
 import ButtonIcon from '../../components/ButtonIcon/ButtonIcon';
-import { add } from 'date-fns';
 import InputFile from '../../components/Inputs/InputFile';
 import SelectSearch from '../../components/Inputs/SelectSearch';
 import { useFetch } from '../../utils/useFetch';
@@ -516,8 +515,8 @@ const Visitadores = () => {
                                 value={proveedorSeleccionadoId}
                                 onChange={(value) => setProveedorSeleccionadoId(value)}
                                 type="text"
-                                options={opcionesProveedores}
-                                tableStyle={false}
+                                options={opcionesProveedores}                    
+                                popup = {false}   
                             />
                             <button
                                 onClick={() => {
