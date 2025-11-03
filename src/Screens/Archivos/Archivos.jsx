@@ -4,7 +4,6 @@
 
 import React, { useState, useEffect, useMemo } from "react"
 import { useOutletContext } from 'react-router-dom';
-import { getOptions } from '../../utils/selects';
 import styles from "./Archivos.module.css"
 import SimpleTitle from "../../components/Titles/SimpleTitle"
 import {  faPen, faCalendar } from '@fortawesome/free-solid-svg-icons';
@@ -17,7 +16,6 @@ import Filters from "../../components/FIlters/Filters";
 import ButtonHeaders from "../../components/ButtonHeaders/ButtonHeaders";
 import InputDates from "../../components/Inputs/InputDates";
 import { getToken } from '../../services/authService';
-import ButtonDisplay from "../../components/ButtonDisplay/ButtonDisplay";
 import OrderBy from "../../components/OrderBy/OrderBy";
 import { useOrderBy } from "../../hooks/useOrderBy";
 import { useFiltroGeneral } from "../../hooks/useFiltroGeneral";
@@ -72,7 +70,18 @@ const ArchivosScreen = () => {
 
   //Nuevo archivo
   const [popupNuevo, setPopupNuevo] = useState(false);
-  const openNuevo = () => setPopupNuevo(true);
+  const openNuevo = () => {
+    // Limpia los estados antes de abrir el popup
+    setNombreArchivo('');
+    setFechaVencimiento(null);
+    setArchivoPDF(null);
+    setFile('');
+    setErrorMessage('');
+    setArchivoAEditar(null); // por si acaso
+    setEditarArchivo(false);
+    
+    setPopupNuevo(true); // finalmente abre el popup
+  };
   const closeNuevo = () => setPopupNuevo(false);
 
   //eliminar archivo
