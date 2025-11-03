@@ -137,6 +137,7 @@ const Compras = () => {
 
     const [fechaInicio, setFechaInicio] = useState(null);
     const [fechaFin, setFechaFin] = useState(null);
+    const [selectedPreDate, setSelectedPreDate] = useState('');
     const [opcionsRoles, setOpcionsRoles] = useState([]);
     const [opcionsUsers, setOpcionsUsers] = useState([]);
     const [precioMin, setPrecioMin] = useState('');
@@ -224,6 +225,7 @@ const Compras = () => {
       const resetFiltros = () => {
         setFechaInicio(null);
         setFechaFin(null);
+        setSelectedPreDate('');
         
 
         setPrecioMin('');
@@ -346,6 +348,8 @@ const Compras = () => {
                       fechaInicio={fechaInicio}
                       fechaFin={fechaFin}
                       setFechaFin = {setFechaFin}
+                      setSelectedPreDate={setSelectedPreDate}
+                      selectedPreDate={selectedPreDate}
 
                       resetFiltros={resetFiltros}
                     ></Filters>

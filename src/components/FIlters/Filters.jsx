@@ -42,6 +42,8 @@ const Filters = ({
     setFechaInicio,
     fechaFin, 
     setFechaFin,
+    setSelectedPreDate,
+    selectedPreDate,
 
     //atributos para usuarios y roles
     isOpendRol,
@@ -61,12 +63,12 @@ const Filters = ({
     handleChangeMedicamento,
 
     resetFiltros
+
     
 
 }) => {
 
-  //Todos los estados de abierto y cerrado de cada filtro
-  const [selectedPreDate, setSelectedPreDate] = useState('');
+  
  
 
 
@@ -174,7 +176,10 @@ const Filters = ({
             
             <button 
               className={styles.resetButton}
-              onClick={resetFiltros}
+              onClick={() => {
+                resetFiltros();
+                
+              }}
             >
               <FontAwesomeIcon icon={faFilterCircleXmark} /> 
             </button>
