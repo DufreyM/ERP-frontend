@@ -19,6 +19,7 @@ import NuevaVenta from './Screens/NuevaVenta/NuevaVenta.jsx';
 import HistorialComprasVentas from './Screens/HistorialComprasVentas/HistorialComprasVentas.jsx';
 import EmpleadosClientes from './Screens/Empleados/EmpleadosClientes.jsx';
 import NuevaCompra from './Screens/NuevaCompra/NuevaCompra.jsx';
+import Notificaciones from './Screens/Notificaciones/Notificaciones.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 
 function App() {
@@ -77,6 +78,7 @@ function App() {
                     <Route path= "historial-vc/nueva-venta" element={<NuevaVenta />}></Route>
                     <Route path= "historial-vc/nueva-compra" element={<NuevaCompra />}></Route>
                     <Route path="configurar-ec" element={<EmpleadosClientes />} />
+                    <Route path="notificaciones" element={<Notificaciones />} />
                 </Route>
 
                 </Route>
