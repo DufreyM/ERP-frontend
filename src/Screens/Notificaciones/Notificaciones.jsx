@@ -80,13 +80,12 @@ const Notificaciones = () => {
   // Marcar como completado (estado_id = 3)
   const marcarCompletado = async (id) => {
     try {
-      const resp = await fetch(`${API_BASE_URL}/api/calendario/${id}`, {
-        method: 'PATCH',
+      const resp = await fetch(`${API_BASE_URL}/api/calendario/${id}/marcar-terminado`, {
+        method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ estado_id: 3 })
+        }
       });
 
       if (!resp.ok) {
