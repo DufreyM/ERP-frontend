@@ -90,6 +90,7 @@ const Ventas = () => {
   //manejo de filtros activos
   const [panelAbierto, setPanelAbierto] = useState(false);
   const [isOpendDate, setIsOpendDate] = useState(false);
+  const [selectedPreDate, setSelectedPreDate] = useState('');
   const [isOpendRol, setIsOpendRol] = useState(false);
   const [isOpendPrice, setIsOpendPrice] = useState(false);
   const [isOpendMedic, setIsOpendMedic] = useState(false);
@@ -199,6 +200,7 @@ const Ventas = () => {
   const resetFiltros = () => {
     setFechaInicio(null);
     setFechaFin(null);
+    setSelectedPreDate('');
     
 
     setPrecioMin('');
@@ -322,6 +324,8 @@ const Ventas = () => {
                       fechaInicio={fechaInicio}
                       fechaFin={fechaFin}
                       setFechaFin = {setFechaFin}
+                      setSelectedPreDate={setSelectedPreDate}
+                      selectedPreDate={selectedPreDate}
 
                       resetFiltros={resetFiltros}
                     ></Filters>

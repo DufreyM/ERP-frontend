@@ -4,7 +4,6 @@
 
 import React, { useState, useEffect, useMemo } from "react"
 import { useOutletContext } from 'react-router-dom';
-import { getOptions } from '../../utils/selects';
 import styles from "./Archivos.module.css"
 import SimpleTitle from "../../components/Titles/SimpleTitle"
 import {  faPen, faCalendar } from '@fortawesome/free-solid-svg-icons';
@@ -17,7 +16,6 @@ import Filters from "../../components/FIlters/Filters";
 import ButtonHeaders from "../../components/ButtonHeaders/ButtonHeaders";
 import InputDates from "../../components/Inputs/InputDates";
 import { getToken } from '../../services/authService';
-import ButtonDisplay from "../../components/ButtonDisplay/ButtonDisplay";
 import OrderBy from "../../components/OrderBy/OrderBy";
 import { useOrderBy } from "../../hooks/useOrderBy";
 import { useFiltroGeneral } from "../../hooks/useFiltroGeneral";
@@ -72,7 +70,18 @@ const ArchivosScreen = () => {
 
   //Nuevo archivo
   const [popupNuevo, setPopupNuevo] = useState(false);
-  const openNuevo = () => setPopupNuevo(true);
+  const openNuevo = () => {
+    // Limpia los estados antes de abrir el popup
+    setNombreArchivo('');
+    setFechaVencimiento(null);
+    setArchivoPDF(null);
+    setFile('');
+    setErrorMessage('');
+    setArchivoAEditar(null); // por si acaso
+    setEditarArchivo(false);
+    
+    setPopupNuevo(true); // finalmente abre el popup
+  };
   const closeNuevo = () => setPopupNuevo(false);
 
   //eliminar archivo
@@ -345,6 +354,7 @@ const ArchivosScreen = () => {
 
   const [fechaInicio, setFechaInicio] = useState(null);
   const [fechaFin, setFechaFin] = useState(null);
+  const [selectedPreDate, setSelectedPreDate] = useState('');
 
   
   const filterKeyMap={
@@ -380,6 +390,7 @@ const ArchivosScreen = () => {
    const resetFiltros = () => {
     setFechaInicio(null);
     setFechaFin(null);
+    setSelectedPreDate('');
   
 
      setRolSeleccionado('');
@@ -421,6 +432,8 @@ const ArchivosScreen = () => {
           setFechaInicio = {setFechaInicio}
           fechaFin = {fechaFin}
           setFechaFin = {setFechaFin}
+          setSelectedPreDate={setSelectedPreDate}
+          selectedPreDate={selectedPreDate}
 
            //atributos para usuarios y roles
           isOpendRol = {isOpendRol}
@@ -454,32 +467,34 @@ const ArchivosScreen = () => {
 
 
         <div className = {styles.contenedorArchivos}>
+          <div className = {styles.contenedorFiltroResumen}>
           
-          <FiltroResumen
-            fechaInicio={fechaInicio}
-            fechaFin={fechaFin}
-            usuarioSeleccionado={usuarioSeleccionadoObj}
-            rolSeleccionado={rolSeleccionadoObj}
+            <FiltroResumen
+              fechaInicio={fechaInicio}
+              fechaFin={fechaFin}
+              usuarioSeleccionado={usuarioSeleccionadoObj}
+              rolSeleccionado={rolSeleccionadoObj}
 
-            // funciones para abrir paneles
-            expandFecha={expandFechaResume}
-            expandPrecio={expandPrecioResume}
-            expandRol={expandRolResume}
-            expandMedicamento={expandMedicamentoResume}
-            //medicamentoSeleccionado={medicamentoSeleccionado}
-            onRemoveFecha={() => {
-              setFechaInicio(null);
-              setFechaFin(null);
-              setSelectedPreDate(""); // si lo manejas así
-            }}
-            onRemovePrecio={() => {
-              setPrecioMin('');
-              setPrecioMax('');
-            }}
-            onRemoveUsuario={() => handleChange({ target: { name: 'usuarios', value: '' } })}
-            onRemoveRol={() => handleChange({ target: { name: 'rol', value: '' } })}
-            onRemoveMedicamento={() => handleChangeMedicamento({ target: { name: 'tipo', value: '' } })}
-          />
+              // funciones para abrir paneles
+              expandFecha={expandFechaResume}
+              expandPrecio={expandPrecioResume}
+              expandRol={expandRolResume}
+              expandMedicamento={expandMedicamentoResume}
+              //medicamentoSeleccionado={medicamentoSeleccionado}
+              onRemoveFecha={() => {
+                setFechaInicio(null);
+                setFechaFin(null);
+                setSelectedPreDate(""); 
+              }}
+              onRemovePrecio={() => {
+                setPrecioMin('');
+                setPrecioMax('');
+              }}
+              onRemoveUsuario={() => handleChange({ target: { name: 'usuarios', value: '' } })}
+              onRemoveRol={() => handleChange({ target: { name: 'rol', value: '' } })}
+              onRemoveMedicamento={() => handleChangeMedicamento({ target: { name: 'tipo', value: '' } })}
+            />
+          </div>
 
        
 

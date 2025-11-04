@@ -223,7 +223,7 @@ const FormTrasladoMedicamentos = ({
               value={formData.producto_id}
               onChange={handleMedicamentoChange}
               placeholder="Buscar medicamento..."
-              popup = {true}
+              popup = {false}
             />
           </div>
 

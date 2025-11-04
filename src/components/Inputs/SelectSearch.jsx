@@ -85,20 +85,10 @@ const SelectSearch = ({
         />
 
         {/* Íconos */}
-        <div
-          style={{
-            position: "absolute",
-            right: "10px",
-            top: "17px",
-            transform: "translateY(-50%)",
-            display: "flex",
-            gap: "6px",
-            //Daniela no me muevas los styles, si ocupas algo hacelo con un variable
-          }}
-        >
+        <div>
           {icono && (
             //Daniela no me muevas lstyles.iconoStylesos styles 
-            <span className={popup ? styles.iconoPopupStyle : styles.iconoStyles}>
+            <span className={popup ? styles.iconoPopupStyle : styles.iconoStyle}>
            
               <FontAwesomeIcon icon={icono} style={{ color: error ? "red" : "#5a60a5" }} />
             </span>

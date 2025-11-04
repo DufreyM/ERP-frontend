@@ -31,7 +31,7 @@ export default function AdminLayout() {
   //colores del fondo :D
   const variantMap = {
     "/admin/": "transparent",
-    "/admin/dashboard": "transparent",
+    "/admin/": "transparent",
     "/admin/mi-perfil": "blue",
     "/admin/archivos": "orange",
     "/admin/historial-vc": "transparent",
@@ -43,7 +43,7 @@ export default function AdminLayout() {
 
   //posiciones del fondo
   const variantMapPositionMirrored = {
-    "/admin/dashboard": false,
+    "/admin/": false,
     "/admin/mi-perfil": false,
     "/admin/archivos": true,
     "/admin/configurar-ec": true,
@@ -55,7 +55,7 @@ export default function AdminLayout() {
   //las rutas que tiene locales
   const showTabsLocalesRoutes = [
     "/admin/",
-    "/admin/dashboard",
+    
     "/admin/inventario",
     "/admin/historial-vc",
     "/admin/historial-vc/nueva-venta",

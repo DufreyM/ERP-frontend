@@ -468,12 +468,13 @@ const VisitadoresAdmin = () => {
             <div className={styles.inputWithIcon}>
               <FontAwesomeIcon icon={faHouseMedical} className={styles.inputLeftIcon} />
               <SelectSearch
+                icono={faHouseMedical}
                 placeholder="Nombre del proveedor"
                 value={String(formVisitador.proveedor_id || '')}
                 onChange={(value) => setFormVisitador(prev => ({ ...prev, proveedor_id: value ? Number(value) : '' }))}
                 options={opcionesProveedores}
                 tableStyle={false}
-                popup // mismo uso que en otras pantallas
+                 // mismo uso que en otras pantallas
               />
             </div>
             {/* fin Proveedor select */}

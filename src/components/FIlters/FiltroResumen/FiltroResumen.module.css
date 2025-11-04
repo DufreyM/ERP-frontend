@@ -32,7 +32,7 @@
 }
 
 .removeIcon {
-  margin-left: 0.5rem;
+  font-size: 17px;
   cursor: pointer;
   color: #5a60A5;
   transition: color 0.2s;
