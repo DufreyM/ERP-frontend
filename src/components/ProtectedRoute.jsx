@@ -21,6 +21,20 @@ export default function ProtectedRoute() {
     return <Navigate to="/" replace />;
   }
 
+
+  // //Control de roles DD
+  // const path = location.pathname;
+
+  // if (path.startsWith("/admin") && user?.rol !== "admin") {
+  //   console.warn("No tienes permiso para acceder a /admin");
+  //   return <Navigate to="/dependienta" replace />;
+  // }
+
+  // if (path.startsWith("/dependienta") && user?.rol !== "dependienta") {
+  //   console.warn("No tienes permiso para acceder a /dependienta");
+  //   return <Navigate to="/admin" replace />;
+  // }
+
   return <Outlet />;
 }
 

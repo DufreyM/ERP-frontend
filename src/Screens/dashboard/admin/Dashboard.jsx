@@ -2,10 +2,6 @@ import { useOutletContext } from 'react-router-dom';
 import { getToken } from '../../../services/authService';
 import { useFetch } from '../../../utils/useFetch';
 import { useCheckToken } from '../../../utils/checkToken';
-import VentasLineChart from '../../../components/Graficas/Graficas12Meses';
-import TopProductosChart from '../../../components/Graficas/GraficasTopProductos';
-import VentasComprasChart from '../../../components/Graficas/GraficasComprasVentas';
-import TopClientesChart from '../../../components/Graficas/GraficasClientes';
 import BaseGraficas from '../../../components/Graficas/GraficasVentas';
 import styles from './Dashboard.module.css'
 import SimpleTitle from '../../../components/Titles/SimpleTitle';

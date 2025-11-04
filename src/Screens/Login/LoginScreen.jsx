@@ -81,13 +81,13 @@ const LoginScreen = () => {
                     navigate('/admin/', { state: { user: userEmail, role: 'Admin' } });
                     break;
                 case 2: // Dependienta
-                    navigate('/dashboard/dependienta', { state: { user: userEmail, role: 'Dependienta' } });
+                    navigate('/dependiente/', { state: { user: userEmail, role: 'Dependienta' } });
                     break;
                 case 3: // Visitador
-                    navigate('/dashboard/visitador', { state: { user: userEmail, role: 'Visitador' } });
+                    navigate('/visitador/', { state: { user: userEmail, role: 'Visitador' } });
                     break;
                 case 4: // Contador
-                    navigate('/dashboard/contador', { state: { user: userEmail, role: 'Contador' } });
+                    navigate('/contador/', { state: { user: userEmail, role: 'Contador' } });
                     break;
                 default:
                     navigate('/dashboard', { state: { user: userEmail, role: 'Usuario' } });
