@@ -22,44 +22,53 @@ Autor: Melisa
 
 import { useState, useEffect, useCallback } from "react";
 import { getToken } from '../services/authService';
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/Auth/useAuth";
 
 export const useFetch = (url, options = {}, dependencies = []) => {
-  const [data, setData] = useState(null);         //almacna la data que responde la API
-  const [loading, setLoading] = useState(false);  //indica si la petición está en curso
-  const [error, setError] = useState(null);       //almacena un posible error
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  const {logout} = useAuth();
 
-  //Función principal, realiza la petición. Se guarda con useCallback para evitar bucles
   const fetchData = useCallback(async () => {
-      if (!url) return;
-      setLoading(true);
-      setError(null);
+    if (!url) return;
+    setLoading(true);
+    setError(null);
 
-      try {
-        const token = getToken();
-        const headers = {
-          ...options.headers,
-          ...(token && { 'Authorization': `Bearer ${token}` })
-        };
+    try {
+      const token = getToken();
+      const headers = {
+        ...options.headers,
+        ...(token && { 'Authorization': `Bearer ${token}` }),
+      };
 
-        const response = await fetch(url, { ...options, headers });
-        if (!response.ok) throw new Error(`Error ${response.status}`);
+      const response = await fetch(url, { ...options, headers });
 
-        const result = await response.json();
-        setData(result);
-      } catch (err) {
-        setError(err.message || "Error desconocido");
-      } finally {
-        setLoading(false);
+      if (response.status === 401 || response.status === 403) {
+        console.warn("Token inválido o expirado. Cerrando sesión...");
+        logout(); 
+        navigate("/", { replace: true }); // manda al login
+        return;
       }
-    
-  }, [url, ...dependencies]); // Se vuelve a crear la función si cambia la URL o alguna dependencia
 
-  // Se llama a la función fetchData cuando se monta el componente o cambian las dependencias.
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}`);
+      }
+
+      const result = await response.json();
+      setData(result);
+    } catch (err) {
+      setError(err.message || "Error desconocido");
+    } finally {
+      setLoading(false);
+    }
+  }, [url, ...dependencies]);
+
   useEffect(() => {
     fetchData();
   }, [fetchData, ...dependencies]);
 
-  // Se expone la función fetchData como `refetch` para poder llamar manualmente a la petición si es necesario.
   return { data, loading, error, refetch: fetchData };
-}
-
+};

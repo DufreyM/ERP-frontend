@@ -3,7 +3,6 @@ import { faMagnifyingGlassDollar,faFilter, faGear, faUser,faFilterCircleXmark, f
 import styles from "./Filters.module.css";
 import { useState, useRef, useEffect } from "react";
 import InputSelects from "../Inputs/InputSelects";
-import InputDates from "../Inputs/InputDates";
 import IconoInput from "../Inputs/InputIcono";
 import ButtonDisplay from "../ButtonDisplay/ButtonDisplay";
 import DatePicker from "react-datepicker";
@@ -43,6 +42,8 @@ const Filters = ({
     setFechaInicio,
     fechaFin, 
     setFechaFin,
+    setSelectedPreDate,
+    selectedPreDate,
 
     //atributos para usuarios y roles
     isOpendRol,
@@ -62,12 +63,12 @@ const Filters = ({
     handleChangeMedicamento,
 
     resetFiltros
+
     
 
 }) => {
 
-  //Todos los estados de abierto y cerrado de cada filtro
-  const [selectedPreDate, setSelectedPreDate] = useState('');
+  
  
 
 
@@ -175,7 +176,10 @@ const Filters = ({
             
             <button 
               className={styles.resetButton}
-              onClick={resetFiltros}
+              onClick={() => {
+                resetFiltros();
+                
+              }}
             >
               <FontAwesomeIcon icon={faFilterCircleXmark} /> 
             </button>
@@ -246,6 +250,7 @@ const Filters = ({
                       icono = {faCalendar}
                       value={fechaInicio ? fechaInicio.toLocaleDateString() : ""}
                       onChange={(e) => handleInputFecha(e.target.value)}
+                      placeholder={"DD-MM-YYYY"}
                     
                     ></IconoInput>
 
@@ -259,6 +264,7 @@ const Filters = ({
                       endDate={fechaFin}
                       selectsStart
                       calendarClassName="calendario-pequeno"
+
                     ></DatePicker>
 
                   </div>  
@@ -269,6 +275,7 @@ const Filters = ({
                       icono = {faCalendar}
                       value={fechaFin ? fechaFin.toLocaleDateString() : ""}
                       onChange={(e) => handleInputFecha(e.target.value)}
+                      placeholder={"DD-MM-YYYY"}
                     ></IconoInput>
 
 

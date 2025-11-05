@@ -36,6 +36,7 @@
     flex-direction: column;
     align-items: center;
     display: flex;
+    overflow-x: auto; /* Agrega scroll horizontal si la tabla es muy ancha */
 }
   
 .modalContenido {
@@ -116,4 +117,24 @@
     .contenedorGeneral {
         padding: 0.5rem;
     }
+}
+
+.inputWithIcon {
+  position: relative;
+}
+
+/* Empuja el texto del input hacia la derecha sin editar SelectSearch */
+.inputWithIcon :global(.inputStyle) {
+  padding-left: 40px !important;
+}
+
+/* Ícono posicionado dentro del campo */
+.inputLeftIcon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #5a60a5;
+  pointer-events: none;
+  font-size: 16px;
 }

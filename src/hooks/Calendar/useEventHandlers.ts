@@ -21,6 +21,8 @@ Autor: Melisa
 Última modificación: 17/08/2025
 */
 
+import { useCheckToken } from "../../utils/checkToken";
+
 declare global {
   interface ImportMeta {
     readonly env: {
@@ -57,37 +59,40 @@ export function useEventHandlers({
   onError,
   removeEventFromState
 }: UseEventHandlersProps) {
+  const checkToken = useCheckToken();
 
 /**
  * Combina una fecha (Date) y una hora (string "hh:mm")
  * y retorna una fecha en formato ISO (string).
  * Devuelve null si alguno de los valores es inválido.
  */
-const combinarFechaYHora = (fecha: Date | null, hora: string): string | null => {
-    if (!fecha || !hora) return null;
+  const combinarFechaYHora = (fecha: Date | null, hora: string): string | null => {
+      if (!fecha || !hora) return null;
 
-    const [horaStr, minutoStr] = hora.split(':');
-    const fechaFinal = new Date(fecha);
-    fechaFinal.setHours(parseInt(horaStr), parseInt(minutoStr), 0, 0);
-    return fechaFinal.toISOString();
-};
+      const [horaStr, minutoStr] = hora.split(':');
+      const fechaFinal = new Date(fecha);
+      fechaFinal.setHours(parseInt(horaStr), parseInt(minutoStr), 0, 0);
+      return fechaFinal.toISOString();
+  };
 
  /**
    * Recibe una fecha en formato ISO y extrae la hora
    * en formato "hh:mm", útil para prellenar formularios.
    */
-const obtenerHoraDesdeFecha = (fechaISO: string): string => {
-    const fecha = new Date(fechaISO);
-    const horas = fecha.getHours().toString().padStart(2, '0');
-    const minutos = fecha.getMinutes().toString().padStart(2, '0');
-    return `${horas}:${minutos}`;
-};
+  const obtenerHoraDesdeFecha = (fechaISO: string): string => {
+      const fecha = new Date(fechaISO);
+      const horas = fecha.getHours().toString().padStart(2, '0');
+      const minutos = fecha.getMinutes().toString().padStart(2, '0');
+      return `${horas}:${minutos}`;
+  };
 
 /**
    * Envía una solicitud POST para crear un nuevo evento.
    * Llama a onSuccess si todo va bien, o a onError si falla.
    */
-const crearEvento = async (datosEvento: EventoDatos) => {
+  const crearEvento = async (datosEvento: EventoDatos) => {
+  
+
     try {
       const response = await fetch(`${apiUrl}/api/calendario`, {
         method: 'POST',
@@ -97,6 +102,7 @@ const crearEvento = async (datosEvento: EventoDatos) => {
         },
         body: JSON.stringify(datosEvento)
       });
+      if (!checkToken(response)) return;
 
       if (!response.ok) {
         const mensaje = await response.text();
@@ -128,6 +134,7 @@ const crearEvento = async (datosEvento: EventoDatos) => {
         },
         body: JSON.stringify(datosActualizados)
       });
+      if (!checkToken(response)) return;
 
       if (!response.ok) {
         const mensaje = await response.text();
@@ -159,6 +166,7 @@ const crearEvento = async (datosEvento: EventoDatos) => {
           'Content-Type': 'application/json'
         }
       });
+      if (!checkToken(response)) return;
 
       if (!response.ok) {
         const mensaje = await response.text();

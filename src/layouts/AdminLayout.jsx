@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 import Navbar from '../components/Navbar/Navbar.jsx';
-import RightPanel from "../components/RightPanel/RightPanel.jsx";
+//import RightPanel from "../components/RightPanel/RightPanel.jsx";
 import "./AdminLayout.css";
 import {useState} from "react";
 import { useLocation } from 'react-router-dom';
@@ -22,15 +22,16 @@ const adminItems = [
 
 
 
-
 export default function AdminLayout() {
+ 
+
   const { pathname } = useLocation();
  
-  const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false);
-
+  //const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false);
+  //colores del fondo :D
   const variantMap = {
-    
-    "/admin/dashboard": "blue",
+    "/admin/": "transparent",
+    "/admin/": "transparent",
     "/admin/mi-perfil": "blue",
     "/admin/archivos": "orange",
     "/admin/historial-vc": "transparent",
@@ -38,11 +39,11 @@ export default function AdminLayout() {
     "/admin/inventario": "blue",
     "/admin/calendario": "transparent",
     "/admin/visitadores-medicos": "blue",
- 
   };
 
+  //posiciones del fondo
   const variantMapPositionMirrored = {
-    "/admin/dashboard": false,
+    "/admin/": false,
     "/admin/mi-perfil": false,
     "/admin/archivos": true,
     "/admin/configurar-ec": true,
@@ -51,10 +52,35 @@ export default function AdminLayout() {
 
   };
 
+  //las rutas que tiene locales
+  const showTabsLocalesRoutes = [
+    "/admin/",
+    
+    "/admin/inventario",
+    "/admin/historial-vc",
+    "/admin/historial-vc/nueva-venta",
+    "/admin/historial-vc/nueva-compra",
+    "/admin/configurar-ec",
+    "/admin/calendario",
+    "/admin/archivos",
+    "/admin/notificaciones",
+    //"/admin/mi-perfil",
+    //"/admin/visitadores-medicos",
+  ];
+
+  // Chequear si la ruta actual debe mostrar los tabs
+  const showTabsLocales = showTabsLocalesRoutes.includes(pathname);
+
+
   const variant = variantMap[pathname] || "default";
   const mirrored = variantMapPositionMirrored[pathname] || false;
 
-  const [selectedLocal, setSelectedLocal] = useState(0);
+  //pestañas de locales y guardar configuración de en donde estás
+  const [selectedLocal, setSelectedLocal] = useState(() => {
+    const storedLocal = localStorage.getItem("selectedLocal");
+    return storedLocal !== null ? parseInt(storedLocal) : 0;
+  });
+
   const locales = ["Local 1", "Local 2"];
 
   console.log("AdminLayout renderizado; selectedLocal:", selectedLocal);
@@ -64,23 +90,31 @@ export default function AdminLayout() {
       mirrored={mirrored} 
       className="admin-background"
     >
-      <div className={`admin-layout ${rightPanelCollapsed ? 'right-collapsed' : ''}`}>
+      <div className={`admin-layout right-collapsed' : ''}`}>
         <Navbar items={adminItems} />
         <main
           className="admin-content"
-          
           >
+
+          {showTabsLocales && (
           <TabsLocales
             locales={locales}
             selectedLocal={selectedLocal}
-            onSelect={setSelectedLocal}
+            onSelect={(index) => {
+              setSelectedLocal(index);
+              localStorage.setItem("selectedLocal", index);
+            }}
           />
-          <Outlet context={{ selectedLocal, rightPanelCollapsed}} />
+          )}
+
+          <Outlet context={{ selectedLocal,
+            //  rightPanelCollapsed
+             }} />
         </main>
-        <RightPanel
+        {/* <RightPanel
           collapsed={rightPanelCollapsed}
           setCollapsed={setRightPanelCollapsed}
-        />
+        /> */}
       </div>
     </BackgroundCross>
   );

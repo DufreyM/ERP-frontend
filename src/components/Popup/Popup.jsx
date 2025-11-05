@@ -1,7 +1,7 @@
 
 import ButtonHeaders from '../ButtonHeaders/ButtonHeaders';
 import './PopupButton.css';  
-const Popup = ({ isOpen, onClose, title, children, onClick }) => {
+const Popup = ({ isOpen, onClose, title, children, onClick, hideActions = false, acceptText = 'Aceptar', cancelText = 'Cancelar' }) => {
   if (!isOpen) return null;  // No renderiza nada si `isOpen` es false
 
   return (
@@ -10,16 +10,14 @@ const Popup = ({ isOpen, onClose, title, children, onClick }) => {
         <h3>{title}</h3>
         <button className="close-btn" onClick={onClose}>X</button>
         {children}
-
-      <div className='buttonStylePopUp'>
-        <ButtonHeaders red = {true} text= 'Cancelar' onClick={onClose}/>
-        <ButtonHeaders text= 'Aceptar'
-        
-          onClick={onClick}
-
-        />
-       
-      </div>
+      {!hideActions && (
+        <div className='buttonStylePopUp'>
+          <ButtonHeaders red = {true} text={cancelText} onClick={onClose}/>
+          <ButtonHeaders text={acceptText}
+            onClick={onClick}
+          />
+        </div>
+      )}
       
       </div>
     </div>

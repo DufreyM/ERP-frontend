@@ -20,6 +20,7 @@ import IconoInput from '../../components/Inputs/InputIcono';
 import InputPassword from '../../components/Inputs/InputPassword';
 import ButtonText from '../../components/ButtonText/ButtonText';
 import Header from './Header';
+import { useAuth } from '../../hooks/Auth/useAuth';
 
 const LoginScreen = () => {
     const [email, setEmail] = useState('');
@@ -27,6 +28,7 @@ const LoginScreen = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate(); // Hook para redirigir
+    const { login } = useAuth();
     
     
     const handleVisitador = () => {
@@ -52,8 +54,9 @@ const LoginScreen = () => {
     };
 
 
-    const handleLogin = async () => {
+    const handleLogin = async (e) => {
         // Validación de campos vacíos
+        e.preventDefault(); 
         if (!email || !password) {
 
             setErrorMessage('Por favor, completa todos los campos');
@@ -66,7 +69,7 @@ const LoginScreen = () => {
             const { token } = data;
 
             // Almacenar el token en localStorage
-            storeToken(token);
+            //storeToken(token);
 
             // Decodificar el token para obtener el rol y el nombre del usuario
             const payload = JSON.parse(atob(token.split('.')[1]));
@@ -75,16 +78,16 @@ const LoginScreen = () => {
             // Redirigir según el rol
             switch (rol_id) {
                 case 1: // Admin
-                    navigate('/admin/dashboard', { state: { user: userEmail, role: 'Admin' } });
+                    navigate('/admin/', { state: { user: userEmail, role: 'Admin' } });
                     break;
                 case 2: // Dependienta
-                    navigate('/dashboard/dependienta', { state: { user: userEmail, role: 'Dependienta' } });
+                    navigate('/dependiente/', { state: { user: userEmail, role: 'Dependienta' } });
                     break;
                 case 3: // Visitador
-                    navigate('/dashboard/visitador', { state: { user: userEmail, role: 'Visitador' } });
+                    navigate('/visitador/', { state: { user: userEmail, role: 'Visitador' } });
                     break;
                 case 4: // Contador
-                    navigate('/dashboard/contador', { state: { user: userEmail, role: 'Contador' } });
+                    navigate('/contador/', { state: { user: userEmail, role: 'Contador' } });
                     break;
                 default:
                     navigate('/dashboard', { state: { user: userEmail, role: 'Usuario' } });

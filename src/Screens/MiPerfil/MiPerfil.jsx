@@ -13,15 +13,20 @@ import { useNavigate } from "react-router-dom";
 import { faUser, faEnvelope, faBirthdayCake } from '@fortawesome/free-solid-svg-icons';
 import styles from './MiPerfil.module.css';
 import ButtonIcon from "../../components/ButtonIcon/ButtonIcon";
+import { useCheckToken } from "../../utils/checkToken";
 
 const MiPerfil = () => {
   const navigate = useNavigate();
+  const checkToken = useCheckToken();
   const [formData, setFormData] = useState({
     nombre: "",
     apellidos: "",
     email: "",
     fechanacimiento: null,
   });
+
+ 
+  const token = getToken();
 
   const [originalData, setOriginalData] = useState(null);
   const [userRole, setUserRole] = useState("");
@@ -60,17 +65,26 @@ const MiPerfil = () => {
     return "Usuario";
   };
 
+  
   // Función para cargar la foto de perfil del usuario
   const fetchProfilePhoto = async () => {
     try {
       const token = getToken();
-      if (!token) return;
+      
+      
 
       const response = await fetch(`${API_BASE_URL}/api/usuario/me/foto-perfil`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
+
+      if (!token) {
+        console.warn("No hay token, no reviso expiración");
+      } else if (!checkToken(response)) {
+        return; // corta ejecución si expiró
+      }
+     
 
       if (response.ok) {
         const data = await response.json();
@@ -105,6 +119,7 @@ const MiPerfil = () => {
         },
         body: formData
       });
+      if (!checkToken(response)) return;
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -152,12 +167,10 @@ const MiPerfil = () => {
   const fetchUserData = async () => {
     setLoading(true);
     setError("");
+    
     try {
       const token = getToken();
-      if (!token) {
-        setError("No hay token de autenticación");
-        return;
-      }
+      
 
       console.log('Token found:', token.substring(0, 20) + '...');
       console.log('API_BASE_URL:', API_BASE_URL);
@@ -175,7 +188,17 @@ const MiPerfil = () => {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         }
+        
       });
+      
+      if (!checkToken(response)) return;
+
+      if (!token) {
+        console.warn("No hay token, no reviso expiración");
+      } else if (!checkToken(response)) {
+        return; // corta ejecución si expiró
+      }
+      
 
       console.log('Response status:', response.status);
       console.log('Response ok:', response.ok);
@@ -247,7 +270,10 @@ const MiPerfil = () => {
           headers: {
             'Content-Type': 'application/json'
           }
-        });
+        }); 
+        //arreglar la cosa esa y luego descomentar esto
+        //if (!checkToken(response)) return;
+        
         console.log('Connection test response:', response.status);
       } catch (error) {
         console.error('Connection test failed:', error);
@@ -272,13 +298,11 @@ const MiPerfil = () => {
     setSaving(true);
     setError("");
     setSuccess("");
+    
 
     try {
       const token = getToken();
-      if (!token) {
-        setError("No hay token de autenticación");
-        return;
-      }
+     
 
       // Preparar datos para enviar al backend
       const updateData = {
@@ -303,6 +327,13 @@ const MiPerfil = () => {
         },
         body: JSON.stringify(updateData)
       });
+      
+
+       if (!token) {
+        console.warn("No hay token, no reviso expiración");
+      } else if (!checkToken(response)) {
+        return; // corta ejecución si expiró
+      }
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
@@ -405,6 +436,7 @@ const MiPerfil = () => {
                 onChange={handleChange}
                 type="text"
                 name="nombre"
+                formatoAa={true}
               />
             ) : (
               <span className={styles.infoValue}>{formData.nombre || "No especificado"}</span>
@@ -421,6 +453,7 @@ const MiPerfil = () => {
                 onChange={handleChange}
                 type="text"
                 name="apellidos"
+                formatoAa={true}
               />
             ) : (
               <span className={styles.infoValue}>{formData.apellidos || "No especificado"}</span>

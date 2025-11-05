@@ -4,7 +4,6 @@
 
 import React, { useState, useEffect, useMemo } from "react"
 import { useOutletContext } from 'react-router-dom';
-import { getOptions } from '../../utils/selects';
 import styles from "./Archivos.module.css"
 import SimpleTitle from "../../components/Titles/SimpleTitle"
 import {  faPen, faCalendar } from '@fortawesome/free-solid-svg-icons';
@@ -17,17 +16,18 @@ import Filters from "../../components/FIlters/Filters";
 import ButtonHeaders from "../../components/ButtonHeaders/ButtonHeaders";
 import InputDates from "../../components/Inputs/InputDates";
 import { getToken } from '../../services/authService';
-import ButtonDisplay from "../../components/ButtonDisplay/ButtonDisplay";
 import OrderBy from "../../components/OrderBy/OrderBy";
 import { useOrderBy } from "../../hooks/useOrderBy";
 import { useFiltroGeneral } from "../../hooks/useFiltroGeneral";
 import { useOpcionesUsuarioDinamicos } from "../../hooks/useOpcionesUsuariosDinamico";
 import FiltroResumen from "../../components/FIlters/FiltroResumen/FiltroResumen";
+import { useCheckToken } from "../../utils/checkToken";
 
 
 const ArchivosScreen = () => {
   const { selectedLocal } = useOutletContext();
   const localSeleccionado = selectedLocal + 1 ;
+  const checkToken = useCheckToken();
      
   const token = getToken();
   const {data, loading, error } = useFetch(`${import.meta.env.VITE_API_URL}/documentos-locales?local_id=${localSeleccionado}` , {
@@ -70,7 +70,18 @@ const ArchivosScreen = () => {
 
   //Nuevo archivo
   const [popupNuevo, setPopupNuevo] = useState(false);
-  const openNuevo = () => setPopupNuevo(true);
+  const openNuevo = () => {
+    // Limpia los estados antes de abrir el popup
+    setNombreArchivo('');
+    setFechaVencimiento(null);
+    setArchivoPDF(null);
+    setFile('');
+    setErrorMessage('');
+    setArchivoAEditar(null); // por si acaso
+    setEditarArchivo(false);
+    
+    setPopupNuevo(true); // finalmente abre el popup
+  };
   const closeNuevo = () => setPopupNuevo(false);
 
   //eliminar archivo
@@ -104,6 +115,7 @@ const ArchivosScreen = () => {
 
     //Nuevo archivo
     const subirDocumento = async (token, datos) => {
+      
       const formData = new FormData();
       formData.append('nombre', datos.nombre);
       formData.append('usuario_id', datos.usuario_id);
@@ -119,6 +131,8 @@ const ArchivosScreen = () => {
         },
         body: formData
       });
+
+      if (!checkToken(response)) return;
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -159,9 +173,11 @@ const ArchivosScreen = () => {
       try {
         const respuesta = await subirDocumento(tokenActual, datos);
         console.log('Documento subido:', respuesta);
+      
 
         closeNuevo(); // si tienes un popup para cerrarlo
         //setNotificacion('Documento subido con éxito');
+        window.location.reload();
       } catch (error) {
         console.error('Error al subir documento:', error);
         setErrorMessage('Ocurrió un error al subir el documento.');
@@ -169,10 +185,18 @@ const ArchivosScreen = () => {
     };
 
   const eliminarDocumento = async (id) => {
+ 
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/documentos-locales/${id}`, {
+       
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          // No pongas Content-Type, fetch lo hace con FormData automáticamente
+        },
       });
+
+      if (!checkToken(response)) return;
 
       if (!response.ok) {
         throw new Error('Error al eliminar el documento');
@@ -205,6 +229,7 @@ const ArchivosScreen = () => {
   };
 
   const editarDocumento = async (id, datos) => {
+    
     const response = await fetch(`${import.meta.env.VITE_API_URL}/documentos-locales/${id}`, {
       method: 'PUT',
       headers: {
@@ -213,6 +238,8 @@ const ArchivosScreen = () => {
       },
       body: JSON.stringify(datos),
     });
+
+    if (!checkToken(response)) return;
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -327,6 +354,7 @@ const ArchivosScreen = () => {
 
   const [fechaInicio, setFechaInicio] = useState(null);
   const [fechaFin, setFechaFin] = useState(null);
+  const [selectedPreDate, setSelectedPreDate] = useState('');
 
   
   const filterKeyMap={
@@ -362,6 +390,7 @@ const ArchivosScreen = () => {
    const resetFiltros = () => {
     setFechaInicio(null);
     setFechaFin(null);
+    setSelectedPreDate('');
   
 
      setRolSeleccionado('');
@@ -403,6 +432,8 @@ const ArchivosScreen = () => {
           setFechaInicio = {setFechaInicio}
           fechaFin = {fechaFin}
           setFechaFin = {setFechaFin}
+          setSelectedPreDate={setSelectedPreDate}
+          selectedPreDate={selectedPreDate}
 
            //atributos para usuarios y roles
           isOpendRol = {isOpendRol}
@@ -436,32 +467,34 @@ const ArchivosScreen = () => {
 
 
         <div className = {styles.contenedorArchivos}>
+          <div className = {styles.contenedorFiltroResumen}>
           
-          <FiltroResumen
-            fechaInicio={fechaInicio}
-            fechaFin={fechaFin}
-            usuarioSeleccionado={usuarioSeleccionadoObj}
-            rolSeleccionado={rolSeleccionadoObj}
+            <FiltroResumen
+              fechaInicio={fechaInicio}
+              fechaFin={fechaFin}
+              usuarioSeleccionado={usuarioSeleccionadoObj}
+              rolSeleccionado={rolSeleccionadoObj}
 
-            // funciones para abrir paneles
-            expandFecha={expandFechaResume}
-            expandPrecio={expandPrecioResume}
-            expandRol={expandRolResume}
-            expandMedicamento={expandMedicamentoResume}
-            //medicamentoSeleccionado={medicamentoSeleccionado}
-            onRemoveFecha={() => {
-              setFechaInicio(null);
-              setFechaFin(null);
-              setSelectedPreDate(""); // si lo manejas así
-            }}
-            onRemovePrecio={() => {
-              setPrecioMin('');
-              setPrecioMax('');
-            }}
-            onRemoveUsuario={() => handleChange({ target: { name: 'usuarios', value: '' } })}
-            onRemoveRol={() => handleChange({ target: { name: 'rol', value: '' } })}
-            onRemoveMedicamento={() => handleChangeMedicamento({ target: { name: 'tipo', value: '' } })}
-          />
+              // funciones para abrir paneles
+              expandFecha={expandFechaResume}
+              expandPrecio={expandPrecioResume}
+              expandRol={expandRolResume}
+              expandMedicamento={expandMedicamentoResume}
+              //medicamentoSeleccionado={medicamentoSeleccionado}
+              onRemoveFecha={() => {
+                setFechaInicio(null);
+                setFechaFin(null);
+                setSelectedPreDate(""); 
+              }}
+              onRemovePrecio={() => {
+                setPrecioMin('');
+                setPrecioMax('');
+              }}
+              onRemoveUsuario={() => handleChange({ target: { name: 'usuarios', value: '' } })}
+              onRemoveRol={() => handleChange({ target: { name: 'rol', value: '' } })}
+              onRemoveMedicamento={() => handleChangeMedicamento({ target: { name: 'tipo', value: '' } })}
+            />
+          </div>
 
        
 

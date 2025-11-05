@@ -1,19 +1,15 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faAddressCard, faArrowLeft, faSearch} from '@fortawesome/free-solid-svg-icons';
 import IconoInput from "../../components/Inputs/InputIcono";
-import SimpleTitle from "../../components/Titles/SimpleTitle";
 import styles from "./NuevaVenta.module.css"
-import { Table } from '../../components/Tables/Table';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { TablaFactura } from "../../components/Tables/TablaFactura.jsx";
-import ButtonText from "../../components/ButtonText/ButtonText.jsx";
 import ButtonHeaders from "../../components/ButtonHeaders/ButtonHeaders.jsx";
 import { useState, useEffect} from "react";
 import { useFetch } from "../../utils/useFetch.jsx";
 import { getToken } from "../../services/authService.js";
 import Popup from "../../components/Popup/Popup.jsx";
-
-
+import { useCheckToken } from "../../utils/checkToken.js";
 
 
 const NuevaVenta = () => {
@@ -24,8 +20,12 @@ const NuevaVenta = () => {
 
   //productos
   const token = getToken(); 
+  const checkToken = useCheckToken();
+  
   const { selectedLocal } = useOutletContext();
   const localSeleccionado = selectedLocal + 1 ;
+  //Separacion de memoria entre locales
+  const ventaKey = `venta-temporal-local-${selectedLocal}`;
   const {data: productos, loading, error } = useFetch(`${import.meta.env.VITE_API_URL}/api/productos/con-stock?local_id=${localSeleccionado}`, {
       headers: {'Authorization': `Bearer ${token}`}
   });
@@ -42,11 +42,27 @@ const NuevaVenta = () => {
     }, [notificacion]);
 
 
-  const [datosCargados, setDatosCargados] = useState(false);
+  const [datosCargados, setDatosCargados] = useState(false);  
 
+  useEffect(() => {
+  // cada vez que cambie el local, marcamos que aún no cargamos sus datos
+    setDatosCargados(false);
+  }, [selectedLocal]);
 
+  //bloquear cf cuando la venta sea mayor a 2500
+  const [totalFactura, setTotalFactura] = useState(0);
+  const [bloquearCF, setBloquearCF] = useState(false);
 
-  
+  useEffect(() => {
+   
+    if (totalFactura > 2500) {
+      setNotificacion('No se puede vender como Consumidor Final, el total supera Q2500'); 
+      setBloquearCF(true);
+      if (tipoCliente === "cf") setTipoCliente("registrado");
+    } else {
+      setBloquearCF(false);
+    }
+  }, [totalFactura]);
 
 
 
@@ -73,9 +89,42 @@ const NuevaVenta = () => {
   const [datosCliente, setDatosCliente] = useState(null);
   const [tipoPago, setTipoPago] = useState("efectivo");
   const [mostrarInputNombreManual, setMostrarInputNombreManual] = useState(false)
-  //para que no se pierdan los datos al refrescar
+ 
   useEffect(() => {
-    if (!datosCargados) return;
+    const datosGuardados = localStorage.getItem(ventaKey);
+    if (datosGuardados) {
+      try {
+        const venta = JSON.parse(datosGuardados);
+        setLineas(venta.lineas || []);
+        setTipoCliente(venta.tipoCliente || "registrado");
+        setNitCliente(venta.nitCliente || "");
+        setNombreClienteManual(venta.nombreClienteManual || "");
+        setTipoPago(venta.tipoPago || "efectivo");
+      } catch (err) {
+        console.error("Error parseando venta guardada:", err);
+        // si hay error, limpiamos para no arrastrar datos corruptos
+        setLineas([]);
+        setTipoCliente("registrado");
+        setNitCliente("");
+        setNombreClienteManual("");
+        setTipoPago("efectivo");
+      }
+    } else {
+      // Si no hay datos para este local, resetea el estado
+      setLineas([]);
+      setTipoCliente("registrado");
+      setNitCliente("");
+      setNombreClienteManual("");
+      setTipoPago("efectivo");
+    }
+    
+    setDatosCargados(true);
+  }, [ventaKey]);
+
+   //para que no se pierdan los datos al refrescar
+  useEffect(() => {
+    if (!datosCargados) return; // no guardar hasta que hayamos cargado los datos del local actual
+
     const ventaTemp = {
       lineas,
       tipoCliente,
@@ -83,24 +132,15 @@ const NuevaVenta = () => {
       nombreClienteManual,
       tipoPago,
     };
-    localStorage.setItem("venta-temporal", JSON.stringify(ventaTemp));
-  }, [lineas, tipoCliente, nitCliente, nombreClienteManual, tipoPago]);
 
-
-  useEffect(() => {
-    const datosGuardados = localStorage.getItem("venta-temporal");
-    if (datosGuardados) {
-      const venta = JSON.parse(datosGuardados);
-      setLineas(venta.lineas || []);
-      setTipoCliente(venta.tipoCliente || "registrado");
-      setNitCliente(venta.nitCliente || "");
-      setNombreClienteManual(venta.nombreClienteManual || "");
-      setTipoPago(venta.tipoPago || "efectivo");
-      //console.log("Datos cargados de localStorage", venta);
+    try {
+      localStorage.setItem(ventaKey, JSON.stringify(ventaTemp));
+    } catch (err) {
+      console.error("No se pudo guardar la venta temporal:", err);
     }
-    
-    setDatosCargados(true);
-  }, []);
+  }, [lineas, tipoCliente, nitCliente, nombreClienteManual, tipoPago, ventaKey, datosCargados]);
+
+
 
 
   const handleNitCliente = (e) => {
@@ -122,6 +162,7 @@ const NuevaVenta = () => {
           'Authorization': `Bearer ${token}`
         }
       });
+      if (!checkToken(response)) return;
 
     
       
@@ -211,6 +252,8 @@ const NuevaVenta = () => {
       body: JSON.stringify(body)
     });
 
+    if (!checkToken(response)) return;
+
     if (!response.ok) {
       const errorText = await response.text();
   console.error("Error del servidor:", errorText);
@@ -221,7 +264,7 @@ const NuevaVenta = () => {
     const result = await response.json();
     //console.log("Venta registrada correctamente:", result);
     setNotificacion("¡Venta registrada con éxito!");
-    localStorage.removeItem("venta-temporal");
+    localStorage.removeItem(ventaKey);
 
 
     // Redirigir o resetear formulario
@@ -241,18 +284,10 @@ const NuevaVenta = () => {
   const handleCancelarVenta = () => {
     
     
-      localStorage.removeItem("venta-temporal");
+      localStorage.removeItem(ventaKey);
       navigate(-1);
     
   };
-
-
-
-
-
-    
-
-
 
     return(
       
@@ -292,7 +327,14 @@ const NuevaVenta = () => {
                         name="tipoCliente"
                         value="cf"
                         checked={tipoCliente === "cf"}
-                        onChange={() => setTipoCliente("cf")}
+                        onChange={() => {
+                          if (bloquearCF) {
+                            setNotificacion("No se puede vender como Consumidor Final, el total supera Q2500.00");
+                          } else {
+                            setTipoCliente("cf");
+                          }
+                        }}
+                        
                       />
                       Consumidor Final
                     </label>
@@ -339,6 +381,7 @@ const NuevaVenta = () => {
                               placeholder={"Nombre del receptor"}
                               value={nombreClienteManual}
                               onChange={(e) => setNombreClienteManual(e.target.value)}
+                              formatoAa={true}
                             />
                           )}
                           
@@ -375,18 +418,9 @@ const NuevaVenta = () => {
                       <option value="efectivo">Efectivo</option>
                       {/* Más opciones en el futuro */}
                     </select>
-                    </div>
-
-                    
-                  
-                    
-                   
+                    </div>            
                 </div>
             </article>
-
-            
-
-
 
 
             <article className={styles.contenedorDatosVenta}>
@@ -398,35 +432,29 @@ const NuevaVenta = () => {
                       productosDisponibles = {productosFiltrados}
                       lineas={lineas}
                       setLineas={setLineas}
+                      setTotalFactura={setTotalFactura}
                     ></TablaFactura>
-
-                  
-
-                   
+            
                 </div>
 
                 <div>
-                  <div className={styles.selectPagoWrapper}>
-                    <ButtonHeaders
-                      text="Subir receta"
-                      
-                    />
-                    <div className={styles.botonesVenta}> 
-                      <ButtonHeaders
-                        text="Cancelar Venta"
-                        onClick={openEliminarEvento}
-                        red={true}
-                      />
+                  
+                 
+                <div className={styles.botonesVenta}> 
+                  <ButtonHeaders
+                    text="Cancelar Venta"
+                    onClick={openEliminarEvento}
+                    red={true}
+                  />
 
-                      <ButtonHeaders
-                        text="Confirmar venta"
-                        onClick={handleConfirmarVenta}
-                      />
-                    </div>
-                    
-                  </div>
-                    
+                  <ButtonHeaders
+                    text="Confirmar venta"
+                    onClick={handleConfirmarVenta}
+                  />
                 </div>
+                    
+                 
+              </div>
 
             </article>
 
@@ -444,9 +472,7 @@ const NuevaVenta = () => {
               </Popup>
             }
 
-
         </main>
-
     )
 }
 

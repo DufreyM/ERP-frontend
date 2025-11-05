@@ -19,6 +19,10 @@ import NuevaVenta from './Screens/NuevaVenta/NuevaVenta.jsx';
 import HistorialComprasVentas from './Screens/HistorialComprasVentas/HistorialComprasVentas.jsx';
 import EmpleadosClientes from './Screens/Empleados/EmpleadosClientes.jsx';
 import NuevaCompra from './Screens/NuevaCompra/NuevaCompra.jsx';
+import Notificaciones from './Screens/Notificaciones/Notificaciones.jsx';
+import ProtectedRoute from './components/ProtectedRoute.jsx';
+import DependienteLayout from './layouts/DependientaLayout.jsx';
+import DashboardDepen from './Screens/dashboard/dependienta/DashboardDepen.jsx';
 
 function App() {
     return (
@@ -60,20 +64,41 @@ function App() {
                     path="/reset-password-success"
                     element={<PasswordSuccess />}
                 />
+                
+                <Route element={<ProtectedRoute />}>
+                    <Route path="/admin" element={<AdminLayout />}>
+                    
+                        <Route index element={<AdminDashboard />} />
+                        <Route path="dashboard" element={<AdminDashboard />} />
+                        <Route path="mi-perfil" element={<MiPerfil />} />
+                        <Route path="cambiar-contraseña" element={<ChangePassword />} />
+                        <Route path="archivos" element={<ArchivosScreen />} />
+                        <Route path="calendario" element={<CalendarScreen />} />
+                        <Route path="visitadores-medicos" element={<VisitadoresAdmin />} />
+                        <Route path="inventario" element={<InventarioScreen />} />
+                        <Route path="historial-vc" element={<HistorialComprasVentas />}></Route>
+                        <Route path= "historial-vc/nueva-venta" element={<NuevaVenta />}></Route>
+                        <Route path= "historial-vc/nueva-compra" element={<NuevaCompra />}></Route>
+                        <Route path="configurar-ec" element={<EmpleadosClientes />} />
+                        <Route path="notificaciones" element={<Notificaciones />} />
+                    </Route>
+                        
 
-                <Route path="/admin" element={<PrivateRoute><AdminLayout /></PrivateRoute>}>
-                <Route index element={<PrivateRoute><AdminDashboard /></PrivateRoute>} />
-                <Route path="dashboard" element={<AdminDashboard />} />
-                <Route path="mi-perfil" element={<MiPerfil />} />
-                <Route path="cambiar-contraseña" element={<ChangePassword />} />
-                <Route path="archivos" element={<ArchivosScreen />} />
-                <Route path="calendario" element={<CalendarScreen />} />
-                <Route path="visitadores-medicos" element={<VisitadoresAdmin />} />
-                <Route path="inventario" element={<InventarioScreen />} />
-                <Route path="historial-vc" element={<HistorialComprasVentas />}></Route>
-                <Route path= "historial-vc/nueva-venta" element={<NuevaVenta />}></Route>
-                <Route path= "historial-vc/nueva-compra" element={<NuevaCompra />}></Route>
-                <Route path="configurar-ec" element={<EmpleadosClientes />} />
+                    <Route path= "/dependiente" element={<DependienteLayout/>}>
+                        <Route index element={<DashboardDepen/>} />
+                        <Route path="mi-perfil" element={<MiPerfil />} />
+                        <Route path="cambiar-contraseña" element={<ChangePassword />} />
+                        {/* <Route path="archivos" element={<ArchivosScreen />} /> */}
+                        <Route path="calendario" element={<CalendarScreen />} />
+                        {/* <Route path="visitadores-medicos" element={<VisitadoresAdmin />} /> */}
+                        <Route path="inventario" element={<InventarioScreen />} />
+                        <Route path="historial-vc" element={<HistorialComprasVentas />}/>
+                        <Route path= "historial-vc/nueva-venta" element={<NuevaVenta />}/>
+                        <Route path= "historial-vc/nueva-compra" element={<NuevaCompra />}/>
+                        {/* <Route path="configurar-ec" element={<EmpleadosClientes />} /> */}
+                        <Route path="notificaciones" element={<Notificaciones />} />
+                    </Route>
+
                 </Route>
             </Routes>
         </Router>

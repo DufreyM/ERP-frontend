@@ -1,7 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faAddressCard, faArrowLeft, faTimes, faPen, faPlus, faHospital, faHouseMedical, faPhone, faEnvelope, faLocationDot, faCircleInfo, faCommentDollar, faSackDollar} from '@fortawesome/free-solid-svg-icons';
 import { useNavigate, useOutletContext } from 'react-router-dom';
-// import styles2 from './NuevaCompra.module.css'
 import styles from '../NuevaVenta/NuevaVenta.module.css'
 import IconoInput from "../../components/Inputs/InputIcono";
 import InputSelects from "../../components/Inputs/InputSelects";
@@ -9,12 +8,12 @@ import { useEffect, useMemo, useState } from "react";
 import { getToken } from "../../services/authService";
 import { useFetch } from "../../utils/useFetch";
 import { TablaCompras } from "../../components/Tables/TablaCompras";
-import { TablaFactura } from "../../components/Tables/TablaFactura";
 import ButtonHeaders from "../../components/ButtonHeaders/ButtonHeaders";
 import ButtonText from "../../components/ButtonText/ButtonText";
 import Popup from "../../components/Popup/Popup";
 import { useEventHandlers } from "../../hooks/Calendar/useEventHandlers";
 import SelectSearch from "../../components/Inputs/SelectSearch";
+import { useCheckToken } from "../../utils/checkToken";
 
 const NuevaCompra = () => {
 
@@ -25,14 +24,16 @@ const NuevaCompra = () => {
 
   //productos
   const token = getToken(); 
+  const checkToken = useCheckToken();
   const { selectedLocal } = useOutletContext();
   const localSeleccionado = selectedLocal + 1 ;
+  //Separacion de memoria entre locales
+  const compraKey = `compra-temporal-local-${selectedLocal}`;
   const {data: productos, loading, error } = useFetch(`${import.meta.env.VITE_API_URL}/api/productos/con-stock?local_id=${localSeleccionado}`, {
       headers: {'Authorization': `Bearer ${token}`}
   });
   const [lineas, setLineas] = useState([]);
 
-  const [notificacion, setNotificacion] = useState('');
   const [datosRestaurados, setDatosRestaurados] = useState(false);
   const [mostrarPopupCancelar, setMostrarPopupCancelar] = useState(false);
   const [eliminarCompra, setEliminarCompra] = useState(false);
@@ -40,6 +41,7 @@ const NuevaCompra = () => {
   const closeEliminarCompra = () => setEliminarCompra(false);
   const [errorMessage, setErrorMessage] = useState("");
 
+  const [notificacion, setNotificacion] = useState('');
   useEffect(() => {
       if (notificacion) {
           const timer = setTimeout(() => {
@@ -114,6 +116,7 @@ const NuevaCompra = () => {
         },
         body: JSON.stringify(nuevoProveedor)
       });
+      if (!checkToken(response)) return;
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -193,37 +196,10 @@ const NuevaCompra = () => {
     setErrorMessage('');
   };
 
-  useEffect(() => {
 
-    if (!datosRestaurados) return;
-      const datosCompra = {
-        lineas,
-        numeroFactura,
-        descripcionCompra,
-        cuotasSeleccionadas,
-        proveedorSeleccionadoId,
-        agregandoProveedor,
-        nuevoProveedorNombre,
-        nuevoProveedorTelefono,
-        nuevoProveedorCorreo,
-        nuevoProveedorDireccion
-      };
-      localStorage.setItem("compra-temporal", JSON.stringify(datosCompra));
-    }, [
-      lineas,
-      numeroFactura,
-      descripcionCompra,
-      cuotasSeleccionadas,
-      proveedorSeleccionadoId,
-      agregandoProveedor,
-      nuevoProveedorNombre,
-      nuevoProveedorTelefono,
-      nuevoProveedorCorreo,
-      nuevoProveedorDireccion
-  ]);
-
+  // Restaurar datos al montar o cambiar de local
   useEffect(() => {
-    const datosGuardados = localStorage.getItem("compra-temporal");
+    const datosGuardados = localStorage.getItem(compraKey);
     if (datosGuardados) {
       const compra = JSON.parse(datosGuardados);
       setLineas(compra.lineas || []);
@@ -236,15 +212,57 @@ const NuevaCompra = () => {
       setNuevoProveedorTelefono(compra.nuevoProveedorTelefono || '');
       setNuevoProveedorCorreo(compra.nuevoProveedorCorreo || '');
       setNuevoProveedorDireccion(compra.nuevoProveedorDireccion || '');
+    } else {
+      // Reiniciar si no hay datos para este local
+      setLineas([]);
+      setNumeroFactura('');
+      setDescripcionCompra('');
+      setCuotasSeleccionadas(0);
+      setProveedorSeleccionadoId('');
+      setAgregandoProveedor(false);
+      setNuevoProveedorNombre('');
+      setNuevoProveedorTelefono('');
+      setNuevoProveedorCorreo('');
+      setNuevoProveedorDireccion('');
+    }
+    setDatosRestaurados(true);
+  }, [compraKey]);
 
-      setDatosRestaurados(true);
-      } else {
-        setDatosRestaurados(true); // Aun si no hay nada guardado
-      }
-  }, []);
+  // Guardar datos en localStorage cuando cambien
+  useEffect(() => {
+    if (!datosRestaurados) return;
+
+    const datosCompra = {
+      lineas,
+      numeroFactura,
+      descripcionCompra,
+      cuotasSeleccionadas,
+      proveedorSeleccionadoId,
+      agregandoProveedor,
+      nuevoProveedorNombre,
+      nuevoProveedorTelefono,
+      nuevoProveedorCorreo,
+      nuevoProveedorDireccion
+    };
+
+    localStorage.setItem(compraKey, JSON.stringify(datosCompra));
+  }, [
+    lineas,
+    numeroFactura,
+    descripcionCompra,
+    cuotasSeleccionadas,
+    proveedorSeleccionadoId,
+    agregandoProveedor,
+    nuevoProveedorNombre,
+    nuevoProveedorTelefono,
+    nuevoProveedorCorreo,
+    nuevoProveedorDireccion,
+    compraKey
+  ]);
+
 
   //Cuotas
-    const opcionesCuotas = [
+  const opcionesCuotas = [
     {value: 0, label: "Sin cuotas"},
     {value: 1, label: "1 cuota"},
     {value: 2, label: "2 cuotas"},
@@ -329,7 +347,7 @@ const NuevaCompra = () => {
       precio_venta: parseFloat(linea.precio_venta),
       lote: linea.lote,
       fecha_vencimiento: linea.fecha_vencimiento
-        ? linea.fecha_vencimiento.toISOString().split('T')[0]
+        ? new Date(linea.fecha_vencimiento).toISOString().split('T')[0]
         : null
     }));
 
@@ -388,6 +406,7 @@ const NuevaCompra = () => {
       },
       body: JSON.stringify(payload)
     });
+    if (!checkToken(res)) return;
 
     if (!res.ok) {
       const errData = await res.json();
@@ -397,7 +416,7 @@ const NuevaCompra = () => {
     }
 
       const data = await res.json();
-      localStorage.removeItem("compra-temporal");
+      localStorage.removeItem(compraKey);
       setNotificacion("Compra registrada con éxito");
       if (credito && data && data.compra_id) {
         //console.log(`Agendando ${cuotasSeleccionadas} recordatorio(s) para la compra #${data.compra_id}`);
@@ -428,7 +447,7 @@ const NuevaCompra = () => {
     setNuevoProveedorTelefono('');
     setNuevoProveedorCorreo('');
     setNuevoProveedorDireccion('');
-    localStorage.removeItem("compra-temporal");
+    localStorage.removeItem(compraKey);
     navigate(-1);
   };
 
@@ -507,6 +526,7 @@ return(
                               type="text"
                               value={nuevoProveedorNombre}
                               onChange={handleNuevoProveedorNombre}
+                              formatoAa={true}
                             />
                             <button
                               onClick={() => setAgregandoProveedor(false)}
@@ -548,14 +568,7 @@ return(
                       ) : (
                         <>
                           <div className={styles.contenedorNitcliente}>
-                            {/* <InputSelects
-                              icono={faHouseMedical}
-                              placeholder="Nombre del proveedor"
-                              value={proveedorSeleccionadoId}
-                              onChange={(e) => setProveedorSeleccionadoId(e.target.value)}
-                              type="text"
-                              opcions={opcionesProveedores}
-                            /> */}
+                          
 
                             <SelectSearch
                               icono={faHouseMedical}
@@ -586,19 +599,19 @@ return(
                               <IconoInput
                                 icono={faPhone}
                                 placeholder="Ingrese el teléfono del proveedor"
-                                value={proveedorSeleccionado.telefonos?.[0]?.numero || ""}
+                                value={proveedorSeleccionado.telefonos?.[0]?.numero || "No se encontró el telefono del proveedor"}
                                 disabled
                               />
                               <IconoInput
                                 icono={faEnvelope}
                                 placeholder="Ingrese el correo del proveedor"
-                                value={proveedorSeleccionado.correo || ""}
+                                value={proveedorSeleccionado.correo || "No se encontró el correo del proveedor"}
                                 disabled
                               />
                               <IconoInput
                                 icono={faLocationDot}
                                 placeholder="Ingrese la dirección del proveedor"
-                                value={proveedorSeleccionado.direccion || ""}
+                                value={proveedorSeleccionado.direccion || "No se encontró la direccion del proveedor"}
                                 disabled
                               />
 

@@ -11,6 +11,11 @@ import { useFiltroGeneral } from '../../hooks/useFiltroGeneral';
 import { useOrderBy } from '../../hooks/useOrderBy';
 import OrderBy from '../../components/OrderBy/OrderBy';
 import FiltroResumen from '../../components/FIlters/FiltroResumen/FiltroResumen';
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import ExportarComo from '../../components/ExportarComo/ExportarComo';
 
 
 const Ventas = () => {
@@ -70,9 +75,10 @@ const Ventas = () => {
     { key: 'cliente', titulo: 'Cliente', type: 'texto' },
     { key: 'tipo_pago', titulo: 'Forma de pago',type: 'texto' },
     { key: 'producto', titulo: 'Producto', type: 'texto' }, 
+    { key: 'lote', titulo: 'Lote', type: 'texto'},
     { key: 'cantidad', titulo: 'Cantidad', type: 'numero' },     
     { key: 'precio_unitario', titulo: 'Precio Unitario (Q)', type: 'numero' },
-    { key: 'descuento', titulo: 'Descuento (Q)', type: 'numero' },
+    //{ key: 'descuento', titulo: 'Descuento (Q)', type: 'numero' },
     { key: 'total', titulo: 'Total (Q)', type: 'numero' },
    
     ];
@@ -84,6 +90,7 @@ const Ventas = () => {
   //manejo de filtros activos
   const [panelAbierto, setPanelAbierto] = useState(false);
   const [isOpendDate, setIsOpendDate] = useState(false);
+  const [selectedPreDate, setSelectedPreDate] = useState('');
   const [isOpendRol, setIsOpendRol] = useState(false);
   const [isOpendPrice, setIsOpendPrice] = useState(false);
   const [isOpendMedic, setIsOpendMedic] = useState(false);
@@ -193,6 +200,7 @@ const Ventas = () => {
   const resetFiltros = () => {
     setFechaInicio(null);
     setFechaFin(null);
+    setSelectedPreDate('');
     
 
     setPrecioMin('');
@@ -214,11 +222,56 @@ const Ventas = () => {
     }, 0);
   }, [sortedData]);
 
- 
-   
 
+  const exportarAExcel = () => {
+    if (!sortedData || sortedData.length === 0) {
+        alert("No hay datos para exportar");
+        return;
+    }
 
+    // Mapea los datos según las columnas visibles
+    const datosParaExcel = sortedData.map(item => {
+        const fila = {};
+        columnas.forEach(col => {
+        fila[col.titulo] = item[col.key];
+        });
+        return fila;
+    });
 
+    // Crea una hoja y un archivo Excel
+    const hoja = XLSX.utils.json_to_sheet(datosParaExcel);
+    const libro = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(libro, hoja, "Compras");
+
+    // Obtener fecha actual en formato YYYY-MM-DD
+    const fechaActual = new Date().toISOString().split("T")[0];
+    const nombreArchivo = `Historial_Ventas_${fechaActual}.xlsx`;
+
+    // Genera el archivo y descarga
+    const excelBuffer = XLSX.write(libro, { bookType: "xlsx", type: "array" });
+    const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+    saveAs(blob, nombreArchivo);
+  };
+
+  const exportarAPDF = () => {
+    const doc = new jsPDF();
+    const columnasPDF = columnas.map(col => col.titulo);
+    const filasPDF = sortedData.map(item => columnas.map(col => item[col.key]));
+    // Obtener fecha actual en formato YYYY-MM-DD
+    const fechaActual = new Date().toISOString().split("T")[0];
+
+    const nombreArchivo1 = `Historial_Ventas_${fechaActual}.pdf`;
+
+    doc.text("Historial de Ventas", 14, 15);
+    autoTable(doc, {
+        startY: 20,
+        head: [columnasPDF],
+        body: filasPDF,
+    });
+
+    doc.save(nombreArchivo1);
+  };
+  
 
 
     return(
@@ -232,7 +285,10 @@ const Ventas = () => {
             
 
                 <div className={styles.headerBotonesVentas}>
-                    <ButtonHeaders text = "Exportar" onlyLine= {true} ></ButtonHeaders>
+                    <ExportarComo
+                      onChangeExcel={exportarAExcel}
+                      onChangePDF={exportarAPDF}
+                    ></ExportarComo>
                     
                     <Filters
                       title = {"Ventas"}
@@ -268,6 +324,8 @@ const Ventas = () => {
                       fechaInicio={fechaInicio}
                       fechaFin={fechaFin}
                       setFechaFin = {setFechaFin}
+                      setSelectedPreDate={setSelectedPreDate}
+                      selectedPreDate={selectedPreDate}
 
                       resetFiltros={resetFiltros}
                     ></Filters>

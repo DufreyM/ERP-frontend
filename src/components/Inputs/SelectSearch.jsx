@@ -13,6 +13,7 @@ const SelectSearch = ({
   icono,
   error = false,
   disabled = false,
+  popup = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -73,25 +74,22 @@ const SelectSearch = ({
           className={styles.inputStyle}
           placeholder={placeholder}
           value={isOpen ? search : selectedOption?.label || ""}
-      onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => setSearch(e.target.value)}
           onFocus={() => !disabled && setIsOpen(true)}
           disabled={disabled}
           readOnly={disabled}
+          //D???
+          style={{
+            paddingRight: icono ? '60px' : '40px'
+          }}
         />
 
         {/* Íconos */}
-        <div
-          style={{
-            position: "absolute",
-            right: "10px",
-            top: "50%",
-            transform: "translateY(-50%)",
-            display: "flex",
-            gap: "6px",
-          }}
-        >
+        <div>
           {icono && (
-            <span className={styles.iconoStyles}>
+            //Daniela no me muevas lstyles.iconoStylesos styles 
+            <span className={popup ? styles.iconoPopupStyle : styles.iconoStyle}>
+           
               <FontAwesomeIcon icon={icono} style={{ color: error ? "red" : "#5a60a5" }} />
             </span>
           )}

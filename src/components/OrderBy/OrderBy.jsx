@@ -47,7 +47,7 @@ const OrderBy = ({
                     <div>
                         <Options
                             icon={faArrowDownAZ}
-                            text={"Alfabeticamente ascente (A - Z)"}
+                            text={"Alfabeticamente ascendente (A - Z)"}
                             onChange = {onChange}
                             value={"AZ"}
                             selected = {selectedOption === "AZ"}

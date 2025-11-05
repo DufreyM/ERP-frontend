@@ -141,6 +141,8 @@ const RegisterScreen = () =>  {
             body: JSON.stringify(payload),
         });
 
+        if (!checkToken(response)) return;
+        
         const data = await response.json();
 
         if (!response.ok) {
@@ -199,7 +201,10 @@ const RegisterScreen = () =>  {
                 value={username}
                 error={errorMessage}
                 onChange={handleNameChange}
-                name="email">
+                name="email"
+                formatoAa={true}
+                >
+                
        
             </IconoInput>
 
@@ -210,7 +215,10 @@ const RegisterScreen = () =>  {
                 value={userlastname}
                 error={errorMessage}
                 onChange={handleLastNameChange}
-                name="email">
+                name="email"
+                formatoAa={true}
+                >
+
        
             </IconoInput>
 
