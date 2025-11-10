@@ -615,7 +615,7 @@ const InventarioScreen = () => {
               name="nombre"
               value={formProducto.nombre}
               onChange={handleProductoChange}
-              placeholder="Paracetamol 500mg"
+              placeholder="Nombre del medicamento"
               type="text"
               formatoAa={true}
             />
@@ -624,7 +624,7 @@ const InventarioScreen = () => {
               name="presentacion"
               value={formProducto.presentacion}
               onChange={handleProductoChange}
-              placeholder="Caja con 10 tabletas"
+              placeholder="Presentación del medicamento"
               type="text"
               formatoAa={true}
             />
@@ -639,7 +639,7 @@ const InventarioScreen = () => {
                   <div style={{ display:'flex', gap:'8px', marginBottom:'8px', alignItems:'start' }}>
                     <IconoInput
                       icono={faHouseMedical}
-                      placeholder="Nombre del nuevo proveedor"
+                      placeholder="Nombre del proveedor"
                       type="text"
                       value={nuevoProveedorNombre}
                       onChange={(e) => setNuevoProveedorNombre(e.target.value)}
@@ -697,7 +697,7 @@ const InventarioScreen = () => {
               name="precioventa"
               value={formProducto.precioventa}
               onChange={handleProductoChange}
-              placeholder="12.50"
+              placeholder="Precio de venta"
               type="number"
               step="0.01"
             />
@@ -706,7 +706,7 @@ const InventarioScreen = () => {
               name="preciocosto"
               value={formProducto.preciocosto}
               onChange={handleProductoChange}
-              placeholder="8.75"
+              placeholder="Precio de costo"
               type="number"
               step="0.01"
             />
@@ -723,7 +723,7 @@ const InventarioScreen = () => {
               name="stock_minimo"
               value={formProducto.stock_minimo}
               onChange={handleProductoChange}
-              placeholder="20"
+              placeholder="Stock mínimo"
               type="number"
             />
             <div>
@@ -732,7 +732,7 @@ const InventarioScreen = () => {
                 name="detalles"
                 value={formProducto.detalles}
                 onChange={handleProductoChange}
-                placeholder="Analgésico y antipirético de uso común"
+                placeholder="Detalles del medicamento"
                 rows={1}
                 style={{ width:'100%', padding:'10px', border:'2px solid  #cccccc8e', borderRadius:'4px', color:'#000', resize:'none' }}
               />
