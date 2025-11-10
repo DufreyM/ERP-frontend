@@ -61,6 +61,24 @@ const VisitadoresAdmin = () => {
   const [fechaInicio, setFechaInicio] = useState(null);
   const [fechaFin, setFechaFin] = useState(null);
   const [sortOption, setSortOption] = useState('alfabetico');
+  
+  // Estados para el panel de filtros
+  const [panelAbierto, setPanelAbierto] = useState(false);
+  const [isOpendDate, setIsOpendDate] = useState(false);
+  const [isOpendRol, setIsOpendRol] = useState(false);
+  const [selectedPreDate, setSelectedPreDate] = useState('');
+  
+  const expandFecha = () => setIsOpendDate(prev => !prev);
+  const expandRol = () => setIsOpendRol(prev => !prev);
+  
+  // Función para resetear filtros
+  const resetFiltros = () => {
+    setProveedorSeleccionadoId('');
+    setFechaInicio(null);
+    setFechaFin(null);
+    setSelectedPreDate('');
+    setBusqueda('');
+  };
 
   // Estados para popups
   const [visitadorAEliminar, setVisitadorAEliminar] = useState(null);
@@ -132,7 +150,7 @@ const VisitadoresAdmin = () => {
         fecha_nacimiento: v.usuario?.fecha_nacimientoISO ? formatearFecha(v.usuario.fecha_nacimientoISO) : 'No disponible',
         fecha_nacimientoISO: v.usuario?.fecha_nacimientoISO || '',
         proveedor: v.proveedor?.nombre || '',
-        proveedor_id: v.proveedor_id ?? '',
+        proveedor_id: v.proveedor_id != null ? String(v.proveedor_id) : '',
         documento: v.documento_url || '',
         status: v.usuario?.status || 'inactivo',
         usuario_id: v.usuario_id
@@ -177,7 +195,12 @@ const VisitadoresAdmin = () => {
 
   // Handlers
   const handleBusqueda = (e) => setBusqueda(e.target.value);
-  const handleChange = (value) => setProveedorSeleccionadoId(value);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "rol") {
+      setProveedorSeleccionadoId(value || '');
+    }
+  };
 
   const openAdvertencia = (visitador) => {
     setVisitadorAEliminar(visitador);
@@ -334,20 +357,34 @@ const VisitadoresAdmin = () => {
           />
         </div>
 
+        <div className={styles.filtersContainer}>
         <Filters
           title="Visitadores"
+          panelAbierto={panelAbierto}
+          setPanelAbierto={setPanelAbierto}
           mostrarRangoFecha={true}
           mostrarRangoPrecio={false}
-          mostrarUsuario={false}
+          mostrarUsuario={true}
           mostrarMedicamento={false}
           fechaInicio={fechaInicio}
           setFechaInicio={setFechaInicio}
           fechaFin={fechaFin}
           setFechaFin={setFechaFin}
+          isOpendDate={isOpendDate}
+          expandFecha={expandFecha}
+          selectedPreDate={selectedPreDate}
+          setSelectedPreDate={setSelectedPreDate}
+          isOpendRol={isOpendRol}
+          expandRol={expandRol}
+          expandUsuario={expandRol}
           opcionesRoles={opcionesProveedores}
+          opcionesUsuarios={[]}
+          usuarioSeleccionado=""
           rolSeleccionado={proveedorSeleccionadoId}
           handleChange={handleChange}
+          resetFiltros={resetFiltros}
         />
+        </div>
 
         <OrderBy
           FAbecedario={true}
