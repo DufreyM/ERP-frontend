@@ -19,6 +19,7 @@ import { getToken } from '../../services/authService';
 import SelectSearch from '../../components/Inputs/SelectSearch';
 import { useFetch } from '../../utils/useFetch.jsx';
 import { useCheckToken } from '../../utils/checkToken.js';
+import {jwtDecode} from 'jwt-decode';
 
 
 const InventarioScreen = () => {
@@ -55,6 +56,11 @@ const InventarioScreen = () => {
   const checkToken = useCheckToken();
 
   const token = getToken();
+
+  const decodedToken = token ? jwtDecode(token) : null; 
+  const rolUsuario = decodedToken ? decodedToken.rol_id : null;
+  const mostrarTraslado = rolUsuario === 1;
+
   const API_BASE_URL = `${import.meta.env.VITE_API_URL}`
 
   // Cargar proveedores (como en Visitadores.jsx)
@@ -480,10 +486,12 @@ const InventarioScreen = () => {
           onChange={setSortOption}
         ></OrderBy>
 
+        {mostrarTraslado &&(
         <ButtonHeaders 
           text="Trasladar Medicamento"
           onClick={openTrasladoForm}
         />
+        )}
       <ButtonHeaders 
         text="Agregar Medicamento"
         onClick={openNuevoProducto}

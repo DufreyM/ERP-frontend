@@ -32,7 +32,7 @@ export default function VisitadorLayout() {
 
   //Decodificar el token
   const decoded = token ? jwtDecode(token) : null;
-  const localId = decoded?.local ?? null; // el campo puede llamarse distinto según backend
+  // const localId = decoded?.local ?? null; // el campo puede llamarse distinto según backend
 
  
   //const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false);
@@ -40,14 +40,16 @@ export default function VisitadorLayout() {
   const variantMap = {
     "/visitador/": "transparent",
     "/visitador/mi-perfil": "blue",
-    "/visitador/historial-vc": "transparent",
+    "/visitador/visitadores-medicos": "transparent",
+    "/visitador/calendario": "blue",
   };
 
   //posiciones del fondo
   const variantMapPositionMirrored = {
     "/visitador/": false,
     "/visitador/mi-perfil": false,
-    "/visitador/historial-vc": true,
+    "/visitador/visitadores-medicos": true,
+    "/visitador/calendario": false,
   };
 
 
@@ -77,7 +79,7 @@ export default function VisitadorLayout() {
 
          
 
-          <Outlet context={{ selectedLocal: localId }} />
+          {/* <Outlet context={{ selectedLocalk: localId }} /> */}
         </main>
       
       </div>

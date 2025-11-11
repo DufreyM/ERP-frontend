@@ -16,6 +16,7 @@ import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import ExportarComo from '../../components/ExportarComo/ExportarComo';
+import {jwtDecode} from 'jwt-decode';
 
 
 const Ventas = () => {
@@ -33,6 +34,10 @@ const Ventas = () => {
     const url = localSeleccionado
     ? `${import.meta.env.VITE_API_URL}/ventas?local_id=${localSeleccionado}`
     : null;  //url para los eventos dependiendo del local
+
+    const decodedToken = token ? jwtDecode(token) : null; 
+    const rolUsuario = decodedToken ? decodedToken.rol_id : null;
+    const mostrarNuevaVenta = rolUsuario === 1 || rolUsuario === 2; 
 
     //Se llama a traer la función useFetch (utils/useFetch) que retorna la carga de datos, y existe la opción de forzar un refetch manual en caso de modificaciones a los eventos.
     const { data, loading, error } = useFetch(url, {headers: { 'Authorization': `Bearer ${token}` }}, [token, localSeleccionado]);
@@ -340,9 +345,9 @@ const Ventas = () => {
                     >
 
                     </OrderBy>
-
+                    {mostrarNuevaVenta &&(
                     <ButtonHeaders text = "Nueva venta" onClick={irANuevaVenta}></ButtonHeaders>
-
+                    )}
 
                 </div>
             </div>
