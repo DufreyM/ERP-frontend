@@ -123,15 +123,8 @@ function App() {
                         <Route index element={<DashboardVisitador />} />
                         <Route path="mi-perfil" element={<MiPerfil />} />
                         <Route path="cambiar-contraseña" element={<ChangePassword />} />
-                        {/* <Route path="archivos" element={<ArchivosScreen />} /> */}
                         <Route path="calendario" element={<CalendarScreen />} />
                         <Route path="visitadores-medicos" element={<VisitadoresExternos />} /> 
-                        {/* <Route path="inventario" element={<InventarioScreen />} /> */}
-                        {/* <Route path="historial-vc" element={<HistorialComprasVentas />}></Route> */}
-                        {/* <Route path= "historial-vc/nueva-venta" element={<NuevaVenta />}></Route> */}
-                        {/* <Route path= "historial-vc/nueva-compra" element={<NuevaCompra />}></Route> */}
-                        {/* <Route path="configurar-ec" element={<EmpleadosClientes />} /> */}
-                        {/* <Route path="notificaciones" element={<Notificaciones />} /> */}
                     </Route>
 
                 </Route>

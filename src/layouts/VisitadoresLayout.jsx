@@ -13,15 +13,10 @@ import { jwtDecode } from "jwt-decode";
 import { getToken } from "../services/authService.js";
 
 const visitadorItems = [
-  { label: "Inicio", to: "/visitador/", icon: faHome },
-  //{ label: "Archivos", to: "/visitador/archivos", icon: faFolder },
-  // { label: "Compras Ventas", to: "/visitador/historial-vc", icon: faSackDollar },
-  //{ label: "Empleados Clientes", to: "/visitador/configurar-ec", icon: faUserGroup },
-//   { label: "Inventario", to: "/visitador/inventario", icon: faBoxOpen },
-  { label: "Calendario", to: "/visitador/calendario", icon: faCalendar },
-  { label: "Visitadores médicos", to: "/visitador/visitadores-medicos", icon: faTruckMedical },
-//    { label: "Alertas", to: "/visitador/notificaciones", icon: faBell },
-  { label: "Mi perfil", to: "/visitador/mi-perfil", icon: faUser },
+  { label: "Inicio", to: "/visitador_logged/", icon: faHome },
+  { label: "Calendario", to: "/visitador_logged/calendario", icon: faCalendar },
+  { label: "Visitadores médicos", to: "/visitador_logged/visitadores-medicos", icon: faTruckMedical },
+  { label: "Mi perfil", to: "/visitador_logged/mi-perfil", icon: faUser },
 ];
 
 
@@ -38,18 +33,18 @@ export default function VisitadorLayout() {
   //const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false);
   //colores del fondo :D
   const variantMap = {
-    "/visitador/": "transparent",
-    "/visitador/mi-perfil": "blue",
-    "/visitador/visitadores-medicos": "transparent",
-    "/visitador/calendario": "blue",
+    "/visitador_logged/": "transparent",
+    "/visitador_logged/mi-perfil": "blue",
+    "/visitador_logged/visitadores-medicos": "transparent",
+    "/visitador_logged/calendario": "blue",
   };
 
   //posiciones del fondo
   const variantMapPositionMirrored = {
-    "/visitador/": false,
-    "/visitador/mi-perfil": false,
-    "/visitador/visitadores-medicos": true,
-    "/visitador/calendario": false,
+    "/visitador_logged/": false,
+    "/visitador_logged/mi-perfil": false,
+    "/visitador_logged/visitadores-medicos": true,
+    "/visitador_logged/calendario": false,
   };
 
 
