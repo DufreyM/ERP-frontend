@@ -24,3 +24,24 @@
     width: 70%;
 
 }
+
+@media (max-width: 768px) {
+    .filaGraficas{
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .pequeñoG {
+        display: flex;
+        width: 100%;
+
+    }
+
+    .grandeG {
+        display: flex;
+        width: 100%;
+
+    }
+
+}
