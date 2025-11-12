@@ -67,5 +67,5 @@ export default function VentasComprasChart({
         ],
     };
 
-    return <ReactECharts option={option} style={{ height: 400 }} />;
+    return <ReactECharts option={option} style={{ height: 300 }} />;
 }

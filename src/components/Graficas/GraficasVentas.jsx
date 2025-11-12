@@ -6,6 +6,7 @@ import VentasComprasChart from './GraficasComprasVentas';
 import VentasLineChart from './Graficas12Meses';
 import TopClientesChart from './GraficasClientes';
 import TopProductosChart from './GraficasTopProductos';
+import MetaSemanalGauge from './GraficaMetaSemanal';
 
 const BaseGraficas = ({
     data,
@@ -81,6 +82,18 @@ const BaseGraficas = ({
 
                             {nameGrafic === "top-clientes" && (
                                 <TopClientesChart data={data} />
+                            )}
+
+                            {nameGrafic === "meta-semanal" && (
+                                <MetaSemanalGauge data={data} 
+                                    text={"Meta de ventas semanal"}
+                                />
+                            )}
+
+                            {nameGrafic === "meta-mensual" && (
+                                <MetaSemanalGauge data={data} 
+                                    text={"Meta de ventas mensual"}
+                                />
                             )}
                         </div>
 

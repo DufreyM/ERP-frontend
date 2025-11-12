@@ -12,3 +12,15 @@
     flex-direction: row;
     gap: 1rem;
 }
+
+.pequeñoG {
+    display: flex;
+    width: 30%;
+
+}
+
+.grandeG {
+    display: flex;
+    width: 70%;
+
+}

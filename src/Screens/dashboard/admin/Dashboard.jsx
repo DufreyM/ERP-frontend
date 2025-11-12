@@ -5,6 +5,7 @@ import { useCheckToken } from '../../../utils/checkToken';
 import BaseGraficas from '../../../components/Graficas/GraficasVentas';
 import styles from './Dashboard.module.css'
 import SimpleTitle from '../../../components/Titles/SimpleTitle';
+import MetaSemanalGauge from '../../../components/Graficas/GraficaMetaSemanal';
 
 const Dashboard = () => {
     const { selectedLocal } = useOutletContext();
@@ -47,8 +48,22 @@ const Dashboard = () => {
         headers: {'Authorization': `Bearer ${token}`}
     });
 
+     const {
+        data: datosMetaSemanal, 
+        loading: loadingMetaSemanal, 
+        error: errorMetaSemanal } = useFetch(`${import.meta.env.VITE_API_URL}/graficas/meta-semanal?local_id=${localSeleccionado}` , 
+    {
+        headers: {'Authorization': `Bearer ${token}`}
+    });
 
-      
+    const {
+        data: datosMetaMensual, 
+        loading: loadingMetaMensual, 
+        error: errorMetaMensual } = useFetch(`${import.meta.env.VITE_API_URL}/graficas/meta-mensual?local_id=${localSeleccionado}` , 
+    {
+        headers: {'Authorization': `Bearer ${token}`}
+    });
+    
    
 
     const dataLocales = [
@@ -76,22 +91,69 @@ const Dashboard = () => {
             <SimpleTitle
                  text={"Panel de inicio"}
             ></SimpleTitle>
+
             <div className={styles.filaGraficas}>
-                <BaseGraficas
-                    titulo ={""}
-                    data={datosVentas12Meses || []}
-                    loading={loading12Meses}
-                    error={error12Meses}
-                    nameGrafic={"ventas-12-meses"}
+                <div className={styles.pequeñoG}>
+                    <BaseGraficas
+                        titulo ={""}
+                        data={datosMetaSemanal || []}
+                        loading={loadingMetaSemanal}
+                        error={errorMetaSemanal}
+                        nameGrafic={"meta-semanal"}
 
-                ></BaseGraficas>
+                    ></BaseGraficas>
 
-                <BaseGraficas
-                    data = {datosVentasCompras || []}
-                    loading={loadingVentasCompras}
-                    error={errorVentasCompras}
-                    nameGrafic={"ventas-compras"}
-                ></BaseGraficas>
+                </div>
+                
+                <div className={styles.grandeG}>
+                    <BaseGraficas
+                        data = {datosVentasCompras || []}
+                        loading={loadingVentasCompras}
+                        error={errorVentasCompras}
+                        nameGrafic={"ventas-compras"}
+                    ></BaseGraficas>
+                    
+
+                </div>
+                
+
+            </div>
+
+            <div className={styles.filaGraficas}>
+                
+                
+                <div className={styles.grandeG}>
+                    <BaseGraficas
+                        titulo ={""}
+                        data={datosVentas12Meses || []}
+                        loading={loading12Meses}
+                        error={error12Meses}
+                        nameGrafic={"ventas-12-meses"}
+
+                    ></BaseGraficas>
+
+                </div>
+
+                <div className={styles.pequeñoG}>
+                    <BaseGraficas
+                        titulo ={""}
+                        data={datosMetaMensual || []}
+                        loading={loadingMetaMensual}
+                        error={errorMetaMensual}
+                        nameGrafic={"meta-mensual"}
+
+                    ></BaseGraficas>
+                    
+                </div>
+                
+
+            </div>
+            
+            
+            <div className={styles.filaGraficas}>
+                
+
+                
 
             </div>
 
