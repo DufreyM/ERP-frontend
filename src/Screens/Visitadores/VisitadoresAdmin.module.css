@@ -138,3 +138,28 @@
   pointer-events: none;
   font-size: 16px;
 }
+
+/* Ocultar el selector de usuarios en el componente Filters */
+/* Ocultar el select y todos sus elementos relacionados */
+.filtersContainer :global(select[name="usuarios"]) {
+  display: none !important;
+}
+
+/* Ocultar los iconos del selector de usuarios */
+.filtersContainer :global(select[name="usuarios"] ~ span) {
+  display: none !important;
+}
+
+/* Ocultar el contenedor completo usando selector de atributo (para navegadores modernos) */
+.filtersContainer :global(.contenedorInput.selects:has(select[name="usuarios"])) {
+  display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Fallback para navegadores que no soportan :has() - ocultar el segundo InputSelects */
+.filtersContainer :global(.contenedorInput.selects:nth-child(2)) {
+  display: none !important;
+}
