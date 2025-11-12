@@ -19,7 +19,7 @@ export default function TopClientesChart({
     const option = {
         title: { text: "Top clientes por monto comprado", left: "center" },
         tooltip: { trigger: "axis" },
-        grid: { left: "25%", right: "5%", bottom: "10%" },
+        grid: { left: 200, right: 150, bottom: 30 },
         xAxis: { type: "value", name: "Monto (Q)" },
         yAxis: {
         type: "category",
@@ -40,5 +40,5 @@ export default function TopClientesChart({
         ],
     };
 
-    return <ReactECharts option={option} style={{ height: 400 }} />;
+    return <ReactECharts option={option} style={{ height: 300 }} />;
 }
