@@ -5,14 +5,13 @@ import SimpleTitle from "../../components/Titles/SimpleTitle";
 import { Table } from "../../components/Tables/Table";
 import Popup from '../../components/Popup/Popup';
 import IconoInput from "../../components/Inputs/InputIcono";
-import Filters from "../../components/FIlters/Filters";
+import InputPassword from "../../components/Inputs/InputPassword";
 import ButtonHeaders from "../../components/ButtonHeaders/ButtonHeaders";
 import OrderBy from "../../components/OrderBy/OrderBy";
 import { useOrderBy } from "../../hooks/useOrderBy";
-import { useFiltroGeneral } from "../../hooks/useFiltroGeneral";
 import { useFetch } from "../../utils/useFetch";
 import { getToken } from "../../services/authService";
-import { faUser, faSearch, faEnvelope, faCalendar } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faSearch, faEnvelope, faCalendar, faLock } from '@fortawesome/free-solid-svg-icons';
 import InputSearch from "../../components/Inputs/InputSearch";
 import InputSelects from "../../components/Inputs/InputSelects";
 import InputDates from "../../components/Inputs/InputDates";
@@ -33,6 +32,26 @@ const EmpleadosClientes = () => {
     return `${dia}-${mes}-${año}`;
   };
 
+  // Función para formatear fecha a YYYY-MM-DD usando métodos locales (evita problemas de zona horaria)
+  const formatearFechaParaInput = (date) => {
+    if (!date) return '';
+    const año = date.getFullYear();
+    const mes = String(date.getMonth() + 1).padStart(2, '0');
+    const dia = String(date.getDate()).padStart(2, '0');
+    return `${año}-${mes}-${dia}`;
+  };
+
+  // Función para convertir string YYYY-MM-DD a Date usando hora local (evita problemas de zona horaria)
+  const stringToDateLocal = (fechaString) => {
+    if (!fechaString) return null;
+    const partes = fechaString.split('-');
+    if (partes.length !== 3) return null;
+    const año = parseInt(partes[0], 10);
+    const mes = parseInt(partes[1], 10) - 1; // Los meses en JS van de 0-11
+    const dia = parseInt(partes[2], 10);
+    return new Date(año, mes, dia);
+  };
+
   //Maneja las noticiaciones de creación eliminación o edición de un estado
   const [notificacion, setNotificacion] = useState('');
   useEffect(() => {
@@ -45,22 +64,23 @@ const EmpleadosClientes = () => {
       }
   }, [notificacion]);
 
+  // Estado para mostrar/ocultar contraseña
+  const [showPassword, setShowPassword] = useState(false);
+  
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
-  // Estados para filtros
+
+  // Estados para búsqueda
   const [busqueda, setBusqueda] = useState('');
-  const [rolSeleccionado, setRolSeleccionado] = useState("");
-  const [fechaInicio, setFechaInicio] = useState(null);
-  const [fechaFin, setFechaFin] = useState(null);
-
+  
   // Filtros de API
-  const [statusSeleccionado, setStatusSeleccionado] = useState(""); // 'activo' | 'inactivo' | ""
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
 
   const params = new URLSearchParams();
   params.set('id_local', String(localSeleccionado));
-  if (rolSeleccionado) params.set('rol_id', String(rolSeleccionado));
-  if (statusSeleccionado) params.set('status', statusSeleccionado);
   if (page) params.set('page', String(page));
   if (limit) params.set('limit', String(limit));
 
@@ -76,7 +96,7 @@ const EmpleadosClientes = () => {
       },
       method: 'GET'
     },
-    [localSeleccionado, rolSeleccionado, statusSeleccionado, page, limit]
+    [localSeleccionado, page, limit]
   );
 
   
@@ -101,7 +121,7 @@ const EmpleadosClientes = () => {
     fechanacimiento: ''
   });
 
-  // Opciones de roles para filtros
+  // Opciones de roles
   const opcionesRoles = [
     { id: 1, nombre: "Administrador" },
     { id: 2, nombre: "Dependiente" },
@@ -125,14 +145,6 @@ const EmpleadosClientes = () => {
     setBusqueda(e.target.value);
   };
 
-  // Función para manejar cambio de rol
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (name === "rol") {
-      const numValue = parseInt(value);
-      setRolSeleccionado(isNaN(numValue) ? "" : numValue);
-    }
-  };
 
   // Función para abrir popup de eliminar
   const openAdvertencia = (empleado) => {
@@ -169,9 +181,13 @@ const EmpleadosClientes = () => {
       contrasena: '',
       fechanacimiento: ''
     });
+    setShowPassword(false); // Resetear visibilidad de contraseña
     setNuevoEmpleado(true);
   };
-  const closeNuevoEmpleado = () => setNuevoEmpleado(false);
+  const closeNuevoEmpleado = () => {
+    setNuevoEmpleado(false);
+    setShowPassword(false); // Resetear visibilidad de contraseña al cerrar
+  };
 
   // Cargar datos al formulario al abrir editar
   useEffect(() => {
@@ -397,13 +413,7 @@ const EmpleadosClientes = () => {
     }
   };
 
-  // Configuración de filtros
-  const filterKeyMap = {
-    RANGO_FECHA: "fechaNacimiento",
-    ROL: "rol_id"
-  };
-
-  // Normalizar respuesta y aplicar filtros
+  // Normalizar respuesta
   const empleadosData = useMemo(() => {
     if (empleadosResponse) {
       try { console.debug('Empleados GET response:', empleadosResponse); } catch {}
@@ -440,25 +450,17 @@ const EmpleadosClientes = () => {
     }));
   }, [empleadosResponse]);
 
-  const { dataFiltrada: dataConFiltros } = useFiltroGeneral({
-    data: empleadosData,
-    filterKeyMap: filterKeyMap,
-    fechaInicio: fechaInicio,
-    fechaFin: fechaFin,
-    rolId: rolSeleccionado
-  });
-
   // Aplicar búsqueda
   const dataFiltrada = useMemo(() => {
-    if (!busqueda) return dataConFiltros;
+    if (!busqueda) return empleadosData;
     
-    return dataConFiltros.filter(empleado => {
+    return empleadosData.filter(empleado => {
       const camposBusqueda = ['nombre', 'apellidos', 'email', 'rol'];
       return camposBusqueda.some(campo => 
         empleado[campo]?.toLowerCase().includes(busqueda.toLowerCase())
       );
     });
-  }, [dataConFiltros, busqueda]);
+  }, [empleadosData, busqueda]);
 
   // Configuración de ordenamiento
   const sortKeyMap = {
@@ -506,21 +508,6 @@ const EmpleadosClientes = () => {
           /> */}
         </div>
 
-        {/* Filtros */}
-        <Filters
-          title="Empleados"
-          mostrarRangoFecha={true}
-          mostrarRangoPrecio={false}
-          mostrarUsuario={false}
-          mostrarMedicamento={false}
-          fechaInicio={fechaInicio}
-          setFechaInicio={setFechaInicio}
-          fechaFin={fechaFin}
-          setFechaFin={setFechaFin}
-          opcionesRoles={opcionesRoles}
-          rolSeleccionado={rolSeleccionado}
-          handleChange={handleChange}
-        />
 
         {/* Ordenar */}
         <OrderBy
@@ -614,8 +601,8 @@ const EmpleadosClientes = () => {
             <InputDates
               icono={faCalendar}
               placeholder={empleadoAEditar?.fechanacimiento || 'Fecha de nacimiento'}
-              selected={formEmpleado.fechanacimiento ? new Date(formEmpleado.fechanacimiento) : (empleadoAEditar?.fechanacimientoISO ? new Date(empleadoAEditar.fechanacimientoISO) : null)}
-              onChange={(date) => setFormEmpleado(prev => ({...prev, fechanacimiento: date ? date.toISOString().slice(0,10) : ''}))}
+              selected={formEmpleado.fechanacimiento ? stringToDateLocal(formEmpleado.fechanacimiento) : (empleadoAEditar?.fechanacimientoISO ? stringToDateLocal(empleadoAEditar.fechanacimientoISO.slice(0,10)) : null)}
+              onChange={(date) => setFormEmpleado(prev => ({...prev, fechanacimiento: formatearFechaParaInput(date)}))}
 
             />
             <InputSelects
@@ -684,8 +671,8 @@ const EmpleadosClientes = () => {
             <InputDates
               icono={faCalendar}
               placeholder="Fecha de nacimiento"
-              selected={formEmpleado.fechanacimiento ? new Date(formEmpleado.fechanacimiento) : null}
-              onChange={(date) => setFormEmpleado(prev => ({...prev, fechanacimiento: date ? date.toISOString().slice(0,10) : ''}))}
+              selected={formEmpleado.fechanacimiento ? stringToDateLocal(formEmpleado.fechanacimiento) : null}
+              onChange={(date) => setFormEmpleado(prev => ({...prev, fechanacimiento: formatearFechaParaInput(date)}))}
 
             />
             <InputSelects
@@ -712,13 +699,14 @@ const EmpleadosClientes = () => {
               onChange={handleFormChange}
               opcions={[{value:1,label:'Local 1'},{value:2,label:'Local 2'}]}
             />
-            <IconoInput
-              icono={faUser}
-              name="contrasena"
+            <InputPassword
+              showPassword={showPassword}
+              togglePasswordVisibility={togglePasswordVisibility}
+              icono={faLock}
+              placeholder="Contraseña"
               value={formEmpleado.contrasena}
               onChange={handleFormChange}
-              placeholder="Contraseña"
-              type="password"
+              name="contrasena"
             />
           </div>
         </div>

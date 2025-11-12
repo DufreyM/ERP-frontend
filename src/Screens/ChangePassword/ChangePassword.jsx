@@ -8,7 +8,7 @@ import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import Isotipo from '../../assets/svg/isotipoEconofarma.svg';
 import { useNavigate } from 'react-router-dom';
 import styles from './ChangePassword.module.css';
-import { changePassword } from '../../services/authService';
+import { changePassword, removeToken } from '../../services/authService';
 import { useCheckToken } from '../../utils/checkToken';
 
 const ChangePassword = () => {
@@ -144,12 +144,31 @@ const ChangePassword = () => {
         navigate('/admin/mi-perfil');
       }, 1500);
     } catch (err) {
+      // Verificar si el error es por contraseña actual incorrecta
+      const errorMessage = err?.message?.toLowerCase() || '';
+      const isCurrentPasswordError = 
+        errorMessage.includes('contraseña actual') ||
+        errorMessage.includes('current password') ||
+        errorMessage.includes('contraseña anterior') ||
+        errorMessage.includes('password incorrect') ||
+        errorMessage.includes('incorrect password') ||
+        errorMessage.includes('invalid password') ||
+        errorMessage.includes('contraseña inválida') ||
+        (err?.status === 400 && errorMessage.includes('password'));
+
+      if (isCurrentPasswordError) {
+        setError('La contraseña actual no es correcta. Por favor, verifica e intenta nuevamente.');
+        setLoading(false);
+        return;
+      }
+
       if (err?.status === 401 || err?.status === 403) {
+        // Si es 401/403 pero no es específicamente por contraseña incorrecta, podría ser token expirado
         if (typeof checkToken === 'function') {
           const handled = await checkToken({ status: err.status });
           if (!handled) return;
         } else {
-          logout();
+          removeToken();
           navigate('/', { replace: true });
           return;
         }
@@ -158,10 +177,10 @@ const ChangePassword = () => {
       if (err.status === 500) {
         setError("Ocurrió un error interno del servidor, pero la contraseña podría haberse cambiado correctamente. Intenta iniciar sesión de nuevo.");
         console.log("Ocurrió un error interno del servidor, pero la contraseña podría haberse cambiado correctamente. Intenta iniciar sesión de nuevo.");
+      } else {
+        setError(err?.message || 'Error al cambiar la contraseña');
       }
-
-      setError(err?.message || 'Error al cambiar la contraseña');
-      } finally {
+    } finally {
       setLoading(false);
     }
   };
