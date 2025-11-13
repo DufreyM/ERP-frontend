@@ -31,7 +31,6 @@ export default function AdminLayout() {
   //colores del fondo :D
   const variantMap = {
     "/admin/": "transparent",
-    "/admin/": "transparent",
     "/admin/mi-perfil": "blue",
     "/admin/archivos": "orange",
     "/admin/historial-vc": "transparent",
