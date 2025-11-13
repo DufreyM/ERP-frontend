@@ -17,6 +17,8 @@ import InputSearch from "../../components/Inputs/InputSearch";
 import InputDates from "../../components/Inputs/InputDates";
 import SelectSearch from "../../components/Inputs/SelectSearch";
 import { useCheckToken } from "../../utils/checkToken";
+import {jwtDecode} from 'jwt-decode';
+
 // Función para formatear fecha
 const formatearFecha = (fechaISO) => {
   if (!fechaISO) return 'No disponible';
@@ -35,6 +37,10 @@ const VisitadoresAdmin = () => {
   const token = getToken();
   const shouldFetch = Boolean(token);
   const checkToken = useCheckToken();
+
+  const decodedToken = token ? jwtDecode(token) : null; 
+  const rolUsuario = decodedToken ? decodedToken.rol_id : null;
+  const esVisitador = rolUsuario === 3;
 
   // Obtener proveedores (usa token ya definido)
   const { data: proveedores, loading: loadingProveedores } = useFetch(
@@ -333,6 +339,7 @@ const VisitadoresAdmin = () => {
           />
         </div>
 
+        {!esVisitador &&(
         <Filters
           title="Visitadores"
           mostrarRangoFecha={true}
@@ -347,7 +354,9 @@ const VisitadoresAdmin = () => {
           rolSeleccionado={proveedorSeleccionadoId}
           handleChange={handleChange}
         />
+        )}
 
+        {!esVisitador &&(
         <OrderBy
           FAbecedario={true}
           FExistencias={false}
@@ -356,6 +365,11 @@ const VisitadoresAdmin = () => {
           selectedOption={sortOption}
           onChange={setSortOption}
         />
+        )}
+        
+        {esVisitador &&(
+        <ButtonHeaders text="Subir nuevo documento" onClick={{}}> </ButtonHeaders>
+        )}
       </div>
 
       <div className={styles.contenedorTabla}>
