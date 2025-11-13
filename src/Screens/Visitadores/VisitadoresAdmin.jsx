@@ -17,6 +17,8 @@ import InputSearch from "../../components/Inputs/InputSearch";
 import InputDates from "../../components/Inputs/InputDates";
 import SelectSearch from "../../components/Inputs/SelectSearch";
 import { useCheckToken } from "../../utils/checkToken";
+import {jwtDecode} from 'jwt-decode';
+
 // Función para formatear fecha
 const formatearFecha = (fechaISO) => {
   if (!fechaISO) return 'No disponible';
@@ -29,13 +31,16 @@ const formatearFecha = (fechaISO) => {
 };
 
 const VisitadoresAdmin = () => {
-  const { selectedLocal } = useOutletContext();
-  const localSeleccionado = selectedLocal + 1;
+  
 
   // Mover token y fetch de proveedores dentro del componente (evita duplicados/scope)
   const token = getToken();
   const shouldFetch = Boolean(token);
   const checkToken = useCheckToken();
+
+  const decodedToken = token ? jwtDecode(token) : null; 
+  const rolUsuario = decodedToken ? decodedToken.rol_id : null;
+  const esVisitador = rolUsuario === 3;
 
   // Obtener proveedores (usa token ya definido)
   const { data: proveedores, loading: loadingProveedores } = useFetch(
@@ -358,6 +363,7 @@ const VisitadoresAdmin = () => {
         </div>
 
         <div className={styles.filtersContainer}>
+        {!esVisitador &&(
         <Filters
           title="Visitadores"
           panelAbierto={panelAbierto}
@@ -384,8 +390,10 @@ const VisitadoresAdmin = () => {
           handleChange={handleChange}
           resetFiltros={resetFiltros}
         />
+        )}
         </div>
 
+        {!esVisitador &&(
         <OrderBy
           FAbecedario={true}
           FExistencias={false}
@@ -394,6 +402,11 @@ const VisitadoresAdmin = () => {
           selectedOption={sortOption}
           onChange={setSortOption}
         />
+        )}
+        
+        {esVisitador &&(
+        <ButtonHeaders text="Subir nuevo documento" onClick={{}}> </ButtonHeaders>
+        )}
       </div>
 
       <div className={styles.contenedorTabla}>

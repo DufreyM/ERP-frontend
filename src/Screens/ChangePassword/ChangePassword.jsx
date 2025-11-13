@@ -10,10 +10,16 @@ import { useNavigate } from 'react-router-dom';
 import styles from './ChangePassword.module.css';
 import { changePassword, removeToken } from '../../services/authService';
 import { useCheckToken } from '../../utils/checkToken';
+import {jwtDecode} from 'jwt-decode';
+import { getToken } from '../../services/authService';
 
 const ChangePassword = () => {
   const checkToken = useCheckToken();
   
+  const token = getToken();
+  const decodedToken = token ? jwtDecode(token) : null; 
+  const rolUsuario = decodedToken ? decodedToken.rol_id : null;
+
   const [formData, setFormData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -140,8 +146,29 @@ const ChangePassword = () => {
       await changePassword(formData.currentPassword, formData.newPassword);
       setSuccess('Contraseña cambiada exitosamente');
       setLoading(false);
+
+       let rutaDestino = "/no-autorizado"; 
+
+      switch (rolUsuario) {
+        case 1:  
+          rutaDestino = "/admin/mi-perfil";
+          break;
+        case 2:  
+          rutaDestino = "/dependiente/mi-perfil";
+          break;
+        case 3:  
+          rutaDestino = "/visitador-logged/mi-perfil";
+          break;
+        case 4:  
+          rutaDestino = "/contador/mi-perfil";
+          break;
+        default:
+          rutaDestino = "/no-autorizado";
+      }
+
+
       setTimeout(() => {
-        navigate('/admin/mi-perfil');
+        navigate(rutaDestino);
       }, 1500);
     } catch (err) {
       // Verificar si el error es por contraseña actual incorrecta
@@ -186,7 +213,22 @@ const ChangePassword = () => {
   };
 
   const handleGoBack = () => {
-    navigate('/admin/mi-perfil');
+    let rutaDestino = "/no-autorizado"; 
+
+    if (rolUsuario === 1) {
+          rutaDestino = "/admin/mi-perfil";
+        } else if (rolUsuario === 2) {
+          rutaDestino = "/dependiente/mi-perfil";
+        } 
+        else if (rolUsuario === 3) {
+          rutaDestino = "/visitador-logged/mi-perfil";
+        }
+        else if (rolUsuario === 4) {
+          rutaDestino = "/contador/mi-perfil";
+        } else {
+          rutaDestino = "/no-autorizado"; 
+        }
+        navigate(rutaDestino);
   };
 
   return (
