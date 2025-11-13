@@ -225,8 +225,10 @@ const Visitadores = () => {
 
             const response = await fetch(`${import.meta.env.VITE_API_URL}/visitadores`, {
             method: 'POST',
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
             body: formData,
             });
+
 
             let responseData;
             try {
