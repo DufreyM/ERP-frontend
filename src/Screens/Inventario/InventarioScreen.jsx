@@ -263,8 +263,8 @@ const InventarioScreen = () => {
   return (
     <div className={styles.inventarioContainer}>
       <SimpleTitle text="Inventario" />
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', minWidth: '400px' }}>
+      <div className={styles.controlsContainer}>
+        <div className={styles.searchContainer}>
           <label style={{ color: '#5a60a5', fontWeight: 500, marginBottom: 4 }}>Medicamento</label>
           <IconoInput
             icono={faSearch}
@@ -277,51 +277,54 @@ const InventarioScreen = () => {
           />
         </div>
       
+        <div className={styles.controlsGroup}>
+          <Filters
+            title = {"Inventario"}
+            panelAbierto={panelAbierto}
+            setPanelAbierto={setPanelAbierto}
+            mostrarRangoFecha ={false}
+            mostrarRangoPrecio = {true}
+            mostrarUsuario = {false}
+            mostrarMedicamento = {true}
 
-        <Filters
-          title = {"Inventario"}
-          panelAbierto={panelAbierto}
-          setPanelAbierto={setPanelAbierto}
-          mostrarRangoFecha ={false}
-          mostrarRangoPrecio = {true}
-          mostrarUsuario = {false}
-          mostrarMedicamento = {true}
+            //atributos para rango de precio
+            isOpendPrice = {isOpendPrice}
+            expandPrecio = {expandPrecio}
+            precioMin = {precioMin}
+            setPrecioMin = {setPrecioMin}
+            precioMax = {precioMax}
+            setPrecioMax = {setPrecioMax}
 
-          //atributos para rango de precio
-          isOpendPrice = {isOpendPrice}
-          expandPrecio = {expandPrecio}
-          precioMin = {precioMin}
-          setPrecioMin = {setPrecioMin}
-          precioMax = {precioMax}
-          setPrecioMax = {setPrecioMax}
+            isOpendMedic = {isOpendMedic}
+            expandMedicamento = {expandMedicamento}
+            opcionesTipoMedicamento = {opcionesTipoMedicamento}
+            medicamentoSeleccionado ={medicamentoSeleccionado}
+            handleChangeMedicamento ={handleMedicamentoChange}
 
-          isOpendMedic = {isOpendMedic}
-          expandMedicamento = {expandMedicamento}
-          opcionesTipoMedicamento = {opcionesTipoMedicamento}
-          medicamentoSeleccionado ={medicamentoSeleccionado}
-          handleChangeMedicamento ={handleMedicamentoChange}
+            resetFiltros = {resetFiltros}
+                         
+          ></Filters>
 
-          resetFiltros = {resetFiltros}
-                       
-        ></Filters>
+          <OrderBy
+            FAbecedario={true}
+            FExistencias={true}
+            FPrecio={true}
+            FFecha={false}
+            selectedOption={sortOption}
+            onChange={setSortOption}
+          ></OrderBy>
 
-        <OrderBy
-          FAbecedario={true}
-          FExistencias={true}
-          FPrecio={true}
-          FFecha={false}
-          selectedOption={sortOption}
-          onChange={setSortOption}
-        ></OrderBy>
-
-        <ButtonHeaders 
-          text="Trasladar Medicamento"
-          onClick={openTrasladoForm}
-        />
-      <ButtonHeaders 
-        text="Agregar Medicamento"
-        onClick={openNuevoProducto}
-      />
+          <div className={styles.buttonsContainer}>
+            <ButtonHeaders 
+              text="Trasladar Medicamento"
+              onClick={openTrasladoForm}
+            />
+            <ButtonHeaders 
+              text="Agregar Medicamento"
+              onClick={openNuevoProducto}
+            />
+          </div>
+        </div>
       </div>
       
       <FiltroResumen

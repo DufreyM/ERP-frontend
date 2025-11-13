@@ -3,6 +3,108 @@
   min-height: 100vh;
 }
 
+/* Contenedor principal de controles */
+.controlsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+/* Contenedor de búsqueda */
+.searchContainer {
+  display: flex;
+  flex-direction: column;
+  min-width: 300px;
+  flex: 0 0 auto;
+}
+
+/* Grupo de controles (Filters, OrderBy, Botones) */
+.controlsGroup {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  flex: 1 1 auto;
+  justify-content: flex-start;
+}
+
+/* Contenedor de botones de acción */
+.buttonsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  flex: 0 1 auto;
+  justify-content: flex-start;
+}
+
+/* Media queries para pantallas más pequeñas */
+@media (max-width: 1200px) {
+  .searchContainer {
+    min-width: 280px;
+  }
+}
+
+/* Cuando la pantalla se corta a la mitad, todos los controles se bajan */
+@media (max-width: 1024px) {
+  .controlsContainer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .searchContainer {
+    width: 100%;
+    min-width: 100%;
+  }
+  
+  .controlsGroup {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  
+  .buttonsContainer {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 768px) {
+  .controlsContainer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .searchContainer {
+    min-width: 100%;
+  }
+  
+  .controlsGroup {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .buttonsContainer {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .inventarioContainer {
+    padding: 16px;
+  }
+  
+  .buttonsContainer {
+    flex-direction: column;
+  }
+  
+  .buttonsContainer > * {
+    width: 100%;
+  }
+}
+
 .contenedorGeneral {
     height: 100dvh;
     width: 100dvw;    
