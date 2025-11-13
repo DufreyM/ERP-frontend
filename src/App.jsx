@@ -119,12 +119,12 @@ function App() {
                         {/* <Route path="notificaciones" element={<Notificaciones />} /> */}
                     </Route>
 
-                    <Route path="/visitador_logged" element={<VisitadorLayout />}>
+                    <Route path="/visitador-logged" element={<VisitadorLayout />}>
                         <Route index element={<DashboardVisitador />} />
                         <Route path="mi-perfil" element={<MiPerfil />} />
                         <Route path="cambiar-contraseña" element={<ChangePassword />} />
-                        <Route path="calendario" element={<CalendarScreen />} />
-                        <Route path="visitadores-medicos" element={<VisitadoresExternos />} /> 
+                        {/* <Route path="calendario" element={<CalendarScreen />} /> */}
+                        <Route path="visitadores-medicos" element={<VisitadoresAdmin />} /> 
                     </Route>
 
                 </Route>

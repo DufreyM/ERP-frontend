@@ -13,10 +13,10 @@ import { jwtDecode } from "jwt-decode";
 import { getToken } from "../services/authService.js";
 
 const visitadorItems = [
-  { label: "Inicio", to: "/visitador_logged/", icon: faHome },
-  { label: "Calendario", to: "/visitador_logged/calendario", icon: faCalendar },
-  { label: "Visitadores médicos", to: "/visitador_logged/visitadores-medicos", icon: faTruckMedical },
-  { label: "Mi perfil", to: "/visitador_logged/mi-perfil", icon: faUser },
+  { label: "Inicio", to: "/visitador-logged/", icon: faHome },
+  //{ label: "Calendario", to: "/visitador-logged/calendario", icon: faCalendar },
+  { label: "Visitadores médicos", to: "/visitador-logged/visitadores-medicos", icon: faTruckMedical },
+  { label: "Mi perfil", to: "/visitador-logged/mi-perfil", icon: faUser },
 ];
 
 
@@ -33,18 +33,18 @@ export default function VisitadorLayout() {
   //const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false);
   //colores del fondo :D
   const variantMap = {
-    "/visitador_logged/": "transparent",
-    "/visitador_logged/mi-perfil": "blue",
-    "/visitador_logged/visitadores-medicos": "transparent",
-    "/visitador_logged/calendario": "blue",
+    "/visitador-logged/": "transparent",
+    "/visitador-logged/mi-perfil": "blue",
+    "/visitador-logged/visitadores-medicos": "transparent",
+    //"/visitador-logged/calendario": "blue",
   };
 
   //posiciones del fondo
   const variantMapPositionMirrored = {
-    "/visitador_logged/": false,
-    "/visitador_logged/mi-perfil": false,
-    "/visitador_logged/visitadores-medicos": true,
-    "/visitador_logged/calendario": false,
+    "/visitador-logged/": false,
+    "/visitador-logged/mi-perfil": false,
+    "/visitador-logged/visitadores-medicos": true,
+    //"/visitador-logged/calendario": false,
   };
 
 
@@ -72,9 +72,9 @@ export default function VisitadorLayout() {
           className="admin-content"
           >
 
-         
+       
 
-          {/* <Outlet context={{ selectedLocalk: localId }} /> */}
+          <Outlet />
         </main>
       
       </div>

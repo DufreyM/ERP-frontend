@@ -29,8 +29,7 @@ const formatearFecha = (fechaISO) => {
 };
 
 const VisitadoresAdmin = () => {
-  const { selectedLocal } = useOutletContext();
-  const localSeleccionado = selectedLocal + 1;
+  
 
   // Mover token y fetch de proveedores dentro del componente (evita duplicados/scope)
   const token = getToken();
