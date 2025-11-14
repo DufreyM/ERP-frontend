@@ -213,7 +213,14 @@ const Empleados = () => {
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
-    setFormEmpleado(prev => ({ ...prev, [name]: name === 'rol_id' || name === 'id_local' ? Number(value) : value }));
+    // Si el valor es vacío (placeholder seleccionado), guardarlo como string vacío o null
+    // Solo convertir a Number si el valor no está vacío
+    if (name === 'rol_id' || name === 'id_local') {
+      const numValue = value === '' ? '' : Number(value);
+      setFormEmpleado(prev => ({ ...prev, [name]: numValue }));
+    } else {
+      setFormEmpleado(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const validarEmpleado = (formEmpleado, { requiereContrasena = false } = {}) => {
@@ -273,7 +280,7 @@ const Empleados = () => {
       return 'Seleccione el local de trabajo del usuario.';
     }
 
-    if (!formEmpleado.rol_id) {
+    if (!formEmpleado.rol_id || formEmpleado.rol_id === '') {
       return 'Seleccione un rol para el nuevo usuario.';
     }
 
@@ -563,41 +570,40 @@ const Empleados = () => {
             <IconoInput
               icono={faUser}
               name="nombre"
-              value={formEmpleado.nombre}
+              value={formEmpleado.nombre || ''}
               onChange={handleFormChange}
-              placeholder={empleadoAEditar?.nombre || 'Nombre'}
+              placeholder="Nombre"
               type="text"
               formatoAa={true}
             />
             <IconoInput
               icono={faUser}
               name="apellidos"
-              value={formEmpleado.apellidos}
+              value={formEmpleado.apellidos || ''}
               onChange={handleFormChange}
-              placeholder={empleadoAEditar?.apellidos || empleadoAEditar?.apellido || 'Apellidos'}
+              placeholder="Apellidos"
               type="text"
               formatoAa={true}
             />
             <IconoInput
               icono={faEnvelope}
               name="email"
-              value={formEmpleado.email}
+              value={formEmpleado.email || ''}
               onChange={handleFormChange}
-              placeholder={empleadoAEditar?.email || 'Correo'}
+              placeholder="Correo electrónico"
               type="email"
             />
             <InputDates
               icono={faCalendar}
-              placeholder={empleadoAEditar?.fechanacimiento || 'Fecha de nacimiento'}
+              placeholder="Fecha de nacimiento"
               selected={formEmpleado.fechanacimiento ? stringToDateLocal(formEmpleado.fechanacimiento) : (empleadoAEditar?.fechanacimientoISO ? stringToDateLocal(empleadoAEditar.fechanacimientoISO.slice(0,10)) : null)}
               onChange={(date) => setFormEmpleado(prev => ({...prev, fechanacimiento: formatearFechaParaInput(date)}))}
-
             />
             <InputSelects
               icono={faUser}
               placeholder="Tipo de rol"
               name="rol_id"
-              value={formEmpleado.rol_id || empleadoAEditar?.rol_id || ''}
+              value={formEmpleado.rol_id !== undefined ? String(formEmpleado.rol_id) : (empleadoAEditar?.rol_id ? String(empleadoAEditar.rol_id) : '')}
               onChange={handleFormChange}
               opcions={opcionesRoles.map(r => ({ value: r.id, label: r.nombre }))}
             />
@@ -605,7 +611,7 @@ const Empleados = () => {
               icono={faUser}
               placeholder="Estado"
               name="status"
-              value={formEmpleado.status || empleadoAEditar?.status || ''}
+              value={formEmpleado.status !== undefined ? String(formEmpleado.status) : (empleadoAEditar?.status ? String(empleadoAEditar.status) : '')}
               onChange={handleFormChange}
               opcions={estadosPosibles.map(s => ({ value: s, label: s.charAt(0).toUpperCase()+s.slice(1) }))}
             />
@@ -613,7 +619,7 @@ const Empleados = () => {
               icono={faUser}
               placeholder="Local"
               name="id_local"
-              value={formEmpleado.id_local || empleadoAEditar?.id_local || ''}
+              value={formEmpleado.id_local !== undefined ? String(formEmpleado.id_local) : (empleadoAEditar?.id_local ? String(empleadoAEditar.id_local) : '')}
               onChange={handleFormChange}
               opcions={[{value:1,label:'Local 1'},{value:2,label:'Local 2'}]}
             />
