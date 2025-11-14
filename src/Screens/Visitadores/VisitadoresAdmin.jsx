@@ -40,6 +40,7 @@ const VisitadoresAdmin = () => {
 
   const decodedToken = token ? jwtDecode(token) : null; 
   const rolUsuario = decodedToken ? decodedToken.rol_id : null;
+  const usuarioIdToken = decodedToken ? decodedToken.id : null;
   const esVisitador = rolUsuario === 3;
 
   // Obtener proveedores (usa token ya definido)
@@ -91,6 +92,12 @@ const VisitadoresAdmin = () => {
   const [visitadorAEditar, setVisitadorAEditar] = useState(null);
   const [editarVisitador, setEditarVisitador] = useState(false);
 
+  // Estados para subir documento (solo visitadores médicos)
+  const [documentoFile, setDocumentoFile] = useState(null);
+  const [subiendoDocumento, setSubiendoDocumento] = useState(false);
+  const [mensajeDocumento, setMensajeDocumento] = useState('');
+  const fileInputRef = React.useRef(null);
+
   // Form state crear/editar
   const [formVisitador, setFormVisitador] = useState({
     nombre: '',
@@ -107,7 +114,7 @@ const VisitadoresAdmin = () => {
   });
 
   // Configuración de columnas de la tabla
-  const columnas = [
+  const todasLasColumnas = [
     { key: 'nombre', titulo: 'Nombre' },
     { key: 'apellido', titulo: 'Apellido' },
     { key: 'email', titulo: 'Correo Electrónico' },
@@ -118,6 +125,15 @@ const VisitadoresAdmin = () => {
     { key: 'status', titulo: 'Estado' },
     { key: 'editar', titulo: 'Editar' }
   ];
+
+  // Filtrar columnas según el rol del usuario
+  const columnas = useMemo(() => {
+    if (esVisitador) {
+      // Ocultar 'status' y 'editar' para visitadores médicos
+      return todasLasColumnas.filter(col => col.key !== 'status' && col.key !== 'editar');
+    }
+    return todasLasColumnas;
+  }, [esVisitador]);
 
   // Fetch de visitadores
   const visitadoresUrl = `${import.meta.env.VITE_API_URL}/visitadores`;
@@ -167,6 +183,11 @@ const VisitadoresAdmin = () => {
   const filteredData = useMemo(() => {
     let filtered = visitadoresData;
 
+    // Si es visitador médico, mostrar solo sus propios datos
+    if (esVisitador && usuarioIdToken) {
+      filtered = filtered.filter(item => item.usuario_id === usuarioIdToken);
+    }
+
     if (busqueda) {
       filtered = filtered.filter(item =>
         item.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
@@ -187,7 +208,7 @@ const VisitadoresAdmin = () => {
     }
 
     return filtered;
-  }, [visitadoresData, busqueda, proveedorSeleccionadoId, fechaInicio, fechaFin]);
+  }, [visitadoresData, esVisitador, usuarioIdToken, busqueda, proveedorSeleccionadoId, fechaInicio, fechaFin]);
 
   const sortedData = useMemo(() => {
     return [...filteredData].sort((a, b) => {
@@ -344,6 +365,180 @@ const VisitadoresAdmin = () => {
     }
   };
 
+  // Funciones para subir documento (solo visitadores médicos)
+  const handleFileChange = async (e) => {
+    const files = Array.from(e.target.files);
+    const pdfFiles = files.filter(file => file.type === 'application/pdf');
+    
+    if (pdfFiles.length !== files.length) {
+      setMensajeDocumento('Solo se permiten archivos PDF');
+      setDocumentoFile(null);
+      e.target.value = ''; // Limpiar el input
+      return;
+    }
+    
+    // Validar tamaño (10MB = 10 * 1024 * 1024 bytes)
+    const maxBytes = 10 * 1024 * 1024;
+    const archivoValido = pdfFiles.find(file => file.size <= maxBytes);
+    
+    if (!archivoValido && pdfFiles.length > 0) {
+      setMensajeDocumento('El archivo no debe exceder 10 MB');
+      setDocumentoFile(null);
+      e.target.value = ''; // Limpiar el input
+      return;
+    }
+    
+    const archivoSeleccionado = pdfFiles[0] || null;
+    setDocumentoFile(archivoSeleccionado);
+    setMensajeDocumento('');
+    
+    // Si hay un archivo válido, subirlo automáticamente
+    if (archivoSeleccionado) {
+      await subirDocumentoConArchivo(archivoSeleccionado);
+    }
+  };
+
+  const handleSubirDocumentoClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const subirDocumentoConArchivo = async (file) => {
+    if (!file) {
+      setMensajeDocumento('Error: Por favor selecciona un archivo');
+      return;
+    }
+
+    // Obtener el visitador actual (debería ser solo uno en la lista filtrada)
+    const visitadorActual = sortedData.length > 0 ? sortedData[0] : null;
+    if (!visitadorActual || !visitadorActual.id) {
+      setMensajeDocumento('Error: No se encontró el visitador');
+      return;
+    }
+
+    setSubiendoDocumento(true);
+    setMensajeDocumento('');
+
+    try {
+      // Obtener los datos actuales del visitador primero
+      const visitadorResponse = await fetch(`${import.meta.env.VITE_API_URL}/visitadores/${visitadorActual.id}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!checkToken(visitadorResponse)) return;
+
+      if (!visitadorResponse.ok) {
+        throw new Error('Error al obtener datos del visitador');
+      }
+
+      const visitadorData = await visitadorResponse.json();
+      console.log('Datos del visitador obtenidos:', visitadorData);
+
+      // Preparar los datos para actualizar (mantener estructura existente con todos los campos requeridos)
+      const usuarioPayload = {
+        nombre: visitadorData.usuario?.nombre || visitadorActual.nombre,
+        apellidos: visitadorData.usuario?.apellidos || visitadorActual.apellido,
+        email: visitadorData.usuario?.email || visitadorActual.email,
+        rol_id: visitadorData.usuario?.rol_id || 3,
+        status: visitadorData.usuario?.status || 'activo',
+        contrasena: 'unchanged' // Campo requerido para actualización
+      };
+
+      // Agregar fechanacimiento si existe (formato YYYY-MM-DD)
+      const fechaNac = visitadorData.usuario?.fechanacimiento || 
+                       visitadorData.usuario?.fecha_nacimiento || 
+                       visitadorData.usuario?.fecha_nacimientoISO ||
+                       visitadorActual.fecha_nacimientoISO;
+      
+      if (fechaNac) {
+        // Convertir a formato YYYY-MM-DD si viene en formato ISO
+        if (fechaNac.includes('T')) {
+          usuarioPayload.fechanacimiento = fechaNac.split('T')[0];
+        } else {
+          usuarioPayload.fechanacimiento = fechaNac;
+        }
+      }
+
+      // Validar que el objeto usuario tenga los campos mínimos requeridos
+      if (!usuarioPayload.nombre || !usuarioPayload.apellidos || !usuarioPayload.email) {
+        throw new Error('Faltan datos obligatorios del usuario');
+      }
+
+      const data = {
+        usuario: usuarioPayload,
+        proveedor_id: visitadorData.proveedor_id ? Number(visitadorData.proveedor_id) : (visitadorActual.proveedor_id ? Number(visitadorActual.proveedor_id) : null),
+        telefonos: visitadorData.telefonos || []
+      };
+
+      console.log('Datos a enviar:', data);
+      console.log('Objeto usuario completo:', JSON.stringify(usuarioPayload, null, 2));
+      console.log('Data stringificado:', JSON.stringify(data, null, 2));
+      
+      // Crear FormData en el mismo orden que Visitadores.jsx: primero data, luego documento
+      const formData = new FormData();
+      formData.append('data', JSON.stringify(data));
+      formData.append('documento', file);
+      
+      // Verificar que el FormData tenga los datos correctos
+      console.log('FormData data:', formData.get('data'));
+      console.log('FormData documento:', formData.get('documento')?.name);
+      
+      // Usar PUT para actualizar el visitador con el documento
+      // El backend espera FormData con 'data' (JSON stringificado) y 'documento' (archivo)
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/visitadores/${visitadorActual.id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`
+          // NO establecer Content-Type manualmente, el navegador lo hará automáticamente para FormData
+        },
+        body: formData
+      });
+
+      if (!checkToken(response)) return;
+
+      if (!response.ok) {
+        // Leer el error de la respuesta
+        let errorText = '';
+        try {
+          const errorData = await response.json();
+          errorText = JSON.stringify(errorData);
+          console.error('Error completo del servidor:', errorData);
+        } catch (e) {
+          // Si falla el JSON, usar el status y statusText
+          errorText = `Error ${response.status}: ${response.statusText}`;
+          console.error('Error al leer respuesta como JSON:', e);
+        }
+        throw new Error(`Error al subir el documento: ${errorText}`);
+      }
+
+      setMensajeDocumento('Documento subido correctamente');
+      setDocumentoFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      
+      // Recargar los datos
+      await refetch();
+      
+      // Limpiar mensaje después de 3 segundos
+      setTimeout(() => {
+        setMensajeDocumento('');
+      }, 3000);
+    } catch (error) {
+      console.error('Error al subir documento:', error);
+      setMensajeDocumento(`Error: ${error.message || 'No se pudo subir el documento'}`);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    } finally {
+      setSubiendoDocumento(false);
+    }
+  };
+
   return (
     <div className={styles.contenedorGeneral}>
       <div className={styles.contenedorEncabezado}>
@@ -405,7 +600,29 @@ const VisitadoresAdmin = () => {
         )}
         
         {esVisitador &&(
-        <ButtonHeaders text="Subir nuevo documento" onClick={{}}> </ButtonHeaders>
+        <>
+          <input
+            type="file"
+            ref={fileInputRef}
+            accept=".pdf"
+            style={{ display: 'none' }}
+            onChange={handleFileChange}
+          />
+          <ButtonHeaders 
+            text={subiendoDocumento ? "Subiendo..." : "Subir nuevo documento"} 
+            onClick={handleSubirDocumentoClick}
+            disabled={subiendoDocumento}
+          />
+          {mensajeDocumento && (
+            <p style={{ 
+              color: mensajeDocumento.includes('Error') ? 'crimson' : '#5a60a5', 
+              marginTop: '8px',
+              fontSize: '14px'
+            }}>
+              {mensajeDocumento}
+            </p>
+          )}
+        </>
         )}
       </div>
 
@@ -414,30 +631,38 @@ const VisitadoresAdmin = () => {
         {error && <p style={{ color: 'crimson' }}>Error: {String(error)}</p>}
         <Table
           nameColumns={columnas}
-          data={sortedData.map(visitador => ({
-            ...visitador,
-            status: (
-              <span
-                className={[
-                  styles.estadoChip,
-                  (String(visitador.status).toLowerCase() === 'activo') ? styles.estadoActivo : styles.estadoInactivo
-                ].join(' ')}
-                onClick={() => onToggleStatus(visitador)}
-                title="Cambiar estado"
-              >
-                {String(visitador.status).toLowerCase() === 'activo' ? 'Activo' : 'Inactivo'}
-              </span>
-            ),
-            documento: visitador.documento ? (
-              <a href={visitador.documento} target="_blank" rel="noopener noreferrer" style={{ color: '#5a60a5', textDecoration: 'none' }}>
-                📄 PDF
-              </a>
-            ) : (
-              <span style={{ color: '#888' }}>-</span>
-            )
-          }))}
-          onEliminarClick={openAdvertencia}
-          onEditarClick={openEditarVisitador}
+          data={sortedData.map(visitador => {
+            const visitadorData = {
+              ...visitador,
+              documento: visitador.documento ? (
+                <a href={visitador.documento} target="_blank" rel="noopener noreferrer" style={{ color: '#5a60a5', textDecoration: 'none' }}>
+                  📄 PDF
+                </a>
+              ) : (
+                <span style={{ color: '#888' }}>-</span>
+              )
+            };
+            
+            // Solo agregar status si no es visitador
+            if (!esVisitador) {
+              visitadorData.status = (
+                <span
+                  className={[
+                    styles.estadoChip,
+                    (String(visitador.status).toLowerCase() === 'activo') ? styles.estadoActivo : styles.estadoInactivo
+                  ].join(' ')}
+                  onClick={() => onToggleStatus(visitador)}
+                  title="Cambiar estado"
+                >
+                  {String(visitador.status).toLowerCase() === 'activo' ? 'Activo' : 'Inactivo'}
+                </span>
+              );
+            }
+            
+            return visitadorData;
+          })}
+          onEliminarClick={esVisitador ? undefined : openAdvertencia}
+          onEditarClick={esVisitador ? undefined : openEditarVisitador}
         />
       </div>
 
