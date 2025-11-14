@@ -6,28 +6,21 @@ import Clientes from "../Clientes/Clientes";
 const EmpleadosClientes = () => {
     // Guardar qué se seleccionó, empleados o clientes
     const storedPage = localStorage.getItem('paginaEmpleadosClientes');
-
-    // Si no hay nada guardado se usa este valor
-    const [empleadosPagina, setEmpleadosPagina] = useState(storedPage === 'clientes' ? false : true);
-    const [clientesPagina, setClientesPagina] = useState(storedPage === 'clientes' ? true : false);
+    
+    // Si no hay nada guardado, por defecto muestra Empleados
+    const [paginaActiva, setPaginaActiva] = useState(storedPage || 'empleados');
     
     const handleChangePage = () => {
-        setEmpleadosPagina(!empleadosPagina);
-        setClientesPagina(!clientesPagina);
-        localStorage.setItem('paginaEmpleadosClientes', !empleadosPagina ? 'clientes' : 'empleados');
+        const nuevaPagina = paginaActiva === 'empleados' ? 'clientes' : 'empleados';
+        setPaginaActiva(nuevaPagina);
+        localStorage.setItem('paginaEmpleadosClientes', nuevaPagina);
     }
 
     useEffect(() => {
         // Verificar si hay un valor guardado en localStorage al cargar la página
         const storedPage = localStorage.getItem('paginaEmpleadosClientes');
         if (storedPage) {
-            if (storedPage === 'empleados') {
-                setEmpleadosPagina(true);
-                setClientesPagina(false);
-            } else {
-                setEmpleadosPagina(false);
-                setClientesPagina(true);
-            }
+            setPaginaActiva(storedPage);
         }
     }, []);
 
@@ -36,14 +29,14 @@ const EmpleadosClientes = () => {
             <div className={styles.navbarEC}>
                 <div className={styles.contenedorBotonesEC}>
                     <button 
-                        className={`${styles.botonEmpleadoOCliente} ${empleadosPagina ? styles.botonECNoActivo : ''}`}
+                        className={`${styles.botonEmpleadoOCliente} ${paginaActiva === 'empleados' ? '' : styles.botonECNoActivo}`}
                         onClick={handleChangePage}
                     >
                         Empleados
                     </button>
 
                     <button 
-                        className={`${styles.botonEmpleadoOCliente} ${clientesPagina ? styles.botonECNoActivo : ''}`}
+                        className={`${styles.botonEmpleadoOCliente} ${paginaActiva === 'clientes' ? '' : styles.botonECNoActivo}`}
                         onClick={handleChangePage}
                     >
                         Clientes
@@ -52,7 +45,7 @@ const EmpleadosClientes = () => {
             </div>
 
             <div className={styles.contenidoEC}>
-                {empleadosPagina ? <Clientes/> : <Empleados/>}
+                {paginaActiva === 'empleados' ? <Empleados/> : <Clientes/>}
             </div>
         </main>
     )
