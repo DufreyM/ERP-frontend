@@ -421,76 +421,16 @@ const VisitadoresAdmin = () => {
     setMensajeDocumento('');
 
     try {
-      // Obtener los datos actuales del visitador primero
-      const visitadorResponse = await fetch(`${import.meta.env.VITE_API_URL}/visitadores/${visitadorActual.id}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      if (!checkToken(visitadorResponse)) return;
-
-      if (!visitadorResponse.ok) {
-        throw new Error('Error al obtener datos del visitador');
-      }
-
-      const visitadorData = await visitadorResponse.json();
-      console.log('Datos del visitador obtenidos:', visitadorData);
-
-      // Preparar los datos para actualizar (mantener estructura existente con todos los campos requeridos)
-      const usuarioPayload = {
-        nombre: visitadorData.usuario?.nombre || visitadorActual.nombre,
-        apellidos: visitadorData.usuario?.apellidos || visitadorActual.apellido,
-        email: visitadorData.usuario?.email || visitadorActual.email,
-        rol_id: visitadorData.usuario?.rol_id || 3,
-        status: visitadorData.usuario?.status || 'activo',
-        contrasena: 'unchanged' // Campo requerido para actualización
-      };
-
-      // Agregar fechanacimiento si existe (formato YYYY-MM-DD)
-      const fechaNac = visitadorData.usuario?.fechanacimiento || 
-                       visitadorData.usuario?.fecha_nacimiento || 
-                       visitadorData.usuario?.fecha_nacimientoISO ||
-                       visitadorActual.fecha_nacimientoISO;
-      
-      if (fechaNac) {
-        // Convertir a formato YYYY-MM-DD si viene en formato ISO
-        if (fechaNac.includes('T')) {
-          usuarioPayload.fechanacimiento = fechaNac.split('T')[0];
-        } else {
-          usuarioPayload.fechanacimiento = fechaNac;
-        }
-      }
-
-      // Validar que el objeto usuario tenga los campos mínimos requeridos
-      if (!usuarioPayload.nombre || !usuarioPayload.apellidos || !usuarioPayload.email) {
-        throw new Error('Faltan datos obligatorios del usuario');
-      }
-
-      const data = {
-        usuario: usuarioPayload,
-        proveedor_id: visitadorData.proveedor_id ? Number(visitadorData.proveedor_id) : (visitadorActual.proveedor_id ? Number(visitadorActual.proveedor_id) : null),
-        telefonos: visitadorData.telefonos || []
-      };
-
-      console.log('Datos a enviar:', data);
-      console.log('Objeto usuario completo:', JSON.stringify(usuarioPayload, null, 2));
-      console.log('Data stringificado:', JSON.stringify(data, null, 2));
-      
-      // Crear FormData en el mismo orden que Visitadores.jsx: primero data, luego documento
+      // Según el backend: POST /visitadores/:id/documento
+      // El backend espera el archivo en req.files.documento
       const formData = new FormData();
-      formData.append('data', JSON.stringify(data));
       formData.append('documento', file);
       
-      // Verificar que el FormData tenga los datos correctos
-      console.log('FormData data:', formData.get('data'));
-      console.log('FormData documento:', formData.get('documento')?.name);
+      console.log('Subiendo documento a:', `${import.meta.env.VITE_API_URL}/visitadores/${visitadorActual.id}/documento`);
+      console.log('Archivo:', file.name, file.type, file.size);
       
-      // Usar PUT para actualizar el visitador con el documento
-      // El backend espera FormData con 'data' (JSON stringificado) y 'documento' (archivo)
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/visitadores/${visitadorActual.id}`, {
-        method: 'PUT',
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/visitadores/${visitadorActual.id}/documento`, {
+        method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
           // NO establecer Content-Type manualmente, el navegador lo hará automáticamente para FormData
