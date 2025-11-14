@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useOutletContext } from 'react-router-dom';
-import styles from "./EmpleadosClientes.module.css";
+import styles from "./Empleados.module.css";
 import SimpleTitle from "../../components/Titles/SimpleTitle";
 import { Table } from "../../components/Tables/Table";
 import Popup from '../../components/Popup/Popup';
@@ -17,7 +17,7 @@ import InputSelects from "../../components/Inputs/InputSelects";
 import InputDates from "../../components/Inputs/InputDates";
 import { useCheckToken } from "../../utils/checkToken";
 
-const EmpleadosClientes = () => {
+const Empleados = () => {
   const { selectedLocal } = useOutletContext();
   const localSeleccionado = selectedLocal + 1;
   const checkToken = useCheckToken();
@@ -483,10 +483,9 @@ const EmpleadosClientes = () => {
       )}
       <div className={styles.contenedorEncabezado}>
         <div className={styles.contenedorTitle}>
-          <SimpleTitle text="Empleados y Clientes" />
+          <h1 className={styles.tituloEmpleados}>Empleados</h1>
         </div>
 
-        {/* Buscador */}
         <div className={styles.buscadorContainer}>
           <InputSearch
             icono={faSearch}
@@ -495,35 +494,24 @@ const EmpleadosClientes = () => {
             onChange={handleBusqueda}
             type="text"
             name="busqueda"
-          
-          
           />
-          {/* <IconoInput
-            icono={faSearch}
-            placeholder="Buscar empleados..."
-            value={busqueda}
-            onChange={handleBusqueda}
-            type="text"
-            name="busqueda"
-          /> */}
         </div>
 
+        <div className={styles.headerBotonesEmpleados}>
+          <OrderBy
+            FAbecedario={true}
+            FExistencias={false}
+            FPrecio={false}
+            FFecha={false}
+            selectedOption={sortOption}
+            onChange={setSortOption}
+          />
 
-        {/* Ordenar */}
-        <OrderBy
-          FAbecedario={true}
-          FExistencias={false}
-          FPrecio={false}
-          FFecha={false}
-          selectedOption={sortOption}
-          onChange={setSortOption}
-        />
-
-        {/* Botón agregar nuevo empleado */}
-        <ButtonHeaders 
-          text="Agregar +"
-          onClick={openNuevoEmpleado}
-        />
+          <ButtonHeaders 
+            text="Agregar +"
+            onClick={openNuevoEmpleado}
+          />
+        </div>
       </div>
 
       <div className={styles.contenedorTabla}>
@@ -715,4 +703,4 @@ const EmpleadosClientes = () => {
   );
 };
 
-export default EmpleadosClientes;
+export default Empleados;

@@ -18,7 +18,7 @@ import InventarioScreen from './Screens/Inventario/InventarioScreen.jsx';
 import AgregarMedicamento from './Screens/Inventario/AgregarMedicamento.jsx';
 import NuevaVenta from './Screens/NuevaVenta/NuevaVenta.jsx';
 import HistorialComprasVentas from './Screens/HistorialComprasVentas/HistorialComprasVentas.jsx';
-import EmpleadosClientes from './Screens/Empleados/EmpleadosClientes.jsx';
+import EmpleadosClientes from './Screens/EmpleadosClientes/EmpleadosClientes.jsx';
 import NuevaCompra from './Screens/NuevaCompra/NuevaCompra.jsx';
 import Notificaciones from './Screens/Notificaciones/Notificaciones.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
