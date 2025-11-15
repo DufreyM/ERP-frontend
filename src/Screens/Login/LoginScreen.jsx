@@ -84,7 +84,7 @@ const LoginScreen = () => {
                     navigate('/dependiente/', { state: { user: userEmail, role: 'Dependienta' } });
                     break;
                 case 3: // Visitador
-                    navigate('/visitador/', { state: { user: userEmail, role: 'Visitador' } });
+                    navigate('/visitador-logged/', { state: { user: userEmail, role: 'Visitador' } });
                     break;
                 case 4: // Contador
                     navigate('/contador/', { state: { user: userEmail, role: 'Contador' } });

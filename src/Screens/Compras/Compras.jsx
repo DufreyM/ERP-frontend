@@ -17,14 +17,13 @@ import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import ExportarComo from '../../components/ExportarComo/ExportarComo';
+import {jwtDecode} from 'jwt-decode';
 
 
 const Compras = () => {
     
     const navigate = useNavigate();
-    const irANuevaCompra = () => {
-        navigate('/admin/historial-vc/nueva-compra');
-    };
+
 
     //Obtener datos de la base de datos
     const token = getToken();                       //Se solicita el tocken del inicio de sesión ya que es solicitado en el fetch
@@ -33,6 +32,23 @@ const Compras = () => {
     const url = localSeleccionado
     ? `${import.meta.env.VITE_API_URL}/compras?local_id=${localSeleccionado}`
     : null;  //url para los eventos dependiendo del local
+
+    const decodedToken = token ? jwtDecode(token) : null; 
+    const rolUsuario = decodedToken ? decodedToken.rol_id : null;
+    const mostrarNuevaCompra = rolUsuario === 1 || rolUsuario === 2; 
+
+    const irANuevaCompra = () => {   //movido para fix de navegaciones
+        let rutaDestino = "/"; // por defecto
+
+        if (rolUsuario === 1) {
+          rutaDestino = "/admin/historial-vc/nueva-compra";
+        } else if (rolUsuario === 2) {
+          rutaDestino = "/dependiente/historial-vc/nueva-compra";
+        } else {
+          rutaDestino = "/no-autorizado"; 
+        }
+        navigate(rutaDestino);
+    };
 
     //Se llama a traer la función useFetch (utils/useFetch) que retorna la carga de datos, y existe la opción de forzar un refetch manual en caso de modificaciones a los eventos.
     const { data, loading, error } = useFetch(url, {headers: { 'Authorization': `Bearer ${token}` }}, [token, localSeleccionado]);
@@ -364,8 +380,10 @@ const Compras = () => {
                     >
 
                     </OrderBy>
-                    
+                    {mostrarNuevaCompra &&(
                     <ButtonHeaders text = "Nueva compra" onClick={irANuevaCompra}></ButtonHeaders>
+                    )}
+                    
                 </div>
             </div>
 

@@ -3,14 +3,14 @@ const loginFlow = require('../../flows/loginFlow');
 const { By } = require('selenium-webdriver');
 const navigateNavBar = require('../../flows/navigateNavBar');
 
-async function testArchivosFindPage() {
+async function testAlertaNavBar() {
   const driver = createDriver();
   //console.log("📌 Crear nuevo evento en calendario: ");
 
   try {
     await loginFlow(driver, 'leomejia646@gmail.com', 'hipopotamo_2025');
 
-    await navigateNavBar(driver, "Archivos", "Archivos");
+    await navigateNavBar(driver, "Alertas", "Notificaciones");
     const calendarHeader = await driver.findElement(By.tagName('h1')).getText();
 
     // if (calendarHeader === 'Calendario de actividades') {
@@ -25,4 +25,4 @@ async function testArchivosFindPage() {
   }
 }
 
-module.exports = testArchivosFindPage;
+module.exports = testAlertaNavBar;

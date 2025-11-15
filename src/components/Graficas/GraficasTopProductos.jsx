@@ -10,7 +10,7 @@ export default function TopProductosChart({
     const option = {
         title: { text: "Top productos más vendidos", left: "center" },
         tooltip: { trigger: "axis" },
-        grid: { left: "20%", right: "5%", bottom: "10%" },
+        grid: { left: 200, right: 150, bottom: 30 },
         xAxis: { type: "value", name: "Cantidad vendida" },
         yAxis: {
         type: "category",
@@ -31,5 +31,5 @@ export default function TopProductosChart({
         ],
     };
 
-    return <ReactECharts option={option} style={{ height: 400 }} />;
+    return <ReactECharts option={option} style={{ height: 300 }} />;
 }

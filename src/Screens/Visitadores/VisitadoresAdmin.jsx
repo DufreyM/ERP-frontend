@@ -17,6 +17,8 @@ import InputSearch from "../../components/Inputs/InputSearch";
 import InputDates from "../../components/Inputs/InputDates";
 import SelectSearch from "../../components/Inputs/SelectSearch";
 import { useCheckToken } from "../../utils/checkToken";
+import {jwtDecode} from 'jwt-decode';
+
 // Función para formatear fecha
 const formatearFecha = (fechaISO) => {
   if (!fechaISO) return 'No disponible';
@@ -29,13 +31,17 @@ const formatearFecha = (fechaISO) => {
 };
 
 const VisitadoresAdmin = () => {
-  const { selectedLocal } = useOutletContext();
-  const localSeleccionado = selectedLocal + 1;
+  
 
   // Mover token y fetch de proveedores dentro del componente (evita duplicados/scope)
   const token = getToken();
   const shouldFetch = Boolean(token);
   const checkToken = useCheckToken();
+
+  const decodedToken = token ? jwtDecode(token) : null; 
+  const rolUsuario = decodedToken ? decodedToken.rol_id : null;
+  const usuarioIdToken = decodedToken ? decodedToken.id : null;
+  const esVisitador = rolUsuario === 3;
 
   // Obtener proveedores (usa token ya definido)
   const { data: proveedores, loading: loadingProveedores } = useFetch(
@@ -61,12 +67,36 @@ const VisitadoresAdmin = () => {
   const [fechaInicio, setFechaInicio] = useState(null);
   const [fechaFin, setFechaFin] = useState(null);
   const [sortOption, setSortOption] = useState('alfabetico');
+  
+  // Estados para el panel de filtros
+  const [panelAbierto, setPanelAbierto] = useState(false);
+  const [isOpendDate, setIsOpendDate] = useState(false);
+  const [isOpendRol, setIsOpendRol] = useState(false);
+  const [selectedPreDate, setSelectedPreDate] = useState('');
+  
+  const expandFecha = () => setIsOpendDate(prev => !prev);
+  const expandRol = () => setIsOpendRol(prev => !prev);
+  
+  // Función para resetear filtros
+  const resetFiltros = () => {
+    setProveedorSeleccionadoId('');
+    setFechaInicio(null);
+    setFechaFin(null);
+    setSelectedPreDate('');
+    setBusqueda('');
+  };
 
   // Estados para popups
   const [visitadorAEliminar, setVisitadorAEliminar] = useState(null);
   const [advertencia, setAdvertencia] = useState(false);
   const [visitadorAEditar, setVisitadorAEditar] = useState(null);
   const [editarVisitador, setEditarVisitador] = useState(false);
+
+  // Estados para subir documento (solo visitadores médicos)
+  const [documentoFile, setDocumentoFile] = useState(null);
+  const [subiendoDocumento, setSubiendoDocumento] = useState(false);
+  const [mensajeDocumento, setMensajeDocumento] = useState('');
+  const fileInputRef = React.useRef(null);
 
   // Form state crear/editar
   const [formVisitador, setFormVisitador] = useState({
@@ -84,7 +114,7 @@ const VisitadoresAdmin = () => {
   });
 
   // Configuración de columnas de la tabla
-  const columnas = [
+  const todasLasColumnas = [
     { key: 'nombre', titulo: 'Nombre' },
     { key: 'apellido', titulo: 'Apellido' },
     { key: 'email', titulo: 'Correo Electrónico' },
@@ -95,6 +125,15 @@ const VisitadoresAdmin = () => {
     { key: 'status', titulo: 'Estado' },
     { key: 'editar', titulo: 'Editar' }
   ];
+
+  // Filtrar columnas según el rol del usuario
+  const columnas = useMemo(() => {
+    if (esVisitador) {
+      // Ocultar 'status' y 'editar' para visitadores médicos
+      return todasLasColumnas.filter(col => col.key !== 'status' && col.key !== 'editar');
+    }
+    return todasLasColumnas;
+  }, [esVisitador]);
 
   // Fetch de visitadores
   const visitadoresUrl = `${import.meta.env.VITE_API_URL}/visitadores`;
@@ -132,7 +171,7 @@ const VisitadoresAdmin = () => {
         fecha_nacimiento: v.usuario?.fecha_nacimientoISO ? formatearFecha(v.usuario.fecha_nacimientoISO) : 'No disponible',
         fecha_nacimientoISO: v.usuario?.fecha_nacimientoISO || '',
         proveedor: v.proveedor?.nombre || '',
-        proveedor_id: v.proveedor_id ?? '',
+        proveedor_id: v.proveedor_id != null ? String(v.proveedor_id) : '',
         documento: v.documento_url || '',
         status: v.usuario?.status || 'inactivo',
         usuario_id: v.usuario_id
@@ -143,6 +182,11 @@ const VisitadoresAdmin = () => {
   // Filtrar y ordenar datos
   const filteredData = useMemo(() => {
     let filtered = visitadoresData;
+
+    // Si es visitador médico, mostrar solo sus propios datos
+    if (esVisitador && usuarioIdToken) {
+      filtered = filtered.filter(item => item.usuario_id === usuarioIdToken);
+    }
 
     if (busqueda) {
       filtered = filtered.filter(item =>
@@ -164,7 +208,7 @@ const VisitadoresAdmin = () => {
     }
 
     return filtered;
-  }, [visitadoresData, busqueda, proveedorSeleccionadoId, fechaInicio, fechaFin]);
+  }, [visitadoresData, esVisitador, usuarioIdToken, busqueda, proveedorSeleccionadoId, fechaInicio, fechaFin]);
 
   const sortedData = useMemo(() => {
     return [...filteredData].sort((a, b) => {
@@ -177,7 +221,12 @@ const VisitadoresAdmin = () => {
 
   // Handlers
   const handleBusqueda = (e) => setBusqueda(e.target.value);
-  const handleChange = (value) => setProveedorSeleccionadoId(value);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "rol") {
+      setProveedorSeleccionadoId(value || '');
+    }
+  };
 
   const openAdvertencia = (visitador) => {
     setVisitadorAEliminar(visitador);
@@ -316,6 +365,120 @@ const VisitadoresAdmin = () => {
     }
   };
 
+  // Funciones para subir documento (solo visitadores médicos)
+  const handleFileChange = async (e) => {
+    const files = Array.from(e.target.files);
+    const pdfFiles = files.filter(file => file.type === 'application/pdf');
+    
+    if (pdfFiles.length !== files.length) {
+      setMensajeDocumento('Solo se permiten archivos PDF');
+      setDocumentoFile(null);
+      e.target.value = ''; // Limpiar el input
+      return;
+    }
+    
+    // Validar tamaño (10MB = 10 * 1024 * 1024 bytes)
+    const maxBytes = 10 * 1024 * 1024;
+    const archivoValido = pdfFiles.find(file => file.size <= maxBytes);
+    
+    if (!archivoValido && pdfFiles.length > 0) {
+      setMensajeDocumento('El archivo no debe exceder 10 MB');
+      setDocumentoFile(null);
+      e.target.value = ''; // Limpiar el input
+      return;
+    }
+    
+    const archivoSeleccionado = pdfFiles[0] || null;
+    setDocumentoFile(archivoSeleccionado);
+    setMensajeDocumento('');
+    
+    // Si hay un archivo válido, subirlo automáticamente
+    if (archivoSeleccionado) {
+      await subirDocumentoConArchivo(archivoSeleccionado);
+    }
+  };
+
+  const handleSubirDocumentoClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const subirDocumentoConArchivo = async (file) => {
+    if (!file) {
+      setMensajeDocumento('Error: Por favor selecciona un archivo');
+      return;
+    }
+
+    // Obtener el visitador actual (debería ser solo uno en la lista filtrada)
+    const visitadorActual = sortedData.length > 0 ? sortedData[0] : null;
+    if (!visitadorActual || !visitadorActual.id) {
+      setMensajeDocumento('Error: No se encontró el visitador');
+      return;
+    }
+
+    setSubiendoDocumento(true);
+    setMensajeDocumento('');
+
+    try {
+      // Según el backend: POST /visitadores/:id/documento
+      // El backend espera el archivo en req.files.documento
+      const formData = new FormData();
+      formData.append('documento', file);
+      
+      console.log('Subiendo documento a:', `${import.meta.env.VITE_API_URL}/visitadores/${visitadorActual.id}/documento`);
+      console.log('Archivo:', file.name, file.type, file.size);
+      
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/visitadores/${visitadorActual.id}/documento`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+          // NO establecer Content-Type manualmente, el navegador lo hará automáticamente para FormData
+        },
+        body: formData
+      });
+
+      if (!checkToken(response)) return;
+
+      if (!response.ok) {
+        // Leer el error de la respuesta
+        let errorText = '';
+        try {
+          const errorData = await response.json();
+          errorText = JSON.stringify(errorData);
+          console.error('Error completo del servidor:', errorData);
+        } catch (e) {
+          // Si falla el JSON, usar el status y statusText
+          errorText = `Error ${response.status}: ${response.statusText}`;
+          console.error('Error al leer respuesta como JSON:', e);
+        }
+        throw new Error(`Error al subir el documento: ${errorText}`);
+      }
+
+      setMensajeDocumento('Documento subido correctamente');
+      setDocumentoFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      
+      // Recargar los datos
+      await refetch();
+      
+      // Limpiar mensaje después de 3 segundos
+      setTimeout(() => {
+        setMensajeDocumento('');
+      }, 3000);
+    } catch (error) {
+      console.error('Error al subir documento:', error);
+      setMensajeDocumento(`Error: ${error.message || 'No se pudo subir el documento'}`);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    } finally {
+      setSubiendoDocumento(false);
+    }
+  };
+
   return (
     <div className={styles.contenedorGeneral}>
       <div className={styles.contenedorEncabezado}>
@@ -334,21 +497,38 @@ const VisitadoresAdmin = () => {
           />
         </div>
 
+        <div className={styles.filtersContainer}>
+        {!esVisitador &&(
         <Filters
           title="Visitadores"
+          panelAbierto={panelAbierto}
+          setPanelAbierto={setPanelAbierto}
           mostrarRangoFecha={true}
           mostrarRangoPrecio={false}
-          mostrarUsuario={false}
+          mostrarUsuario={true}
           mostrarMedicamento={false}
           fechaInicio={fechaInicio}
           setFechaInicio={setFechaInicio}
           fechaFin={fechaFin}
           setFechaFin={setFechaFin}
+          isOpendDate={isOpendDate}
+          expandFecha={expandFecha}
+          selectedPreDate={selectedPreDate}
+          setSelectedPreDate={setSelectedPreDate}
+          isOpendRol={isOpendRol}
+          expandRol={expandRol}
+          expandUsuario={expandRol}
           opcionesRoles={opcionesProveedores}
+          opcionesUsuarios={[]}
+          usuarioSeleccionado=""
           rolSeleccionado={proveedorSeleccionadoId}
           handleChange={handleChange}
+          resetFiltros={resetFiltros}
         />
+        )}
+        </div>
 
+        {!esVisitador &&(
         <OrderBy
           FAbecedario={true}
           FExistencias={false}
@@ -357,6 +537,33 @@ const VisitadoresAdmin = () => {
           selectedOption={sortOption}
           onChange={setSortOption}
         />
+        )}
+        
+        {esVisitador &&(
+        <>
+          <input
+            type="file"
+            ref={fileInputRef}
+            accept=".pdf"
+            style={{ display: 'none' }}
+            onChange={handleFileChange}
+          />
+          <ButtonHeaders 
+            text={subiendoDocumento ? "Subiendo..." : "Subir nuevo documento"} 
+            onClick={handleSubirDocumentoClick}
+            disabled={subiendoDocumento}
+          />
+          {mensajeDocumento && (
+            <p style={{ 
+              color: mensajeDocumento.includes('Error') ? 'crimson' : '#5a60a5', 
+              marginTop: '8px',
+              fontSize: '14px'
+            }}>
+              {mensajeDocumento}
+            </p>
+          )}
+        </>
+        )}
       </div>
 
       <div className={styles.contenedorTabla}>
@@ -364,30 +571,38 @@ const VisitadoresAdmin = () => {
         {error && <p style={{ color: 'crimson' }}>Error: {String(error)}</p>}
         <Table
           nameColumns={columnas}
-          data={sortedData.map(visitador => ({
-            ...visitador,
-            status: (
-              <span
-                className={[
-                  styles.estadoChip,
-                  (String(visitador.status).toLowerCase() === 'activo') ? styles.estadoActivo : styles.estadoInactivo
-                ].join(' ')}
-                onClick={() => onToggleStatus(visitador)}
-                title="Cambiar estado"
-              >
-                {String(visitador.status).toLowerCase() === 'activo' ? 'Activo' : 'Inactivo'}
-              </span>
-            ),
-            documento: visitador.documento ? (
-              <a href={visitador.documento} target="_blank" rel="noopener noreferrer" style={{ color: '#5a60a5', textDecoration: 'none' }}>
-                📄 PDF
-              </a>
-            ) : (
-              <span style={{ color: '#888' }}>-</span>
-            )
-          }))}
-          onEliminarClick={openAdvertencia}
-          onEditarClick={openEditarVisitador}
+          data={sortedData.map(visitador => {
+            const visitadorData = {
+              ...visitador,
+              documento: visitador.documento ? (
+                <a href={visitador.documento} target="_blank" rel="noopener noreferrer" style={{ color: '#5a60a5', textDecoration: 'none' }}>
+                  📄 PDF
+                </a>
+              ) : (
+                <span style={{ color: '#888' }}>-</span>
+              )
+            };
+            
+            // Solo agregar status si no es visitador
+            if (!esVisitador) {
+              visitadorData.status = (
+                <span
+                  className={[
+                    styles.estadoChip,
+                    (String(visitador.status).toLowerCase() === 'activo') ? styles.estadoActivo : styles.estadoInactivo
+                  ].join(' ')}
+                  onClick={() => onToggleStatus(visitador)}
+                  title="Cambiar estado"
+                >
+                  {String(visitador.status).toLowerCase() === 'activo' ? 'Activo' : 'Inactivo'}
+                </span>
+              );
+            }
+            
+            return visitadorData;
+          })}
+          onEliminarClick={esVisitador ? undefined : openAdvertencia}
+          onEditarClick={esVisitador ? undefined : openEditarVisitador}
         />
       </div>
 

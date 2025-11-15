@@ -363,7 +363,28 @@ const MiPerfil = () => {
   };
 
   const handleChangePassword = () => {
-    navigate('/admin/cambiar-contraseña');
+    const rolUsuario = getUserRole();
+
+    let rutaDestino = "/no-autorizado"; 
+
+    switch (rolUsuario) {
+      case "Administradora":
+        rutaDestino = "/admin/cambiar-contraseña";
+        break;
+      case "Dependienta":
+        rutaDestino = "/dependiente/cambiar-contraseña"; 
+        break;
+      case "Visitador Médico":
+        rutaDestino = "/visitador-logged/cambiar-contraseña"; 
+        break;
+      case "Contador":
+        rutaDestino = "/contador/cambiar-contraseña"; 
+        break;
+      default:
+        rutaDestino = "/no-autorizado";
+    }
+
+    navigate(rutaDestino);
   };
 
   const handleEditProfile = () => {

@@ -1,24 +1,23 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useOutletContext } from 'react-router-dom';
-import styles from "./EmpleadosClientes.module.css";
+import styles from "./Empleados.module.css";
 import SimpleTitle from "../../components/Titles/SimpleTitle";
 import { Table } from "../../components/Tables/Table";
 import Popup from '../../components/Popup/Popup';
 import IconoInput from "../../components/Inputs/InputIcono";
-import Filters from "../../components/FIlters/Filters";
+import InputPassword from "../../components/Inputs/InputPassword";
 import ButtonHeaders from "../../components/ButtonHeaders/ButtonHeaders";
 import OrderBy from "../../components/OrderBy/OrderBy";
 import { useOrderBy } from "../../hooks/useOrderBy";
-import { useFiltroGeneral } from "../../hooks/useFiltroGeneral";
 import { useFetch } from "../../utils/useFetch";
 import { getToken } from "../../services/authService";
-import { faUser, faSearch, faEnvelope, faCalendar } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faSearch, faEnvelope, faCalendar, faLock } from '@fortawesome/free-solid-svg-icons';
 import InputSearch from "../../components/Inputs/InputSearch";
 import InputSelects from "../../components/Inputs/InputSelects";
 import InputDates from "../../components/Inputs/InputDates";
 import { useCheckToken } from "../../utils/checkToken";
 
-const EmpleadosClientes = () => {
+const Empleados = () => {
   const { selectedLocal } = useOutletContext();
   const localSeleccionado = selectedLocal + 1;
   const checkToken = useCheckToken();
@@ -33,6 +32,26 @@ const EmpleadosClientes = () => {
     return `${dia}-${mes}-${año}`;
   };
 
+  // Función para formatear fecha a YYYY-MM-DD usando métodos locales (evita problemas de zona horaria)
+  const formatearFechaParaInput = (date) => {
+    if (!date) return '';
+    const año = date.getFullYear();
+    const mes = String(date.getMonth() + 1).padStart(2, '0');
+    const dia = String(date.getDate()).padStart(2, '0');
+    return `${año}-${mes}-${dia}`;
+  };
+
+  // Función para convertir string YYYY-MM-DD a Date usando hora local (evita problemas de zona horaria)
+  const stringToDateLocal = (fechaString) => {
+    if (!fechaString) return null;
+    const partes = fechaString.split('-');
+    if (partes.length !== 3) return null;
+    const año = parseInt(partes[0], 10);
+    const mes = parseInt(partes[1], 10) - 1; // Los meses en JS van de 0-11
+    const dia = parseInt(partes[2], 10);
+    return new Date(año, mes, dia);
+  };
+
   //Maneja las noticiaciones de creación eliminación o edición de un estado
   const [notificacion, setNotificacion] = useState('');
   useEffect(() => {
@@ -45,22 +64,23 @@ const EmpleadosClientes = () => {
       }
   }, [notificacion]);
 
+  // Estado para mostrar/ocultar contraseña
+  const [showPassword, setShowPassword] = useState(false);
+  
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
-  // Estados para filtros
+
+  // Estados para búsqueda
   const [busqueda, setBusqueda] = useState('');
-  const [rolSeleccionado, setRolSeleccionado] = useState("");
-  const [fechaInicio, setFechaInicio] = useState(null);
-  const [fechaFin, setFechaFin] = useState(null);
-
+  
   // Filtros de API
-  const [statusSeleccionado, setStatusSeleccionado] = useState(""); // 'activo' | 'inactivo' | ""
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
 
   const params = new URLSearchParams();
   params.set('id_local', String(localSeleccionado));
-  if (rolSeleccionado) params.set('rol_id', String(rolSeleccionado));
-  if (statusSeleccionado) params.set('status', statusSeleccionado);
   if (page) params.set('page', String(page));
   if (limit) params.set('limit', String(limit));
 
@@ -76,7 +96,7 @@ const EmpleadosClientes = () => {
       },
       method: 'GET'
     },
-    [localSeleccionado, rolSeleccionado, statusSeleccionado, page, limit]
+    [localSeleccionado, page, limit]
   );
 
   
@@ -101,7 +121,7 @@ const EmpleadosClientes = () => {
     fechanacimiento: ''
   });
 
-  // Opciones de roles para filtros
+  // Opciones de roles
   const opcionesRoles = [
     { id: 1, nombre: "Administrador" },
     { id: 2, nombre: "Dependiente" },
@@ -125,14 +145,6 @@ const EmpleadosClientes = () => {
     setBusqueda(e.target.value);
   };
 
-  // Función para manejar cambio de rol
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (name === "rol") {
-      const numValue = parseInt(value);
-      setRolSeleccionado(isNaN(numValue) ? "" : numValue);
-    }
-  };
 
   // Función para abrir popup de eliminar
   const openAdvertencia = (empleado) => {
@@ -169,9 +181,13 @@ const EmpleadosClientes = () => {
       contrasena: '',
       fechanacimiento: ''
     });
+    setShowPassword(false); // Resetear visibilidad de contraseña
     setNuevoEmpleado(true);
   };
-  const closeNuevoEmpleado = () => setNuevoEmpleado(false);
+  const closeNuevoEmpleado = () => {
+    setNuevoEmpleado(false);
+    setShowPassword(false); // Resetear visibilidad de contraseña al cerrar
+  };
 
   // Cargar datos al formulario al abrir editar
   useEffect(() => {
@@ -197,7 +213,14 @@ const EmpleadosClientes = () => {
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
-    setFormEmpleado(prev => ({ ...prev, [name]: name === 'rol_id' || name === 'id_local' ? Number(value) : value }));
+    // Si el valor es vacío (placeholder seleccionado), guardarlo como string vacío o null
+    // Solo convertir a Number si el valor no está vacío
+    if (name === 'rol_id' || name === 'id_local') {
+      const numValue = value === '' ? '' : Number(value);
+      setFormEmpleado(prev => ({ ...prev, [name]: numValue }));
+    } else {
+      setFormEmpleado(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const validarEmpleado = (formEmpleado, { requiereContrasena = false } = {}) => {
@@ -257,7 +280,7 @@ const EmpleadosClientes = () => {
       return 'Seleccione el local de trabajo del usuario.';
     }
 
-    if (!formEmpleado.rol_id) {
+    if (!formEmpleado.rol_id || formEmpleado.rol_id === '') {
       return 'Seleccione un rol para el nuevo usuario.';
     }
 
@@ -397,13 +420,7 @@ const EmpleadosClientes = () => {
     }
   };
 
-  // Configuración de filtros
-  const filterKeyMap = {
-    RANGO_FECHA: "fechaNacimiento",
-    ROL: "rol_id"
-  };
-
-  // Normalizar respuesta y aplicar filtros
+  // Normalizar respuesta
   const empleadosData = useMemo(() => {
     if (empleadosResponse) {
       try { console.debug('Empleados GET response:', empleadosResponse); } catch {}
@@ -440,25 +457,17 @@ const EmpleadosClientes = () => {
     }));
   }, [empleadosResponse]);
 
-  const { dataFiltrada: dataConFiltros } = useFiltroGeneral({
-    data: empleadosData,
-    filterKeyMap: filterKeyMap,
-    fechaInicio: fechaInicio,
-    fechaFin: fechaFin,
-    rolId: rolSeleccionado
-  });
-
   // Aplicar búsqueda
   const dataFiltrada = useMemo(() => {
-    if (!busqueda) return dataConFiltros;
+    if (!busqueda) return empleadosData;
     
-    return dataConFiltros.filter(empleado => {
+    return empleadosData.filter(empleado => {
       const camposBusqueda = ['nombre', 'apellidos', 'email', 'rol'];
       return camposBusqueda.some(campo => 
         empleado[campo]?.toLowerCase().includes(busqueda.toLowerCase())
       );
     });
-  }, [dataConFiltros, busqueda]);
+  }, [empleadosData, busqueda]);
 
   // Configuración de ordenamiento
   const sortKeyMap = {
@@ -481,10 +490,9 @@ const EmpleadosClientes = () => {
       )}
       <div className={styles.contenedorEncabezado}>
         <div className={styles.contenedorTitle}>
-          <SimpleTitle text="Empleados y Clientes" />
+          <h1 className={styles.tituloEmpleados}>Empleados</h1>
         </div>
 
-        {/* Buscador */}
         <div className={styles.buscadorContainer}>
           <InputSearch
             icono={faSearch}
@@ -493,50 +501,24 @@ const EmpleadosClientes = () => {
             onChange={handleBusqueda}
             type="text"
             name="busqueda"
-          
-          
           />
-          {/* <IconoInput
-            icono={faSearch}
-            placeholder="Buscar empleados..."
-            value={busqueda}
-            onChange={handleBusqueda}
-            type="text"
-            name="busqueda"
-          /> */}
         </div>
 
-        {/* Filtros */}
-        <Filters
-          title="Empleados"
-          mostrarRangoFecha={true}
-          mostrarRangoPrecio={false}
-          mostrarUsuario={false}
-          mostrarMedicamento={false}
-          fechaInicio={fechaInicio}
-          setFechaInicio={setFechaInicio}
-          fechaFin={fechaFin}
-          setFechaFin={setFechaFin}
-          opcionesRoles={opcionesRoles}
-          rolSeleccionado={rolSeleccionado}
-          handleChange={handleChange}
-        />
+        <div className={styles.headerBotonesEmpleados}>
+          <OrderBy
+            FAbecedario={true}
+            FExistencias={false}
+            FPrecio={false}
+            FFecha={false}
+            selectedOption={sortOption}
+            onChange={setSortOption}
+          />
 
-        {/* Ordenar */}
-        <OrderBy
-          FAbecedario={true}
-          FExistencias={false}
-          FPrecio={false}
-          FFecha={false}
-          selectedOption={sortOption}
-          onChange={setSortOption}
-        />
-
-        {/* Botón agregar nuevo empleado */}
-        <ButtonHeaders 
-          text="Agregar +"
-          onClick={openNuevoEmpleado}
-        />
+          <ButtonHeaders 
+            text="Agregar +"
+            onClick={openNuevoEmpleado}
+          />
+        </div>
       </div>
 
       <div className={styles.contenedorTabla}>
@@ -588,41 +570,40 @@ const EmpleadosClientes = () => {
             <IconoInput
               icono={faUser}
               name="nombre"
-              value={formEmpleado.nombre}
+              value={formEmpleado.nombre || ''}
               onChange={handleFormChange}
-              placeholder={empleadoAEditar?.nombre || 'Nombre'}
+              placeholder="Nombre"
               type="text"
               formatoAa={true}
             />
             <IconoInput
               icono={faUser}
               name="apellidos"
-              value={formEmpleado.apellidos}
+              value={formEmpleado.apellidos || ''}
               onChange={handleFormChange}
-              placeholder={empleadoAEditar?.apellidos || empleadoAEditar?.apellido || 'Apellidos'}
+              placeholder="Apellidos"
               type="text"
               formatoAa={true}
             />
             <IconoInput
               icono={faEnvelope}
               name="email"
-              value={formEmpleado.email}
+              value={formEmpleado.email || ''}
               onChange={handleFormChange}
-              placeholder={empleadoAEditar?.email || 'Correo'}
+              placeholder="Correo electrónico"
               type="email"
             />
             <InputDates
               icono={faCalendar}
-              placeholder={empleadoAEditar?.fechanacimiento || 'Fecha de nacimiento'}
-              selected={formEmpleado.fechanacimiento ? new Date(formEmpleado.fechanacimiento) : (empleadoAEditar?.fechanacimientoISO ? new Date(empleadoAEditar.fechanacimientoISO) : null)}
-              onChange={(date) => setFormEmpleado(prev => ({...prev, fechanacimiento: date ? date.toISOString().slice(0,10) : ''}))}
-
+              placeholder="Fecha de nacimiento"
+              selected={formEmpleado.fechanacimiento ? stringToDateLocal(formEmpleado.fechanacimiento) : (empleadoAEditar?.fechanacimientoISO ? stringToDateLocal(empleadoAEditar.fechanacimientoISO.slice(0,10)) : null)}
+              onChange={(date) => setFormEmpleado(prev => ({...prev, fechanacimiento: formatearFechaParaInput(date)}))}
             />
             <InputSelects
               icono={faUser}
               placeholder="Tipo de rol"
               name="rol_id"
-              value={formEmpleado.rol_id || empleadoAEditar?.rol_id || ''}
+              value={formEmpleado.rol_id !== undefined ? String(formEmpleado.rol_id) : (empleadoAEditar?.rol_id ? String(empleadoAEditar.rol_id) : '')}
               onChange={handleFormChange}
               opcions={opcionesRoles.map(r => ({ value: r.id, label: r.nombre }))}
             />
@@ -630,7 +611,7 @@ const EmpleadosClientes = () => {
               icono={faUser}
               placeholder="Estado"
               name="status"
-              value={formEmpleado.status || empleadoAEditar?.status || ''}
+              value={formEmpleado.status !== undefined ? String(formEmpleado.status) : (empleadoAEditar?.status ? String(empleadoAEditar.status) : '')}
               onChange={handleFormChange}
               opcions={estadosPosibles.map(s => ({ value: s, label: s.charAt(0).toUpperCase()+s.slice(1) }))}
             />
@@ -638,7 +619,7 @@ const EmpleadosClientes = () => {
               icono={faUser}
               placeholder="Local"
               name="id_local"
-              value={formEmpleado.id_local || empleadoAEditar?.id_local || ''}
+              value={formEmpleado.id_local !== undefined ? String(formEmpleado.id_local) : (empleadoAEditar?.id_local ? String(empleadoAEditar.id_local) : '')}
               onChange={handleFormChange}
               opcions={[{value:1,label:'Local 1'},{value:2,label:'Local 2'}]}
             />
@@ -684,8 +665,8 @@ const EmpleadosClientes = () => {
             <InputDates
               icono={faCalendar}
               placeholder="Fecha de nacimiento"
-              selected={formEmpleado.fechanacimiento ? new Date(formEmpleado.fechanacimiento) : null}
-              onChange={(date) => setFormEmpleado(prev => ({...prev, fechanacimiento: date ? date.toISOString().slice(0,10) : ''}))}
+              selected={formEmpleado.fechanacimiento ? stringToDateLocal(formEmpleado.fechanacimiento) : null}
+              onChange={(date) => setFormEmpleado(prev => ({...prev, fechanacimiento: formatearFechaParaInput(date)}))}
 
             />
             <InputSelects
@@ -712,13 +693,14 @@ const EmpleadosClientes = () => {
               onChange={handleFormChange}
               opcions={[{value:1,label:'Local 1'},{value:2,label:'Local 2'}]}
             />
-            <IconoInput
-              icono={faUser}
-              name="contrasena"
+            <InputPassword
+              showPassword={showPassword}
+              togglePasswordVisibility={togglePasswordVisibility}
+              icono={faLock}
+              placeholder="Contraseña"
               value={formEmpleado.contrasena}
               onChange={handleFormChange}
-              placeholder="Contraseña"
-              type="password"
+              name="contrasena"
             />
           </div>
         </div>
@@ -727,4 +709,4 @@ const EmpleadosClientes = () => {
   );
 };
 
-export default EmpleadosClientes;
+export default Empleados;

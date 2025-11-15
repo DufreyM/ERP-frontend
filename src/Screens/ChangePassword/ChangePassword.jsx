@@ -8,12 +8,18 @@ import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import Isotipo from '../../assets/svg/isotipoEconofarma.svg';
 import { useNavigate } from 'react-router-dom';
 import styles from './ChangePassword.module.css';
-import { changePassword } from '../../services/authService';
+import { changePassword, removeToken } from '../../services/authService';
 import { useCheckToken } from '../../utils/checkToken';
+import {jwtDecode} from 'jwt-decode';
+import { getToken } from '../../services/authService';
 
 const ChangePassword = () => {
   const checkToken = useCheckToken();
   
+  const token = getToken();
+  const decodedToken = token ? jwtDecode(token) : null; 
+  const rolUsuario = decodedToken ? decodedToken.rol_id : null;
+
   const [formData, setFormData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -140,16 +146,56 @@ const ChangePassword = () => {
       await changePassword(formData.currentPassword, formData.newPassword);
       setSuccess('Contraseña cambiada exitosamente');
       setLoading(false);
+
+       let rutaDestino = "/no-autorizado"; 
+
+      switch (rolUsuario) {
+        case 1:  
+          rutaDestino = "/admin/mi-perfil";
+          break;
+        case 2:  
+          rutaDestino = "/dependiente/mi-perfil";
+          break;
+        case 3:  
+          rutaDestino = "/visitador-logged/mi-perfil";
+          break;
+        case 4:  
+          rutaDestino = "/contador/mi-perfil";
+          break;
+        default:
+          rutaDestino = "/no-autorizado";
+      }
+
+
       setTimeout(() => {
-        navigate('/admin/mi-perfil');
+        navigate(rutaDestino);
       }, 1500);
     } catch (err) {
+      // Verificar si el error es por contraseña actual incorrecta
+      const errorMessage = err?.message?.toLowerCase() || '';
+      const isCurrentPasswordError = 
+        errorMessage.includes('contraseña actual') ||
+        errorMessage.includes('current password') ||
+        errorMessage.includes('contraseña anterior') ||
+        errorMessage.includes('password incorrect') ||
+        errorMessage.includes('incorrect password') ||
+        errorMessage.includes('invalid password') ||
+        errorMessage.includes('contraseña inválida') ||
+        (err?.status === 400 && errorMessage.includes('password'));
+
+      if (isCurrentPasswordError) {
+        setError('La contraseña actual no es correcta. Por favor, verifica e intenta nuevamente.');
+        setLoading(false);
+        return;
+      }
+
       if (err?.status === 401 || err?.status === 403) {
+        // Si es 401/403 pero no es específicamente por contraseña incorrecta, podría ser token expirado
         if (typeof checkToken === 'function') {
           const handled = await checkToken({ status: err.status });
           if (!handled) return;
         } else {
-          logout();
+          removeToken();
           navigate('/', { replace: true });
           return;
         }
@@ -158,16 +204,31 @@ const ChangePassword = () => {
       if (err.status === 500) {
         setError("Ocurrió un error interno del servidor, pero la contraseña podría haberse cambiado correctamente. Intenta iniciar sesión de nuevo.");
         console.log("Ocurrió un error interno del servidor, pero la contraseña podría haberse cambiado correctamente. Intenta iniciar sesión de nuevo.");
+      } else {
+        setError(err?.message || 'Error al cambiar la contraseña');
       }
-
-      setError(err?.message || 'Error al cambiar la contraseña');
-      } finally {
+    } finally {
       setLoading(false);
     }
   };
 
   const handleGoBack = () => {
-    navigate('/admin/mi-perfil');
+    let rutaDestino = "/no-autorizado"; 
+
+    if (rolUsuario === 1) {
+          rutaDestino = "/admin/mi-perfil";
+        } else if (rolUsuario === 2) {
+          rutaDestino = "/dependiente/mi-perfil";
+        } 
+        else if (rolUsuario === 3) {
+          rutaDestino = "/visitador-logged/mi-perfil";
+        }
+        else if (rolUsuario === 4) {
+          rutaDestino = "/contador/mi-perfil";
+        } else {
+          rutaDestino = "/no-autorizado"; 
+        }
+        navigate(rutaDestino);
   };
 
   return (

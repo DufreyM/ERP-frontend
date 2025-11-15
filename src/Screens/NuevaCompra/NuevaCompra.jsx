@@ -19,7 +19,11 @@ const NuevaCompra = () => {
 
   const navigate = useNavigate();
   const volver = () => {
-      navigate(-1); // Va una página atrás en el historial
+    navigate(-1); // Va una página atrás en el historial
+  };
+
+  const nuevoMedicamento = () => {
+    navigate('/admin/inventario/agregar-medicamento');
   };
 
   //productos
@@ -620,6 +624,7 @@ return(
                           <ButtonText
                           texto={""}
                           textoButton={"Agregar producto relacionado con el proveedor"}
+                          accion={nuevoMedicamento}
                           ></ButtonText>
                             </>
 

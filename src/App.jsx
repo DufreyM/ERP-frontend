@@ -15,14 +15,20 @@ import PasswordSuccess from './Screens/ResetPassword/PasswordSuccess.jsx'
 import PrivateRoute from './components/authcomponent.jsx'; // Importa el componente de ruta privada
 import VisitadoresAdmin from './Screens/Visitadores/VisitadoresAdmin.jsx';
 import InventarioScreen from './Screens/Inventario/InventarioScreen.jsx';
+import AgregarMedicamento from './Screens/Inventario/AgregarMedicamento.jsx';
 import NuevaVenta from './Screens/NuevaVenta/NuevaVenta.jsx';
 import HistorialComprasVentas from './Screens/HistorialComprasVentas/HistorialComprasVentas.jsx';
-import EmpleadosClientes from './Screens/Empleados/EmpleadosClientes.jsx';
+import EmpleadosClientes from './Screens/EmpleadosClientes/EmpleadosClientes.jsx';
 import NuevaCompra from './Screens/NuevaCompra/NuevaCompra.jsx';
 import Notificaciones from './Screens/Notificaciones/Notificaciones.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import DependienteLayout from './layouts/DependientaLayout.jsx';
 import DashboardDepen from './Screens/dashboard/dependienta/DashboardDepen.jsx';
+import VisitadoresExternos from './Screens/Visitadores/Visitadores.jsx'
+import ContadorLayout from './layouts/ContadorLayout.jsx';
+import DashboardContador from './Screens/dashboard/contador/DashboardContador.jsx';
+import VisitadorLayout from './layouts/VisitadoresLayout.jsx';
+import DashboardVisitador from './Screens/dashboard/visitador/DashboardVisitador.jsx';
 
 function App() {
     return (
@@ -76,6 +82,7 @@ function App() {
                         <Route path="calendario" element={<CalendarScreen />} />
                         <Route path="visitadores-medicos" element={<VisitadoresAdmin />} />
                         <Route path="inventario" element={<InventarioScreen />} />
+                        <Route path="inventario/agregar-medicamento" element={<AgregarMedicamento />} />
                         <Route path="historial-vc" element={<HistorialComprasVentas />}></Route>
                         <Route path= "historial-vc/nueva-venta" element={<NuevaVenta />}></Route>
                         <Route path= "historial-vc/nueva-compra" element={<NuevaCompra />}></Route>
@@ -92,11 +99,35 @@ function App() {
                         <Route path="calendario" element={<CalendarScreen />} />
                         {/* <Route path="visitadores-medicos" element={<VisitadoresAdmin />} /> */}
                         <Route path="inventario" element={<InventarioScreen />} />
+                        <Route path="inventario/agregar-medicamento" element={<AgregarMedicamento />} />
                         <Route path="historial-vc" element={<HistorialComprasVentas />}/>
                         <Route path= "historial-vc/nueva-venta" element={<NuevaVenta />}/>
                         <Route path= "historial-vc/nueva-compra" element={<NuevaCompra />}/>
                         {/* <Route path="configurar-ec" element={<EmpleadosClientes />} /> */}
                         <Route path="notificaciones" element={<Notificaciones />} />
+                    </Route>
+
+                    <Route path="/contador" element={<ContadorLayout />}>
+                        <Route index element={<DashboardContador />} />
+                        <Route path="mi-perfil" element={<MiPerfil />} />
+                        <Route path="cambiar-contraseña" element={<ChangePassword />} />
+                        {/* <Route path="archivos" element={<ArchivosScreen />} /> */}
+                        {/* <Route path="calendario" element={<CalendarScreen />} /> */}
+                        {/* <Route path="visitadores-medicos" element={<VisitadoresAdmin />} /> */}
+                        {/* <Route path="inventario" element={<InventarioScreen />} /> */}
+                        <Route path="historial-vc" element={<HistorialComprasVentas />}></Route>
+                        {/* <Route path= "historial-vc/nueva-venta" element={<NuevaVenta />}></Route> */}
+                        {/* <Route path= "historial-vc/nueva-compra" element={<NuevaCompra />}></Route> */}
+                        {/* <Route path="configurar-ec" element={<EmpleadosClientes />} /> */}
+                        {/* <Route path="notificaciones" element={<Notificaciones />} /> */}
+                    </Route>
+
+                    <Route path="/visitador-logged" element={<VisitadorLayout />}>
+                        <Route index element={<DashboardVisitador />} />
+                        <Route path="mi-perfil" element={<MiPerfil />} />
+                        <Route path="cambiar-contraseña" element={<ChangePassword />} />
+                        {/* <Route path="calendario" element={<CalendarScreen />} /> */}
+                        <Route path="visitadores-medicos" element={<VisitadoresAdmin />} /> 
                     </Route>
 
                 </Route>
