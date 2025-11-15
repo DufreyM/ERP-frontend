@@ -486,33 +486,37 @@ const Empleados = () => {
           <h1 className={styles.tituloEmpleados}>Empleados</h1>
         </div>
 
-        <div className={styles.buscadorContainer}>
-          <InputSearch
-            icono={faSearch}
-            placeholder="Buscar empleados..."
-            value={busqueda}
-            onChange={handleBusqueda}
-            type="text"
-            name="busqueda"
-          />
-        </div>
+        <div className={styles.opcionesE}>
+          <div className={styles.buscadorContainer}>
+            <InputSearch
+              icono={faSearch}
+              placeholder="Buscar empleados..."
+              value={busqueda}
+              onChange={handleBusqueda}
+              type="text"
+              name="busqueda"
+            />
+          </div>
 
-        <div className={styles.headerBotonesEmpleados}>
-          <OrderBy
-            FAbecedario={true}
-            FExistencias={false}
-            FPrecio={false}
-            FFecha={false}
-            selectedOption={sortOption}
-            onChange={setSortOption}
-          />
+          <div className={styles.headerBotonesEmpleados}>
+            <OrderBy
+              FAbecedario={true}
+              FExistencias={false}
+              FPrecio={false}
+              FFecha={false}
+              selectedOption={sortOption}
+              onChange={setSortOption}
+            />
 
-          <ButtonHeaders 
-            text="Agregar +"
-            onClick={openNuevoEmpleado}
-          />
+            <ButtonHeaders 
+              text="Agregar +"
+              onClick={openNuevoEmpleado}
+            />
+          </div>
         </div>
+        
       </div>
+
 
       <div className={styles.contenedorTabla}>
         {loading && <p style={{color:'#5a60A5'}}>Cargando...</p>}

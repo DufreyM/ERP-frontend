@@ -6,28 +6,32 @@
 /* Contenedor principal de controles */
 .controlsContainer {
   display: flex;
+  width: 100%;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: space-between;
   gap: 16px;
   margin-bottom: 24px;
+ 
 }
 
 /* Contenedor de búsqueda */
 .searchContainer {
   display: flex;
-  flex-direction: column;
-  min-width: 300px;
-  flex: 0 0 auto;
+  min-width: 500px;
+ 
 }
 
 /* Grupo de controles (Filters, OrderBy, Botones) */
 .controlsGroup {
   display: flex;
   flex-wrap: wrap;
+  width: 20%;
   align-items: center;
   gap: 12px;
   flex: 1 1 auto;
-  justify-content: flex-start;
+  justify-content: end;
+
 }
 
 /* Contenedor de botones de acción */
@@ -37,6 +41,7 @@
   gap: 12px;
   flex: 0 1 auto;
   justify-content: flex-start;
+
 }
 
 /* Media queries para pantallas más pequeñas */
@@ -49,45 +54,61 @@
 /* Cuando la pantalla se corta a la mitad, todos los controles se bajan */
 @media (max-width: 1024px) {
   .controlsContainer {
-    flex-direction: column;
-    align-items: flex-start;
+    display: flex;
+    flex-direction: column-reverse;
+    
   }
   
   .searchContainer {
+    display: flex;
     width: 100%;
-    min-width: 100%;
+    
+    
   }
   
   .controlsGroup {
+    display: flex;
+    flex-direction: row;
     width: 100%;
-    justify-content: flex-start;
+    margin-top: 20px;
+    justify-content: center;
+   
   }
   
   .buttonsContainer {
-    width: 100%;
+    display: flex;
     justify-content: flex-start;
+   
   }
 }
 
 @media (max-width: 768px) {
   .controlsContainer {
-    flex-direction: column;
-    align-items: stretch;
+    display: flex;
+    flex-direction: column-reverse;
+    
   }
   
   .searchContainer {
-    min-width: 100%;
+    display: flex;
+    width: 100%;
+  
+   
   }
   
   .controlsGroup {
+    display: flex;
+    margin-top: 20px;
+    flex-direction: row;
     width: 100%;
-    flex-direction: column;
-    align-items: stretch;
+    justify-content: center;
+   
   }
   
   .buttonsContainer {
-    width: 100%;
+    display: flex;
     justify-content: flex-start;
+   
   }
 }
 
