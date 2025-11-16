@@ -134,6 +134,9 @@
     border-radius: 5px;
     color: #767272;
     transition: background-color 0.3s;
+    justify-content: center;
+    align-items: center;
+    background-color: #ffffff;
 }
 
 .iconoFile{

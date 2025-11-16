@@ -45,7 +45,7 @@
     background-color: white;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1000px) {
     .bodyVentas{
         height: calc(100% - 70px);
     }
@@ -56,6 +56,8 @@
 
     .headerBotonesVentas{
         width: 100%;
+        display: flex;
+        flex-direction: row-reverse;
         justify-content: center;
         min-height: 43px;
     }

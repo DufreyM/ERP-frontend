@@ -271,6 +271,7 @@ const InventarioScreen = () => {
     <div className={styles.inventarioContainer}>
       <SimpleTitle text="Inventario" />
       <div className={styles.controlsContainer}>
+       
         <div className={styles.searchContainer}>
           
       
@@ -285,6 +286,7 @@ const InventarioScreen = () => {
                   
         </div>
       
+     
         <div className={styles.controlsGroup}>
           <Filters
             title = {"Inventario"}
@@ -335,6 +337,7 @@ const InventarioScreen = () => {
             />
           </div>
         </div>
+
       </div>
       
       <FiltroResumen

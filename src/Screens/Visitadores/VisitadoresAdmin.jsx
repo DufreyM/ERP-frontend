@@ -546,6 +546,7 @@ const VisitadoresAdmin = () => {
           <SimpleTitle text="Visitadores médicos" />
         </div>
 
+      <div className={styles.contbotonesV}>
         <div className={styles.buscadorContainer}>
           <InputSearch
             icono={faSearch}
@@ -556,6 +557,7 @@ const VisitadoresAdmin = () => {
             name="busqueda"
           />
         </div>
+        
 
         <div className={styles.filtersContainer}>
         {!esVisitador &&(
@@ -624,6 +626,7 @@ const VisitadoresAdmin = () => {
           )}
         </>
         )}
+      </div>
       </div>
 
       <div className={styles.contenedorTabla}>

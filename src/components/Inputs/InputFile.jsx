@@ -9,6 +9,7 @@ const InputFile = ({
     placeholder,
     onChange,
     accept,
+    type= 'file',
     error = false,
     disabled=false,
 }) => {
@@ -65,13 +66,12 @@ const InputFile = ({
                 <span>
                         <FontAwesomeIcon className={styles.iconoFile}  icon={faCloudArrowUp} style={{ color: error? 'red' : '#2f368998' }} />
                 </span>
-                Seleccionar archivo PDF
+                Seleccionar archivo 
 
                 <input
                     id="file-upload" 
                     style={{ display: "none" }}
-                    type= 'file'
-                    name = {name}
+                    type= {type}
                     disabled = {disabled}
                     accept={accept}
                     onChange={handleInputChange}

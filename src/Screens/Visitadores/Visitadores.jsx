@@ -13,6 +13,7 @@ import InputFile from '../../components/Inputs/InputFile';
 import SelectSearch from '../../components/Inputs/SelectSearch';
 import { useFetch } from '../../utils/useFetch';
 import { getToken } from '../../services/authService';
+import styles from './Visitadores.module.css';
 
 const Visitadores = () => {
     const [nombre, setNombre] = useState('');
@@ -291,21 +292,10 @@ const Visitadores = () => {
     }
 
     return (
-        <BackgroundCross variant="green" mirrored={true}>
-            <div
-                style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    position: 'relative',
-                    width: '100%',
-                    maxWidth: '600px',
-                    height: '100vh',
-                }}
-            >
+       
+            <div className= {styles.conteinerVisitadores}>
                 {/* Título */}
-                <div style={{ display: 'flex', marginBottom: '0px', gap: '18px',textAlign: 'left' }}>
+                <div style={{ display: 'flex', margin: '0px', gap: '18px',textAlign: 'left' }}>
                     <img
                         src={Isotipo}
                         alt="Isotipo Econofarma"
@@ -627,7 +617,7 @@ const Visitadores = () => {
                     </p>
                 )}
             </div>
-        </BackgroundCross>
+      
     );
 };
 

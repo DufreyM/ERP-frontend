@@ -22,6 +22,11 @@
  
 }
 
+.controlsContainer2{
+  display: flex;
+  flex-direction: row;
+}
+
 /* Grupo de controles (Filters, OrderBy, Botones) */
 .controlsGroup {
   display: flex;
@@ -58,6 +63,8 @@
     flex-direction: column-reverse;
     
   }
+
+  
   
   .searchContainer {
     display: flex;
@@ -68,7 +75,7 @@
   
   .controlsGroup {
     display: flex;
-    flex-direction: row;
+    flex-direction: row-reverse;
     width: 100%;
     margin-top: 20px;
     justify-content: center;
@@ -99,7 +106,7 @@
   .controlsGroup {
     display: flex;
     margin-top: 20px;
-    flex-direction: row;
+    flex-direction: row-reverse;
     width: 100%;
     justify-content: center;
    
@@ -112,19 +119,7 @@
   }
 }
 
-@media (max-width: 480px) {
-  .inventarioContainer {
-    padding: 16px;
-  }
-  
-  .buttonsContainer {
-    flex-direction: column;
-  }
-  
-  .buttonsContainer > * {
-    width: 100%;
-  }
-}
+
 
 .contenedorGeneral {
     height: 100dvh;
