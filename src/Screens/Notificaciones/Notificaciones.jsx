@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faTrash, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { getToken } from '../../services/authService';
 import { useFetch } from '../../utils/useFetch.jsx';
+import InputSearch from '../../components/Inputs/InputSearch.jsx';
 
 const Notificaciones = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -170,10 +171,11 @@ const Notificaciones = () => {
       
       <div className={styles.buscadorContainer}>
         <div style={{ display: 'flex', flexDirection: 'column', minWidth: '400px' }}>
-          <label style={{ color: '#5a60a5', fontWeight: 500, marginBottom: 4 }}>Buscar notificación</label>
-          <IconoInput
+         
+
+          <InputSearch
             icono={faSearch}
-            placeholder="Buscar por título..."
+            placeholder="Buscar notificación por título..."
             value={searchTerm}
             onChange={handleSearchInputChange}
             type="text"
