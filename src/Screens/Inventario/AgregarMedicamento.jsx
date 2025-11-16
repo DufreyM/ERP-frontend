@@ -339,6 +339,7 @@ const AgregarMedicamento = () => {
         <div className={formStyles.inputWrapper}>
           <label style={{ color:'#5a60a5', fontWeight:600, marginBottom:6, display:'block' }}>¿Requiere receta?</label>
           <InputSelects
+            name="receta"
             value={formProducto.receta}
             icono={faPen}
             placeholder={"Seleccione una opción"}
@@ -387,6 +388,7 @@ const AgregarMedicamento = () => {
           /> */}
 
           <InputFile
+            id = "agregar-foto-m"
             type='file'
             accept={"image/png, image/jpeg"}
             onChange={handleImagenChange}

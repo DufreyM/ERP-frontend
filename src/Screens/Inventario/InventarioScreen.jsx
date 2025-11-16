@@ -60,6 +60,7 @@ const InventarioScreen = () => {
     {}, 
     [selectedLocal]
   );
+  console.log(productosData)
 
   useEffect(() => {
     if (productosData) {
