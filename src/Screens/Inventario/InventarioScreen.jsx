@@ -379,7 +379,14 @@ const InventarioScreen = () => {
         {sortedData.map(producto => (
           <div
             key={producto.codigo}
-            className={styles.productoCard}
+            className={`${styles.productoCard} ${
+              producto.stock_actual === 0
+                ? styles.sinStock
+                : producto.stock_actual > 0 &&
+                  producto.stock_actual <= producto.stock_minimo
+                ? styles.pocoStock
+                : ""
+            }`}
             onClick={() => setProductoSeleccionado(producto)}
           >
             <img

@@ -88,8 +88,7 @@ const AgregarMedicamento = () => {
     return null;
   };
 
-  const handleImagenChange = (e) => {
-    const file = e.target.files?.[0] || null;
+  const handleImagenChange = (file) => {
     setImagenFile(file);
   };
 

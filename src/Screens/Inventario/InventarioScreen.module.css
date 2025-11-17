@@ -165,6 +165,19 @@
   flex-direction: column;
   align-items: center;
 }
+
+/*  Stock = 0 */
+.sinStock {
+  border: 2px solid #d9534f;
+  background: #ffe5e5;
+}
+
+/* Stock bajo (entre 1 y stock_minimo) */
+.pocoStock {
+  border: 2px solid #f0ad4e;
+  background: #f7efd5;
+}
+
 .productoCard:hover {
   box-shadow: 0 4px 16px rgba(30,64,175,0.12);
   transform: translateY(-4px) scale(1.03);
