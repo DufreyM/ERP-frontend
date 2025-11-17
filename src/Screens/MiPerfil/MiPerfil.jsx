@@ -260,27 +260,6 @@ const MiPerfil = () => {
   useEffect(() => {
     const role = getUserRole();
     setUserRole(role);
-    
-    // Función para probar la conectividad
-    const testConnection = async () => {
-      try {
-        console.log('Testing connection to:', API_BASE_URL);
-        const response = await fetch(`${API_BASE_URL}/api/usuario/me`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }); 
-        //arreglar la cosa esa y luego descomentar esto
-        //if (!checkToken(response)) return;
-        
-        console.log('Connection test response:', response.status);
-      } catch (error) {
-        console.error('Connection test failed:', error);
-      }
-    };
-    
-    testConnection();
     fetchUserData();
     fetchProfilePhoto();
   }, []);

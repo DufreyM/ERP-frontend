@@ -60,7 +60,14 @@ const InventarioScreen = () => {
     {}, 
     [selectedLocal]
   );
-  console.log(productosData)
+  //console.log(productosData)
+
+  const { data: productoslote } = useFetch(
+    `${API_BASE_URL}/lotes/producto/2`,
+    {}, 
+    [selectedLocal]
+  );
+  console.log(productoslote)
 
   useEffect(() => {
     if (productosData) {
