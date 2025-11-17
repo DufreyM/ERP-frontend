@@ -19,6 +19,7 @@ import { getToken } from '../../services/authService';
 import { useFetch } from '../../utils/useFetch.jsx';
 import { useCheckToken } from '../../utils/checkToken.js';
 import {jwtDecode} from 'jwt-decode';
+import InputSearch from '../../components/Inputs/InputSearch.jsx';
 
 
 const InventarioScreen = () => {
@@ -59,6 +60,7 @@ const InventarioScreen = () => {
     {}, 
     [selectedLocal]
   );
+  console.log(productosData)
 
   useEffect(() => {
     if (productosData) {
@@ -270,19 +272,22 @@ const InventarioScreen = () => {
     <div className={styles.inventarioContainer}>
       <SimpleTitle text="Inventario" />
       <div className={styles.controlsContainer}>
+       
         <div className={styles.searchContainer}>
-          <label style={{ color: '#5a60a5', fontWeight: 500, marginBottom: 4 }}>Medicamento</label>
-          <IconoInput
-            icono={faSearch}
-            placeholder="Escribe el nombre de un medicamento"
-            value={searchTerm}
-            onChange={handleSearchInputChange}
-            type="text"
-            name="medicamento"
-            
+          
+      
+          <InputSearch
+              icono={faSearch}
+              placeholder="Buscar por medicamento por nombre..."
+              value={searchTerm}
+              onChange={handleSearchInputChange}
+              type="text"
+              name="medicamento"
           />
+                  
         </div>
       
+     
         <div className={styles.controlsGroup}>
           <Filters
             title = {"Inventario"}
@@ -333,6 +338,7 @@ const InventarioScreen = () => {
             />
           </div>
         </div>
+
       </div>
       
       <FiltroResumen
@@ -373,7 +379,14 @@ const InventarioScreen = () => {
         {sortedData.map(producto => (
           <div
             key={producto.codigo}
-            className={styles.productoCard}
+            className={`${styles.productoCard} ${
+              producto.stock_actual === 0
+                ? styles.sinStock
+                : producto.stock_actual > 0 &&
+                  producto.stock_actual <= producto.stock_minimo
+                ? styles.pocoStock
+                : ""
+            }`}
             onClick={() => setProductoSeleccionado(producto)}
           >
             <img

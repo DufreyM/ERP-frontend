@@ -331,7 +331,7 @@ const Compras = () => {
                     ></ExportarComo>
                     
                     <Filters
-                      title = {"Ventas"}
+                      title = {"Compras"}
                       panelAbierto={panelAbierto}
                       setPanelAbierto={setPanelAbierto}
                       mostrarRangoFecha = {true}

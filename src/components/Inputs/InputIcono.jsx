@@ -29,6 +29,7 @@ const IconoInput = ({
     disabled=false,
     onFocus,
     formatoAa = false,
+    minValue = null,
 }) => {
 
     // Handler que filtra si está activo formatoAa
@@ -70,6 +71,7 @@ const IconoInput = ({
                 placeholder= {placeholder}
                 disabled = {disabled}
                 onFocus={onFocus}
+                min={minValue}
             />
 
             <span className={styles.iconoStyle} >

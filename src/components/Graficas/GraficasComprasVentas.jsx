@@ -42,9 +42,13 @@ export default function VentasComprasChart({
         legend: { data: ["Ventas", "Compras"], top: "bottom" },
         xAxis: {
             type: "category",
-            data: meses.map((m) =>
-                new Date(m + "-01").toLocaleString("es-ES", { month: "short" })
-            ),
+            data: meses.map((m) => {
+                const fecha = new Date(m + "-01");
+                return fecha.toLocaleString("es-ES", {
+                    month: "short",
+                    year: "numeric"
+                });
+            }),
         },
         yAxis: { type: "value", name: "Monto (Q)" },
         series: [

@@ -9,11 +9,14 @@ const InputFile = ({
     placeholder,
     onChange,
     accept,
+    type= 'file',
     error = false,
     disabled=false,
+    id
 }) => {
 
     const [archivo, setArchivo] = useState(null);
+    const uniqueId = id || `file-upload-${crypto.randomUUID()}`;
     const [hovering, setHovering] = useState(false);
 
     const handleDrop =(e) => {
@@ -60,18 +63,17 @@ const InputFile = ({
                 <p>Arrastra un archivo aquí o haz clic para seleccionarlo</p>
             )}
 
-            <label htmlFor="file-upload" className={styles.inputFileStyle}>
+            <label htmlFor={uniqueId} className={styles.inputFileStyle}>
             
                 <span>
                         <FontAwesomeIcon className={styles.iconoFile}  icon={faCloudArrowUp} style={{ color: error? 'red' : '#2f368998' }} />
                 </span>
-                Seleccionar archivo PDF
+                Seleccionar archivo 
 
                 <input
-                    id="file-upload" 
+                    id={uniqueId}
                     style={{ display: "none" }}
-                    type= 'file'
-                    name = {name}
+                    type= {type}
                     disabled = {disabled}
                     accept={accept}
                     onChange={handleInputChange}

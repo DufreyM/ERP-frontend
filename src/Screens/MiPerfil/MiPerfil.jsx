@@ -424,6 +424,7 @@ const MiPerfil = () => {
       {success && <div style={{ color: '#1bbf5c', fontWeight: 600, marginBottom: 12 }}>{success}</div>}
       
       <div className={styles.profileSection}>
+        <div className={styles.fotoContainer2}> 
         <div className={styles.fotoContainer} onClick={handlePhotoClick}>
           <img
             src={profilePhoto || "/default-user.svg"}
@@ -444,6 +445,7 @@ const MiPerfil = () => {
             onChange={handlePhotoChange}
             style={{ display: 'none' }}
           />
+        </div>
         </div>
         
         <div className={styles.profileInfo}>

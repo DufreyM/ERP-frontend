@@ -549,6 +549,7 @@ const ArchivosScreen = () => {
                
 
                   <InputFile
+                  id = 'documentosAdmin'
                   icono = {faPen}
                   placeholder = {"Nombre del archivo"}
                   value = {file}

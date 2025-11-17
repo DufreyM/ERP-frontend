@@ -45,9 +45,9 @@ function App() {
                 <Route
                     path="/visitador"
                     element={
-                        <BackgroundCross variant="green" mirrored={true}>
+                       
                             <Visitadores />
-                        </BackgroundCross>
+                       
                     }
                 />
                 <Route

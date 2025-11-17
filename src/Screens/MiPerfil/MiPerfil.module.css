@@ -42,14 +42,19 @@
   min-height: 200px;
 }
 
+
+
 .fotoContainer {
   position: relative;
+  top: 90px;
+  height: 200px;
   cursor: pointer;
   flex-shrink: 0;
   transition: transform 0.2s ease;
   align-self: stretch;
   display: flex;
   align-items: center;
+ 
 }
 
 .fotoContainer:hover {
@@ -303,7 +308,15 @@
   }
   
   .fotoContainer {
-    align-self: center;
+    position: relative;
+    top: 0px;
+    height: 150px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+    align-self: stretch;
+    display: flex;
+    align-items: center;
   }
   
   .fotoPerfil {

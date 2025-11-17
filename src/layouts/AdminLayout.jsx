@@ -38,6 +38,8 @@ export default function AdminLayout() {
     "/admin/inventario": "blue",
     "/admin/calendario": "transparent",
     "/admin/visitadores-medicos": "blue",
+    "/admin/inventario/agregar-medicamento": "blue",
+    "/admin/notificaciones": "transparent",
   };
 
   //posiciones del fondo
@@ -62,7 +64,7 @@ export default function AdminLayout() {
     "/admin/configurar-ec",
     "/admin/calendario",
     "/admin/archivos",
-    "/admin/notificaciones",
+    //"/admin/notificaciones",
     //"/admin/mi-perfil",
     //"/admin/visitadores-medicos",
   ];
