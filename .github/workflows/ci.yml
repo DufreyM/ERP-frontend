@@ -1,0 +1,39 @@
+name: frontend CI
+
+on:
+  push:
+    branches:
+      - feature/actions
+      - develop2
+  pull_request:
+    branches:
+      - feature/actions
+      - develop2
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set environment variables from GitHub Secrets
+        run: |
+          echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" >> $GITHUB_ENV
+
+      - name: Set up Docker Compose with environment variables
+        run: |
+          docker compose -f docker-compose.yml up -d
+
+      - name: Install dependencies
+        run: |
+          docker compose exec frontend npm install
+
+      - name: Run tests
+        run: |
+          docker compose exec frontend npm run test
+
+      - name: Tear down Docker Compose
+        run: |
+          docker compose down
