@@ -322,7 +322,11 @@ export const CalendarScreen= () =>{
         )?.label || null;
 
         return (
-            <div className='eventoEnCalendario'>
+            <div className='eventoEnCalendario'
+                style={{
+                    backgroundColor: getColorPorTipo(tipoEventoId),
+                }}
+            >
                 <b>{tipoEvento}</b>
             </div>
         );
@@ -356,6 +360,17 @@ export const CalendarScreen= () =>{
         fechaEvento.setHours(0, 0, 0, 0);
         return fechaEvento > hoy && fechaEvento <= finSemana;
     });
+
+    const getColorPorTipo = (tipoId) => {
+        switch (tipoId) {
+            case 1: return "#37933aff";    // Verde - Visitadores
+            case 2: return "#387eb6ff";    // Azul - Reuniones
+            case 3: return "#c98e36ff";    // Naranja - Recordatorios
+            case 4: return "#E91E63";    // Rosa - Otro
+            default: return "#9E9E9E";   // Gris por defecto
+        }
+    };
+
 
 
 //Por fin, el return
