@@ -165,17 +165,16 @@ const Visitadores = () => {
         setTelefonos(updatedTelefonos);
     };
 
-    const handleFileChange = (e) => {
-        const files = Array.from(e.target.files);
-        const pdfFiles = files.filter(file => file.type === 'application/pdf');
-        
-        if (pdfFiles.length !== files.length) {
-            setError('Solo se permiten archivos PDF');
+    const handleFileChange = (file) => {
+        if (!file) return;
+
+        if (file.type !== "application/pdf") {
+            setError("Solo se permiten archivos PDF");
             return;
         }
-        
-        setDocumentos(pdfFiles);
-        setError('');
+
+        setDocumentos([file]);
+        setError("");
     };
 
     // Función para agregar proveedor nuevo (igual que NuevaCompra)
@@ -630,10 +629,10 @@ const Visitadores = () => {
                     id = "documentoVisitadoresE"
                     icon={faPen }
                     placeholder = {"Nombre del archivo"}
-                    value = {documentos}
+                    
                     accept=".pdf"
                     onChange = {handleFileChange}
-                    name = ""
+                    
                 >
                 </InputFile>
               
