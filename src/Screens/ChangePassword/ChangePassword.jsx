@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import BackgroundCross from '../../components/BackgroundCross/BackgroundCross';
 import InputPassword from '../../components/Inputs/InputPassword';
 import ButtonForm from '../../components/ButtonForm/ButtonForm';
@@ -19,6 +19,18 @@ const ChangePassword = () => {
   const token = getToken();
   const decodedToken = token ? jwtDecode(token) : null; 
   const rolUsuario = decodedToken ? decodedToken.rol_id : null;
+
+//Maneja las noticiaciones de creación eliminación o edición de un estado
+  const [notificacion, setNotificacion] = useState('');
+  useEffect(() => {
+      if (notificacion) {
+          const timer = setTimeout(() => {
+          setNotificacion('');
+          }, 2500); // se quita en 2.5 segundos
+
+          return () => clearTimeout(timer);
+      }
+  }, [notificacion]);
 
   const [formData, setFormData] = useState({
     currentPassword: '',
@@ -133,6 +145,8 @@ const ChangePassword = () => {
   };
 
   const handleSubmit = async () => {
+  
+
     setError('');
     setSuccess('');
 
@@ -203,7 +217,7 @@ const ChangePassword = () => {
 
       if (err.status === 500) {
         setError("Ocurrió un error interno del servidor, pero la contraseña podría haberse cambiado correctamente. Intenta iniciar sesión de nuevo.");
-        console.log("Ocurrió un error interno del servidor, pero la contraseña podría haberse cambiado correctamente. Intenta iniciar sesión de nuevo.");
+
       } else {
         setError(err?.message || 'Error al cambiar la contraseña');
       }
@@ -233,6 +247,11 @@ const ChangePassword = () => {
 
   return (
       <div className={styles.container}>
+        {notificacion && (
+            <div className="toast">
+                {notificacion}
+            </div>
+        )}
         {/* Logo centrado */}
         <div className={styles.logoContainer}>
           <img
@@ -362,7 +381,7 @@ const ChangePassword = () => {
             <ButtonForm
               text={loading ? "Cambiando..." : "Cambiar contraseña"}
               onClick={handleSubmit}
-              disabled={!isFormValid() || loading}
+              // disabled={!isFormValid() || loading}
             />
           </div>
 

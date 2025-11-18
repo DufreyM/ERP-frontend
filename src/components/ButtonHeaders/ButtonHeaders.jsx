@@ -5,7 +5,8 @@ const ButtonHeaders = ({
   text,
   onClick,
   onlyLine = false,
-  red = false
+  red = false,
+  disabled,
 
 }) => {
     
@@ -18,6 +19,7 @@ const ButtonHeaders = ({
           `}
           
           onClick={onClick}
+          disabled = {disabled}
         >
            {text}
         </button>

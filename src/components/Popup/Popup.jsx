@@ -1,7 +1,16 @@
 
 import ButtonHeaders from '../ButtonHeaders/ButtonHeaders';
 import './PopupButton.css';  
-const Popup = ({ isOpen, onClose, title, children, onClick, hideActions = false, acceptText = 'Aceptar', cancelText = 'Cancelar' }) => {
+const Popup = ({ 
+  isOpen, 
+  onClose, 
+  title, 
+  children, 
+  onClick, 
+  hideActions = false, 
+  acceptText = 'Aceptar', 
+  cancelText = 'Cancelar' 
+}) => {
   if (!isOpen) return null;  // No renderiza nada si `isOpen` es false
 
   return (

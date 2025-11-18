@@ -39,6 +39,7 @@ export default function ContadorLayout() {
     "/contador/": "transparent",
     "/contador/mi-perfil": "blue",
     "/contador/historial-vc": "transparent",
+    "/contador/cambiar-contraseña": "blue",
   };
 
   //posiciones del fondo
@@ -67,7 +68,7 @@ export default function ContadorLayout() {
 
   const locales = ["Local 1", "Local 2"];
 
-  console.log("ContadorLayout renderizado; selectedLocal:", selectedLocal); //Luego quitar el print
+  //console.log("ContadorLayout renderizado; selectedLocal:", selectedLocal); //Luego quitar el print
   return (
     <BackgroundCross 
       variant={variantMap[pathname] || "default"} 

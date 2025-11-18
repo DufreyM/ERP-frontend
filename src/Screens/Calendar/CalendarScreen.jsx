@@ -213,7 +213,7 @@ export const CalendarScreen= () =>{
             const respuesta = await crearEvento(datosEvento);
             closeNuevoEvento();                             //cierra el popUp
             setNotificacion('Evento creado con éxito');     //llama a la notificación
-            console.log('Evento creado:', respuesta);       //asegurarme
+            //console.log('Evento creado:', respuesta);       //asegurarme
             await refetch();                                //hace un refetch para volver a llamar los datos que se actualizaron
             actualizar()                                    //vuelve a renderizar por si acaso
            
@@ -273,7 +273,7 @@ export const CalendarScreen= () =>{
 
         try { //la misma cosa que en crear datos
             const respuesta = await actualizarEvento(eventoAEditar, datos);
-            console.log("Evento actualizado:", respuesta);
+            //console.log("Evento actualizado:", respuesta);
             setNotificacion("Evento actualizado con éxito");
             closeEditarEvento();
             await refetch();

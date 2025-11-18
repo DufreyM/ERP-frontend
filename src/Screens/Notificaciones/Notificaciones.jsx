@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import SimpleTitle from '../../components/Titles/SimpleTitle';
 import IconoInput from '../../components/Inputs/InputIcono.jsx';
 import styles from './Notificaciones.module.css';
@@ -20,6 +20,18 @@ const Notificaciones = () => {
       headers: token ? { 'Authorization': `Bearer ${token}` } : {}
     }
   );
+
+  //Maneja las noticiaciones de creación eliminación o edición de un estado
+  const [notificacion, setNotificacion] = useState('');
+  useEffect(() => {
+      if (notificacion) {
+          const timer = setTimeout(() => {
+          setNotificacion('');
+          }, 2500); // se quita en 2.5 segundos
+
+          return () => clearTimeout(timer);
+      }
+  }, [notificacion]);
 
   // Función para formatear fecha
   const formatearFecha = (fechaISO) => {
@@ -107,10 +119,11 @@ const Notificaciones = () => {
         throw new Error('Error al marcar como completado');
       }
 
+      setNotificacion("Se actualizó la notificación correctamente")
       await refetch();
     } catch (err) {
       console.error(err);
-      alert('No se pudo marcar como completado');
+      setNotificacion('No se pudo marcar como completado');
     }
   };
 
@@ -128,11 +141,11 @@ const Notificaciones = () => {
       if (!resp.ok) {
         throw new Error('Error al eliminar');
       }
-
+      setNotificacion("Se eliminó la notificación correctamente")
       await refetch();
     } catch (err) {
       console.error(err);
-      alert('No se pudo eliminar la notificación');
+      setNotificacion('No se pudo eliminar la notificación');
     }
   };
 
@@ -142,6 +155,7 @@ const Notificaciones = () => {
 
     return (
       <div key={notif.id || notif.codigo} className={className}>
+        
         <div className={styles.notificacionHeader}>
           <div className={styles.contenidonoti}>
           <h3 className={styles.titulo}>{notif.titulo}</h3>
@@ -194,6 +208,11 @@ const Notificaciones = () => {
 
   return (
     <div className={styles.notificacionesContainer}>
+      {notificacion && (
+            <div className={styles.toast}>
+                {notificacion}
+            </div>
+        )}
       <SimpleTitle text="Notificaciones" />
       
       <div className={styles.buscadorContainer}>
