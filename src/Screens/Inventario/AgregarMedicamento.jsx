@@ -202,11 +202,12 @@ const AgregarMedicamento = () => {
 
   return (
     <div className={formStyles.pageContainer}>
+      
       <div className={formStyles.contentWrapper}>
         <SimpleTitle text="Agregar nuevo medicamento" />
         
         {notificacion && (
-          <div className={formStyles.notification}>
+          <div className={formStyles.toast}>
             {notificacion}
           </div>
         )}
@@ -401,16 +402,17 @@ const AgregarMedicamento = () => {
         {/* Botones de acción */}
         <div className={formStyles.actionButtons}>
           <ButtonHeaders 
-            text={loading ? "Guardando..." : "Guardar medicamento"} 
-            onClick={crearProducto}
-            disabled={loading}
-          />
-          <ButtonHeaders 
             text="Cancelar" 
             onClick={handleCancelar}
             onlyLine={false}
             red = {true}
           />
+          <ButtonHeaders 
+            text={loading ? "Guardando..." : "Guardar medicamento"} 
+            onClick={crearProducto}
+            disabled={loading}
+          />
+          
         </div>
       </div>
       </div>

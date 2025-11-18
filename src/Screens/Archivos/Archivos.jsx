@@ -30,10 +30,21 @@ const ArchivosScreen = () => {
   const checkToken = useCheckToken();
      
   const token = getToken();
-  const {data, loading, error } = useFetch(`${import.meta.env.VITE_API_URL}/documentos-locales?local_id=${localSeleccionado}` , {
+  const {data, loading, error, refetch } = useFetch(`${import.meta.env.VITE_API_URL}/documentos-locales?local_id=${localSeleccionado}` , {
       headers: {'Authorization': `Bearer ${token}`}
   });
 
+  //Maneja las noticiaciones de creación eliminación o edición de un estado
+  const [notificacion, setNotificacion] = useState('');
+  useEffect(() => {
+      if (notificacion) {
+          const timer = setTimeout(() => {
+          setNotificacion('');
+          }, 2500); // se quita en 2.5 segundos
+
+          return () => clearTimeout(timer);
+      }
+  }, [notificacion]);
 
   const getPayloadFromToken = (token) => {
     try {
@@ -168,16 +179,16 @@ const ArchivosScreen = () => {
         vencimiento: fechaVencimiento.toISOString().split('T')[0],
         archivo: archivoPDF
       };
-      console.log('estoy mandando:', datos);
+   
 
       try {
         const respuesta = await subirDocumento(tokenActual, datos);
-        console.log('Documento subido:', respuesta);
-      
+        
 
         closeNuevo(); // si tienes un popup para cerrarlo
-        //setNotificacion('Documento subido con éxito');
-        window.location.reload();
+        setNotificacion('Documento subido con éxito');
+        refetch();
+        
       } catch (error) {
         console.error('Error al subir documento:', error);
         setErrorMessage('Ocurrió un error al subir el documento.');
@@ -202,13 +213,12 @@ const ArchivosScreen = () => {
         throw new Error('Error al eliminar el documento');
       }
 
-      alert('Documento eliminado con éxito');
+      setNotificacion('Documento eliminado con éxito');
 
-      // Opcional: recargar los datos
-      window.location.reload(); // o usa un useFetch que se pueda refrescar
+      refetch();
     } catch (error) {
       console.error(error);
-      alert('Hubo un error al eliminar el documento');
+      setNotificacion('Hubo un error al eliminar el documento');
     }
   };
 
@@ -244,7 +254,10 @@ const ArchivosScreen = () => {
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`Error ${response.status}: ${errorText}`);
+
     }
+    setNotificacion("Documento editado con exito");
+
 
     return await response.json();
   };
@@ -271,7 +284,7 @@ const ArchivosScreen = () => {
     try {
       await editarDocumento(archivoAEditar.id, datosEditados);
       closeEditarArchivo();
-      window.location.reload(); // o actualiza tu estado si no querés recargar
+      refetch();
     } catch (error) {
       console.error('Error al editar documento:', error);
       setErrorMessage('Ocurrió un error al editar el documento.');
@@ -409,6 +422,11 @@ const ArchivosScreen = () => {
 
   return(
     <div className={styles.contenedorGeneral}>
+      {notificacion && (
+            <div className={styles.toast}>
+                {notificacion}
+            </div>
+        )}
       <div className={styles.contenedorEncabezado}>
         <div className={styles.contenedorTitle}>
           <SimpleTitle text={"Archivos"}></SimpleTitle>

@@ -40,6 +40,7 @@ export default function AdminLayout() {
     "/admin/visitadores-medicos": "blue",
     "/admin/inventario/agregar-medicamento": "blue",
     "/admin/notificaciones": "transparent",
+    "/admin/cambiar-contraseña": "blue",
   };
 
   //posiciones del fondo
@@ -84,7 +85,7 @@ export default function AdminLayout() {
 
   const locales = ["Local 1", "Local 2"];
 
-  console.log("AdminLayout renderizado; selectedLocal:", selectedLocal);
+  //console.log("AdminLayout renderizado; selectedLocal:", selectedLocal);
   return (
     <BackgroundCross 
       variant={variantMap[pathname] || "default"} 

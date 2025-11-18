@@ -30,6 +30,18 @@ const Visitadores = () => {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
+    //Maneja las noticiaciones de creación eliminación o edición de un estado
+    const [notificacion, setNotificacion] = useState('');
+    useEffect(() => {
+        if (notificacion) {
+            const timer = setTimeout(() => {
+            setNotificacion('');
+            }, 2500); // se quita en 2.5 segundos
+
+            return () => clearTimeout(timer);
+        }
+    }, [notificacion]);
+
     // Obtener proveedores
     const [refreshProveedores, setRefreshProveedores] = useState(0);
     const token = getToken();
@@ -125,22 +137,22 @@ const Visitadores = () => {
     // Handlers para nuevo proveedor (igual que NuevaCompra)
     const handleNuevoProveedorNombre = (e) => {
         setNuevoProveedorNombre(e.target.value);
-        setError('');
+        setNotificacion('');
     };
 
     const handleNuevoProveedorTelefono = (e) => {
         setNuevoProveedorTelefono(e.target.value);
-        setError('');
+        setNotificacion('');
     };
 
     const handleNuevoProveedorCorreo = (e) => {
         setNuevoProveedorCorreo(e.target.value);
-        setError('');
+        setNotificacion('');
     };
 
     const handleNuevoProveedorDireccion = (e) => {
         setNuevoProveedorDireccion(e.target.value);
-        setError('');
+        setNotificacion('');
     };
 
     // Funciones para manejar teléfonos
@@ -148,7 +160,7 @@ const Visitadores = () => {
          if (telefonos.length < LIMITE_TELEFONOS) {
             setTelefonos([...telefonos, { numero: '', tipo: 'móvil' }]);
         } else {
-            alert('Has alcanzado el límite de teléfonos permitidos');
+            setNotificacion('Has alcanzado el límite de teléfonos permitidos');
         }
     };
 
@@ -169,12 +181,12 @@ const Visitadores = () => {
         if (!file) return;
 
         if (file.type !== "application/pdf") {
-            setError("Solo se permiten archivos PDF");
+            setNotificacion("Solo se permiten archivos PDF");
             return;
         }
 
         setDocumentos([file]);
-        setError("");
+        setNotificacion("");
     };
 
     // Función para agregar proveedor nuevo (igual que NuevaCompra)
@@ -182,7 +194,7 @@ const Visitadores = () => {
         try {
             // Validaciones básicas
             if (!nuevoProveedorNombre || !nuevoProveedorTelefono || !nuevoProveedorCorreo || !nuevoProveedorDireccion) {
-                setError("Por favor, completa todos los campos del proveedor.");
+                setNotificacion("Por favor, completa todos los campos del proveedor.");
                 return;
             }
 
@@ -211,7 +223,7 @@ const Visitadores = () => {
             }
 
             const result = await response.json();
-            setMessage("¡Proveedor agregado correctamente!");
+            setNotificacion("¡Proveedor agregado correctamente!");
             setRefreshProveedores(prev => prev + 1);
 
             
@@ -227,18 +239,18 @@ const Visitadores = () => {
 
         } catch (error) {
             console.error(error.message);
-            setError("Ocurrió un error al registrar el proveedor.");
+            setNotificacion("Ocurrió un error al registrar el proveedor.");
         }
     };
 
     const handleSubmit = async () => {
-        setError('');
-        setMessage('');
+        
+  
         setLoading(true);
 
         // Validar campos requeridos
         if (!nombre.trim() || !apellido.trim() || !email.trim() || !proveedorSeleccionadoId || !fechaNacimiento) {
-            setError('Por favor, completa todos los campos requeridos.');
+            setNotificacion('Por favor, completa todos los campos requeridos.');
             setLoading(false);
             return;
         }
@@ -246,7 +258,7 @@ const Visitadores = () => {
         // Validar que al menos un teléfono esté completo
         const telefonosCompletos = telefonos.filter(t => t.numero.trim() && t.tipo);
         if (telefonosCompletos.length === 0) {
-            setError('Por favor, ingresa al menos un número de teléfono.');
+            setNotificacion('Por favor, ingresa al menos un número de teléfono.');
             setLoading(false);
             return;
         }
@@ -254,7 +266,7 @@ const Visitadores = () => {
         // Validar formato de email
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
-            setError('Por favor, ingresa un correo electrónico válido.');
+            setNotificacion('Por favor, ingresa un correo electrónico válido.');
             setLoading(false);
             return;
         }
@@ -277,8 +289,8 @@ const Visitadores = () => {
                 }))
             };
 
-            console.log('Enviando datos del visitador:', visitadorData);
-            console.log('JSON stringificado:', JSON.stringify(visitadorData, null, 2));
+            // console.log('Enviando datos del visitador:', visitadorData);
+            // console.log('JSON stringificado:', JSON.stringify(visitadorData, null, 2));
 
             const formData = new FormData();
             formData.append('data', JSON.stringify(visitadorData));
@@ -304,11 +316,11 @@ const Visitadores = () => {
                 throw new Error('Error al procesar respuesta del servidor');
             }
             
-            console.log('Respuesta del servidor:', { 
-                status: response.status, 
-                statusText: response.statusText,
-                data: responseData 
-            });
+            // console.log('Respuesta del servidor:', { 
+            //     status: response.status, 
+            //     statusText: response.statusText,
+            //     data: responseData 
+            // });
 
             if (!response.ok) {
                 console.error('Error completo:', {
@@ -320,7 +332,7 @@ const Visitadores = () => {
                 throw new Error(responseData.error || responseData.message || `Error al registrar al visitador: ${response.status} ${response.statusText}`);
             }
 
-            setMessage('Solicitud enviada correctamente. El administrador revisará tu solicitud.');
+            setNotificacion('Solicitud enviada correctamente. El administrador revisará tu solicitud.');
             localStorage.removeItem('formVisitador');
 
             
@@ -346,7 +358,7 @@ const Visitadores = () => {
 
         } catch (err) {
             console.error('Error al enviar solicitud de registro:', err);
-            setError(err.message || 'No se pudo enviar la solicitud. Verifica los datos e intenta nuevamente.');
+            setNotificacion(err.message || 'No se pudo enviar la solicitud. Verifica los datos e intenta nuevamente.');
         } finally {
             setLoading(false);
         }
@@ -358,6 +370,11 @@ const Visitadores = () => {
 
     return (
        <BackgroundCross mirrored={true} variant={'green'} className={styles.backgound}>
+        {notificacion && (
+                    <div className={styles.toast}>
+                        {notificacion}
+                    </div>
+                )}
         <div className= {styles.conteinerVisitadores}>
             {/* Título */}
             <div className={styles.tituloC}>

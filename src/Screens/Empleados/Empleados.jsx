@@ -329,9 +329,10 @@ const Empleados = () => {
       }
       await refetch();
       closeNuevoEmpleado();
+      setNotificacion('Empladocreado exitosamente');
     } catch (e) {
       console.error(e);
-      alert(`No se pudo crear el empleado. ${e.message || ''}`);
+      setNotificacion(`No se pudo crear el empleado. ${e.message || ''}`);
     }
   };
 
@@ -370,9 +371,10 @@ const Empleados = () => {
       }
       await refetch();
       closeEditarEmpleado();
+      setNotificacion('Empleado editado exitosamente');
     } catch (e) {
       console.error(e);
-      alert(`No se pudo actualizar el empleado. ${e.message || ''}`);
+      setNotificacion(`No se pudo actualizar el empleado. ${e.message || ''}`);
     }
   };
 
@@ -391,9 +393,10 @@ const Empleados = () => {
       if (!resp.ok) throw new Error('Error al eliminar');
       await refetch();
       closeAdvertencia();
+      setNotificacion('Estado de empleado cambiado exitosamente');
     } catch (e) {
       console.error(e);
-      alert('No se pudo eliminar el empleado');
+      setNotificacion('No se pudo editar el estado del empleado');
     }
   };
 
@@ -414,16 +417,20 @@ const Empleados = () => {
 
       if (!resp.ok) throw new Error('Error al cambiar estado');
       await refetch();
+      setNotificacion('Se cambió el estado exitosamente');
     } catch (e) {
       console.error(e);
-      alert('No se pudo cambiar el estado');
+      setNotificacion('No se pudo cambiar el estado');
     }
   };
 
   // Normalizar respuesta
   const empleadosData = useMemo(() => {
     if (empleadosResponse) {
-      try { console.debug('Empleados GET response:', empleadosResponse); } catch {}
+      try { 
+        a = 1;
+        //console.debug('Empleados GET response:', empleadosResponse);
+       } catch {}
     }
     const maybeArrays = [
       empleadosResponse?.data?.items,

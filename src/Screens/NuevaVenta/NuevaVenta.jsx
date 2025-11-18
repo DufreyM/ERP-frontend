@@ -258,7 +258,7 @@ const NuevaVenta = () => {
       const errorText = await response.text();
   console.error("Error del servidor:", errorText);
   throw new Error("Error al crear la venta");
-  console.log("Payload enviado:", body);
+  
     }
 
     const result = await response.json();

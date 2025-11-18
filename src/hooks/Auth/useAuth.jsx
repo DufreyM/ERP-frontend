@@ -28,7 +28,7 @@ export function AuthProvider({ children }) {
 
 
   const logout = () => {
-    console.log("🔒 Cerrando sesión...");
+    //console.log("🔒 Cerrando sesión...");
     removeToken();
     setToken(null);
  

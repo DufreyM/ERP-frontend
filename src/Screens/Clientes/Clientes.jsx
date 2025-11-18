@@ -200,7 +200,7 @@ const Clientes = () => {
             setNotificacion('Cliente creado exitosamente');
         } catch (e) {
             console.error('Error creando cliente:', e);
-            alert(`No se pudo crear el cliente. ${e.message || ''}`);
+            setNotificacion(`No se pudo crear el cliente. ${e.message || ''}`);
         }
     };
 
@@ -247,7 +247,7 @@ const Clientes = () => {
             setNotificacion('Cliente actualizado exitosamente');
         } catch (e) {
             console.error('Error actualizando cliente:', e);
-            alert(`No se pudo actualizar el cliente. ${e.message || ''}`);
+            setNotificacion(`No se pudo actualizar el cliente. ${e.message || ''}`);
         }
     };
 
@@ -278,7 +278,7 @@ const Clientes = () => {
             setNotificacion('Cliente eliminado exitosamente');
         } catch (e) {
             console.error('Error eliminando cliente:', e);
-            alert(`No se pudo eliminar el cliente. ${e.message || ''}`);
+            setNotificacion(`No se pudo eliminar el cliente. ${e.message || ''}`);
         }
     };
 

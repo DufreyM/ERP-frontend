@@ -49,7 +49,7 @@ const MultiSelect = ({
 
   const toggleOption = (option) => {
     const alreadySelected = value.find((v) => v.value === option.value);
-    console.log("Toggle option:", option, "Already selected:", !!alreadySelected);
+    //console.log("Toggle option:", option, "Already selected:", !!alreadySelected);
     if (alreadySelected) {
       onChange(value.filter((v) => v.value !== option.value));
     } else {

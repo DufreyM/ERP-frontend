@@ -23,6 +23,17 @@ import {jwtDecode} from 'jwt-decode';
 const Compras = () => {
     
     const navigate = useNavigate();
+     //Maneja las noticiaciones de creación eliminación o edición de un estado
+    const [notificacion, setNotificacion] = useState('');
+    useEffect(() => {
+        if (notificacion) {
+            const timer = setTimeout(() => {
+            setNotificacion('');
+            }, 2500); // se quita en 2.5 segundos
+
+            return () => clearTimeout(timer);
+        }
+    }, [notificacion]);
 
 
     //Obtener datos de la base de datos
@@ -264,7 +275,7 @@ const Compras = () => {
 
     const exportarAExcel = () => {
         if (!sortedData || sortedData.length === 0) {
-            alert("No hay datos para exportar");
+            setNotificacion("No hay datos para exportar");
             return;
         }
 
@@ -318,6 +329,11 @@ const Compras = () => {
 
     return(
         <main className={styles.bodyVentas}>
+             {notificacion && (
+                                <div className={styles.toast}>
+                                    {notificacion}
+                                </div>
+                            )}
             <div className={styles.headerVentas}>
                 <div className={styles.titulosVentas}>
                     <h1 className={styles.tituloVentas}>Historial de Compras </h1>
