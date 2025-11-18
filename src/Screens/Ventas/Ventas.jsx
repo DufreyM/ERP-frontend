@@ -3,7 +3,7 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import Filters from '../../components/FIlters/Filters';
 import { Table } from '../../components/Tables/Table';
 import styles from './Ventas.module.css'
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { getToken } from '../../services/authService';
 import { useFetch } from '../../utils/useFetch';
 import { useOpcionesUsuarioDinamicos } from '../../hooks/useOpcionesUsuariosDinamico';
@@ -248,7 +248,6 @@ const Ventas = () => {
       return sum + (isNaN(total) ? 0 : total);
     }, 0);
   }, [sortedData]);
-
 
   const exportarAExcel = () => {
     if (!sortedData || sortedData.length === 0) {

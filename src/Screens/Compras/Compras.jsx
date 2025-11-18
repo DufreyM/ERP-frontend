@@ -4,7 +4,7 @@ import ButtonHeaders from '../../components/ButtonHeaders/ButtonHeaders';
 
 import { useFetch } from '../../utils/useFetch';
 import { getToken } from '../../services/authService';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Table } from '../../components/Tables/Table';
 import { useOpcionesUsuarioDinamicos } from '../../hooks/useOpcionesUsuariosDinamico';
 import { useFiltroGeneral } from '../../hooks/useFiltroGeneral';

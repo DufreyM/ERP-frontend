@@ -34,6 +34,10 @@ const InventarioScreen = () => {
   const [deleting, setDeleting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [showTrasladoForm, setShowTrasladoForm] = useState(false);
+  const [lotes, setLotes] = useState([]);
+  const [cargandoLotes, setCargandoLotes] = useState(false);
+  const [mostrarLotes, setMostrarLotes] = useState(false);
+
   const checkToken = useCheckToken();
 
   const token = getToken();
@@ -62,12 +66,6 @@ const InventarioScreen = () => {
   );
   //console.log(productosData)
 
-  const { data: productoslote } = useFetch(
-    `${API_BASE_URL}/lotes/producto/2`,
-    {}, 
-    [selectedLocal]
-  );
-  console.log(productoslote)
 
   useEffect(() => {
     if (productosData) {
@@ -272,6 +270,35 @@ const InventarioScreen = () => {
     //sortedData es la data que se mostrará en pantalla
     //sortOption debe de ir en el componente de Ordeyby al igual que setSortOption
     const {sortedData, sortOption, setSortOption} = useOrderBy({data: dataFiltrada, sortKeyMap});
+
+    const cargarLotes = async () => {
+      if (!productoSeleccionado) return;
+      setCargandoLotes(true);
+
+      try {
+        const tokenActual = getToken();
+        const res = await fetch(
+          `${API_BASE_URL}/lotes/producto/${productoSeleccionado.codigo}?local_id=${selectedLocal + 1}`,
+          {
+            headers: {
+              "Authorization": `Bearer ${tokenActual}`,
+            },
+          }
+        );
+
+        if (!checkToken(res)) return;
+
+        const data = await res.json();
+        setLotes(data);
+        setMostrarLotes(true);
+      } catch (err) {
+        console.error(err);
+        alert("Error al cargar los lotes.");
+      } finally {
+        setCargandoLotes(false);
+      }
+    };
+
     
    
 
@@ -413,37 +440,81 @@ const InventarioScreen = () => {
       {productoSeleccionado && (
         <PopupButton
           isOpen={Boolean(productoSeleccionado)}
-          onClose={() => setProductoSeleccionado(null)}
+          onClose={() => {
+            setProductoSeleccionado(null);
+            setLotes([]);          
+            setMostrarLotes(false); 
+            setCargandoLotes(false); 
+            refetch();
+          }}
           title={productoSeleccionado.nombre}
           hideActions
         >
           <div className={styles.popupContent}>
-            <img
-              src={productoSeleccionado.imagen || '/default-user.svg'}
-              alt={productoSeleccionado.nombre}
-              className={styles.popupImg}
-            />
-            <div className={styles.popupDetails}>
-              <div className={styles.presentacion}>{productoSeleccionado.presentacion}</div>
-              <div className={styles.detalles}>{productoSeleccionado.detalles}</div>
-              <div className={styles.proveedor}><b>Proveedor:</b> {productoSeleccionado.proveedor?.nombre || '-'}</div>
-              <div className={styles.precio}><b>Precio venta:</b> Q{productoSeleccionado.precio_venta}</div>
-              <div className={styles.precioCosto}><b>Precio costo:</b> Q{productoSeleccionado.precio_costo}</div>
-              <div className={styles.stock}><b>Stock:</b> {productoSeleccionado.stock_actual}</div>
-              <div className={styles.popupActions}>
-                <ButtonText
-                  text="Editar"
-                  icon="edit"
-                  onClick={() => alert('Funcionalidad de edición aquí')}
-                  color="primary"
-                />
-                <ButtonText
-                  text="Eliminar"
-                  icon="delete"
-                  onClick={() => setShowConfirmDelete(true)}
-                  color="danger"
-                />
+            <div className={styles.contentImage}>
+              <img
+                src={productoSeleccionado.imagen || '/default-user.svg'}
+                alt={productoSeleccionado.nombre}
+                className={styles.popupImg}
+              />
+              <div className={styles.popupDetails}>
+                <div className={styles.presentacion}>{productoSeleccionado.presentacion}</div>
+                <div className={styles.detalles}>{productoSeleccionado.detalles}</div>
+                <div className={styles.proveedor}><b>Proveedor:</b> {productoSeleccionado.proveedor?.nombre || '-'}</div>
+                <div className={styles.stock}><b>Stock total:</b> {productoSeleccionado.stock_actual}</div>
+                <div style={{ marginTop: "10px" }}>
+                
               </div>
+            </div>
+            </div>
+
+            <div className={styles.contentImage2}>
+
+            {cargandoLotes && <div>Cargando lotes...</div>}
+
+            {mostrarLotes && lotes.length > 0 && (
+              <div className={styles.lotesContainer}>
+
+                {lotes.map((l) => (
+                  <div key={l.lote} className={styles.loteCard}>
+                    <div><b>Lote:</b> {l.lote}</div>
+                    <div className={styles.prow}>
+
+                      <div className={styles.contentImage2}>
+                        <div><b>Vencimiento:</b> {new Date(l.fecha_vencimiento).toLocaleDateString()}</div>
+                        <div><b>Precio costo:</b> Q{l.preciocosto}</div>
+                      </div>
+                      <div className={styles.contentImage2}>
+                        <div><b>Stock:</b> {l.stock_actual}</div>
+                        <div><b>Precio venta:</b> Q{l.precioventa}</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {mostrarLotes && lotes.length === 0 && (
+              <div className={styles.textoAd}>No hay lotes para este producto en este local.</div>
+            )}
+
+           
+
+              
+              {/* <div className={styles.popupActions}>
+                <ButtonHeaders
+                  text="Editar"
+                 
+                  onClick={() => alert('Funcionalidad de edición aquí')}
+                  
+                />
+                <ButtonHeaders
+                  text="Eliminar"
+              
+                  onClick={() => setShowConfirmDelete(true)}
+                  
+                />
+              </div> */}
               {showConfirmDelete && (
                 <div className={styles.confirmDelete}>
                   <p>¿Seguro que deseas eliminar este producto?</p>
@@ -460,6 +531,19 @@ const InventarioScreen = () => {
                 </div>
               )}
             </div>
+
+             <div className={styles}>
+
+            <ButtonHeaders
+                text="Ver lotes"
+                onlyLine = {true}
+                onClick={cargarLotes}
+                //disabled={productoSeleccionado.stock_actual <= 0}
+                
+              />
+
+            </div>
+            
           </div>
         </PopupButton>
       )}
