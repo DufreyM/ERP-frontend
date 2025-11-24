@@ -13,6 +13,7 @@ import InputFile from '../../components/Inputs/InputFile';
 import SelectSearch from '../../components/Inputs/SelectSearch';
 import { useFetch } from '../../utils/useFetch';
 import { getToken } from '../../services/authService';
+import styles from './Visitadores.module.css';
 
 const Visitadores = () => {
     const [nombre, setNombre] = useState('');
@@ -29,14 +30,32 @@ const Visitadores = () => {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
+    //Maneja las noticiaciones de creación eliminación o edición de un estado
+    const [notificacion, setNotificacion] = useState('');
+    useEffect(() => {
+        if (notificacion) {
+            const timer = setTimeout(() => {
+            setNotificacion('');
+            }, 2500); // se quita en 2.5 segundos
+
+            return () => clearTimeout(timer);
+        }
+    }, [notificacion]);
+
     // Obtener proveedores
+    const [refreshProveedores, setRefreshProveedores] = useState(0);
     const token = getToken();
     const { data: proveedores, loading: loadingProveedores } = useFetch(
         `${import.meta.env.VITE_API_URL}/api/proveedor`,
         {
             headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-        }
+        },
+        [refreshProveedores] // <--- depende de este estado
     );
+
+
+    
+
 
     // Estados para agregar proveedor nuevo
     const [agregandoProveedor, setAgregandoProveedor] = useState(false);
@@ -44,6 +63,58 @@ const Visitadores = () => {
     const [nuevoProveedorTelefono, setNuevoProveedorTelefono] = useState('');
     const [nuevoProveedorCorreo, setNuevoProveedorCorreo] = useState('');
     const [nuevoProveedorDireccion, setNuevoProveedorDireccion] = useState('');
+    const LIMITE_TELEFONOS = 2;
+
+    useEffect(() => {
+        const data = {
+            nombre,
+            apellido,
+            password,
+            email,
+            telefonos,
+            proveedorSeleccionadoId,
+            fechaNacimiento,
+            documentos
+        };
+        localStorage.setItem('formVisitador', JSON.stringify(data));
+    }, [
+        nombre,
+        apellido,
+        password,
+        email,
+        telefonos,
+        proveedorSeleccionadoId,
+        fechaNacimiento,
+        documentos
+    ]);
+
+    useEffect(() => {
+    const saved = localStorage.getItem('formVisitador');
+    if (saved) {
+        const data = JSON.parse(saved);
+
+        setNombre(data.nombre || '');
+        setApellido(data.apellido || '');
+        setPassword(data.password || '');
+        setEmail(data.email || '');
+        setTelefonos(data.telefonos || [{ numero: '', tipo: 'móvil' }]);
+        setProveedorSeleccionadoId(data.proveedorSeleccionadoId || '');
+        setFechaNacimiento(data.fechaNacimiento || '');
+        setDocumentos(data.documentos || []);
+    }
+}, []);
+
+
+    useEffect(() => {
+        const handleUnload = () => {
+            localStorage.removeItem('formVisitador');
+        };
+
+        window.addEventListener('beforeunload', handleUnload);
+        return () => window.removeEventListener('beforeunload', handleUnload);
+    }, []);
+
+
 
     // Opciones de proveedores para el select (igual que NuevaCompra)
     const opcionesProveedores = useMemo(() => {
@@ -66,27 +137,31 @@ const Visitadores = () => {
     // Handlers para nuevo proveedor (igual que NuevaCompra)
     const handleNuevoProveedorNombre = (e) => {
         setNuevoProveedorNombre(e.target.value);
-        setError('');
+        setNotificacion('');
     };
 
     const handleNuevoProveedorTelefono = (e) => {
         setNuevoProveedorTelefono(e.target.value);
-        setError('');
+        setNotificacion('');
     };
 
     const handleNuevoProveedorCorreo = (e) => {
         setNuevoProveedorCorreo(e.target.value);
-        setError('');
+        setNotificacion('');
     };
 
     const handleNuevoProveedorDireccion = (e) => {
         setNuevoProveedorDireccion(e.target.value);
-        setError('');
+        setNotificacion('');
     };
 
     // Funciones para manejar teléfonos
     const addTelefono = () => {
-        setTelefonos([...telefonos, { numero: '', tipo: 'móvil' }]);
+         if (telefonos.length < LIMITE_TELEFONOS) {
+            setTelefonos([...telefonos, { numero: '', tipo: 'móvil' }]);
+        } else {
+            setNotificacion('Has alcanzado el límite de teléfonos permitidos');
+        }
     };
 
     const removeTelefono = (index) => {
@@ -102,17 +177,16 @@ const Visitadores = () => {
         setTelefonos(updatedTelefonos);
     };
 
-    const handleFileChange = (e) => {
-        const files = Array.from(e.target.files);
-        const pdfFiles = files.filter(file => file.type === 'application/pdf');
-        
-        if (pdfFiles.length !== files.length) {
-            setError('Solo se permiten archivos PDF');
+    const handleFileChange = (file) => {
+        if (!file) return;
+
+        if (file.type !== "application/pdf") {
+            setNotificacion("Solo se permiten archivos PDF");
             return;
         }
-        
-        setDocumentos(pdfFiles);
-        setError('');
+
+        setDocumentos([file]);
+        setNotificacion("");
     };
 
     // Función para agregar proveedor nuevo (igual que NuevaCompra)
@@ -120,7 +194,7 @@ const Visitadores = () => {
         try {
             // Validaciones básicas
             if (!nuevoProveedorNombre || !nuevoProveedorTelefono || !nuevoProveedorCorreo || !nuevoProveedorDireccion) {
-                setError("Por favor, completa todos los campos del proveedor.");
+                setNotificacion("Por favor, completa todos los campos del proveedor.");
                 return;
             }
 
@@ -149,7 +223,9 @@ const Visitadores = () => {
             }
 
             const result = await response.json();
-            setMessage("¡Proveedor agregado correctamente!");
+            setNotificacion("¡Proveedor agregado correctamente!");
+            setRefreshProveedores(prev => prev + 1);
+
             
             // Selecciona el proveedor recién creado
             setProveedorSeleccionadoId(String(result.id));
@@ -163,18 +239,18 @@ const Visitadores = () => {
 
         } catch (error) {
             console.error(error.message);
-            setError("Ocurrió un error al registrar el proveedor.");
+            setNotificacion("Ocurrió un error al registrar el proveedor.");
         }
     };
 
     const handleSubmit = async () => {
-        setError('');
-        setMessage('');
+        
+  
         setLoading(true);
 
         // Validar campos requeridos
         if (!nombre.trim() || !apellido.trim() || !email.trim() || !proveedorSeleccionadoId || !fechaNacimiento) {
-            setError('Por favor, completa todos los campos requeridos.');
+            setNotificacion('Por favor, completa todos los campos requeridos.');
             setLoading(false);
             return;
         }
@@ -182,7 +258,7 @@ const Visitadores = () => {
         // Validar que al menos un teléfono esté completo
         const telefonosCompletos = telefonos.filter(t => t.numero.trim() && t.tipo);
         if (telefonosCompletos.length === 0) {
-            setError('Por favor, ingresa al menos un número de teléfono.');
+            setNotificacion('Por favor, ingresa al menos un número de teléfono.');
             setLoading(false);
             return;
         }
@@ -190,7 +266,7 @@ const Visitadores = () => {
         // Validar formato de email
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
-            setError('Por favor, ingresa un correo electrónico válido.');
+            setNotificacion('Por favor, ingresa un correo electrónico válido.');
             setLoading(false);
             return;
         }
@@ -213,8 +289,8 @@ const Visitadores = () => {
                 }))
             };
 
-            console.log('Enviando datos del visitador:', visitadorData);
-            console.log('JSON stringificado:', JSON.stringify(visitadorData, null, 2));
+            // console.log('Enviando datos del visitador:', visitadorData);
+            // console.log('JSON stringificado:', JSON.stringify(visitadorData, null, 2));
 
             const formData = new FormData();
             formData.append('data', JSON.stringify(visitadorData));
@@ -240,11 +316,11 @@ const Visitadores = () => {
                 throw new Error('Error al procesar respuesta del servidor');
             }
             
-            console.log('Respuesta del servidor:', { 
-                status: response.status, 
-                statusText: response.statusText,
-                data: responseData 
-            });
+            // console.log('Respuesta del servidor:', { 
+            //     status: response.status, 
+            //     statusText: response.statusText,
+            //     data: responseData 
+            // });
 
             if (!response.ok) {
                 console.error('Error completo:', {
@@ -256,7 +332,9 @@ const Visitadores = () => {
                 throw new Error(responseData.error || responseData.message || `Error al registrar al visitador: ${response.status} ${response.statusText}`);
             }
 
-            setMessage('Solicitud enviada correctamente. El administrador revisará tu solicitud.');
+            setNotificacion('Solicitud enviada correctamente. El administrador revisará tu solicitud.');
+            localStorage.removeItem('formVisitador');
+
             
             // Notificar que se creó un nuevo visitador para actualizar la lista en admin
             window.dispatchEvent(new CustomEvent('visitadorCreado', { 
@@ -280,7 +358,7 @@ const Visitadores = () => {
 
         } catch (err) {
             console.error('Error al enviar solicitud de registro:', err);
-            setError(err.message || 'No se pudo enviar la solicitud. Verifica los datos e intenta nuevamente.');
+            setNotificacion(err.message || 'No se pudo enviar la solicitud. Verifica los datos e intenta nuevamente.');
         } finally {
             setLoading(false);
         }
@@ -291,242 +369,114 @@ const Visitadores = () => {
     }
 
     return (
-        <BackgroundCross variant="green" mirrored={true}>
-            <div
-                style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    position: 'relative',
-                    width: '100%',
-                    maxWidth: '600px',
-                    height: '100vh',
-                }}
-            >
-                {/* Título */}
-                <div style={{ display: 'flex', marginBottom: '0px', gap: '18px',textAlign: 'left' }}>
-                    <img
-                        src={Isotipo}
-                        alt="Isotipo Econofarma"
-                        style={{
-                            width: 120,
-                            height: 120,
-                            minWidth: 120,
-                        }}
-                    />
-                    <h1 style={{ color: '#5a60a5', fontFamily: 'Segoe UI', fontWeight: 'bold', margin: 0 }}>
-                            Acceso para Visitadores Médicos
-                    </h1>  
-                </div>
-
-                <h2 style={{ color: '#5a60a5', fontFamily: 'Segoe UI', fontWeight: 'bold', marginBottom: '10px', fontSize: '20px' }}>
-                    Datos
-                </h2>
-
-                {/* Inputs */}
-                <IconoInput
-                    icono={faUser}
-                    placeholder="Nombre"
-                    value={nombre}
-                    onChange={(e) => setNombre(e.target.value)}
-                    name="nombre"
-                    formatoAa={true}
-                />
-                <IconoInput
-                    icono={faUser}
-                    placeholder="Apellido"
-                    value={apellido}
-                    onChange={(e) => setApellido(e.target.value)}
-                    name="apellido"
-                    formatoAa={true}
-                />
-                <InputPassword
-                    showPassword={showPassword}
-                    togglePasswordVisibility={togglePasswordVisibility}
-                    icono={faLock}
-                    placeholder="Contraseña"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    name="password"
-                />
-                <IconoInput
-                    icono={faEnvelope}
-                    placeholder="Correo Electrónico"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    name="email"
-                />
-                {/* Sección de Teléfonos */}
-                <div style={{ width: '100%', maxWidth: '400px', marginBottom: '16px' }}>
-                    <label style={{ 
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px',
-                        color: '#5a60a5',
-                        fontFamily: 'Segoe UI',
-                        fontWeight: 'bold',
-                        marginBottom: '10px',
-                    }}>
-                        Teléfonos
-                    </label>
-                    {telefonos.map((telefono, index) => (
-                        <div key={index} style={{ 
-                            display: 'flex', 
-                            gap: '8px', 
-                            marginBottom: '8px',
-                            alignItems: 'start',
-                         
-                        }}>
-                            <IconoInput
-                                icono={faPhone}
-                                placeholder="Número de teléfono"
-                                value={telefono.numero}
-                                onChange={(e) => updateTelefono(index, 'numero', e.target.value)}
-                                name={`telefono_${index}`}
-                            />
-                            <select
-                                value={telefono.tipo}
-                                onChange={(e) => updateTelefono(index, 'tipo', e.target.value)}
-                                style={{
-                                    padding: '8px 12px',
-                                    border: '2px solid #cccccc8e',
-                                    borderRadius: '4px',
-                                    backgroundColor: '#ffffff',
-                                    color: '#5a60a5',
-                                    fontSize: '14px',
-                                    minWidth: '100px'
-                                }}
-                            >
-                                <option value="móvil">Móvil</option>
-                                <option value="fijo">Fijo</option>
-                            </select>
-                            {telefonos.length > 1 && (
-                                <button
-                                    type="button"
-                                    onClick={() => removeTelefono(index)}
-                                    style={{
-                                        background: '#e74c3c',
-                                        border: 'none',
-                                        borderRadius: '4px',
-                                        color: 'white',
-                                        padding: '8px 12px',
-                                        cursor: 'pointer',
-                                        fontSize: '12px'
-                                    }}
-                                >
-                                    ✕
-                                </button>
-                            )}
-                        </div>
-                    ))}
-
-                    <ButtonIcon
-                        solid = {true}
-                        title={'Agregar Teléfono'}
-                        icon = {faPlus}
-                        onClick={addTelefono}
-                    >
-                    </ButtonIcon>
-                   
-                </div>
-                <IconoInput
-                    icono={faUser}
-                    placeholder="Fecha de Nacimiento (YYYY-MM-DD)"
-                    value={fechaNacimiento}
-                    onChange={(e) => setFechaNacimiento(e.target.value)}
-                    name="fechaNacimiento"
-                    type="date"
-                />
-                {/* Campo de Proveedor con funcionalidad de agregar nuevo */}
-                <div style={{ width: '100%', maxWidth: '400px', marginBottom: '16px' }}>
-                    <label style={{ 
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px',
-                        color: '#5a60a5',
-                        fontFamily: 'Segoe UI',
-                        fontWeight: 'bold',
-                        marginBottom: '10px',
-                    }}>
-                        Proveedor
-                    </label>
+       <BackgroundCross mirrored={true} variant={'green'} className={styles.backgound}>
+        {notificacion && (
+                    <div className={styles.toast}>
+                        {notificacion}
+                    </div>
+                )}
+        <div className= {styles.conteinerVisitadores}>
+            {/* Título */}
+            <div className={styles.tituloC}>
+                <img
+                    src={Isotipo}
+                    alt="Isotipo Econofarma"
+                    className={styles.imagenV}
                     
-                    {/* Si está en modo "agregar proveedor nuevo" */}
-                    {agregandoProveedor ? (
-                        <>
-                            <div style={{ display: 'flex', gap: '8px', marginBottom: '8px', alignItems: 'start' }}>
-                                <IconoInput
-                                    icono={faHouseMedical}
-                                    placeholder="Nombre del nuevo proveedor"
-                                    type="text"
-                                    value={nuevoProveedorNombre}
-                                    onChange={handleNuevoProveedorNombre}
-                                    formatoAa={true}
-                                />
-                                <button
-                                    onClick={() => setAgregandoProveedor(false)}
-                                    style={{
-                                        background: '#e74c3c',
-                                        border: 'none',
-                                        borderRadius: '4px',
-                                        color: 'white',
-                                        padding: '8px 12px',
-                                        cursor: 'pointer',
-                                        fontSize: '12px'
-                                    }}
-                                >
-                                    <FontAwesomeIcon icon={faTimes} />
-                                </button>
-                            </div>
+                />
+                <h1 className={styles.tituloV}>
+                        Acceso para Visitadores Médicos
+                </h1>  
+            </div>
 
-                            <IconoInput 
-                                icono={faPhone} 
-                                placeholder="Teléfono del proveedor" 
-                                type="text" 
-                                value={nuevoProveedorTelefono}
-                                onChange={handleNuevoProveedorTelefono}
-                            />
+            <h2 style={{ color: '#5a60a5', fontFamily: 'Segoe UI', fontWeight: 'bold', marginBottom: '10px', fontSize: '20px' }}>
+                Datos
+            </h2>
 
-                            <IconoInput 
-                                icono={faEnvelope} 
-                                placeholder="Correo del proveedor" 
-                                type="email" 
-                                value={nuevoProveedorCorreo}
-                                onChange={handleNuevoProveedorCorreo}
-                            />
-
-                            <IconoInput 
-                                icono={faLocationDot} 
-                                placeholder="Dirección del proveedor" 
-                                type="text" 
-                                value={nuevoProveedorDireccion}
-                                onChange={handleNuevoProveedorDireccion}
-                            />
-
-                            <ButtonForm
-                                text="Agregar proveedor"
-                                onClick={handleAgregarProveedor}
-                            />
-                        </>
-                    ) : (
-                        <div style={{ display: 'flex', gap: '8px', alignItems: 'start' }}>
-                            <SelectSearch
-                                icono={faHouseMedical}
-                                placeholder="Nombre del proveedor"
-                                value={proveedorSeleccionadoId}
-                                onChange={(value) => setProveedorSeleccionadoId(value)}
-                                type="text"
-                                options={opcionesProveedores}                    
-                                popup = {false}   
-                            />
+            {/* Inputs */}
+            <IconoInput
+                icono={faUser}
+                placeholder="Nombre"
+                value={nombre}
+                onChange={(e) => setNombre(e.target.value)}
+                name="nombre"
+                formatoAa={true}
+            />
+            <IconoInput
+                icono={faUser}
+                placeholder="Apellido"
+                value={apellido}
+                onChange={(e) => setApellido(e.target.value)}
+                name="apellido"
+                formatoAa={true}
+            />
+            <InputPassword
+                showPassword={showPassword}
+                togglePasswordVisibility={togglePasswordVisibility}
+                icono={faLock}
+                placeholder="Contraseña"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                name="password"
+            />
+            <IconoInput
+                icono={faEnvelope}
+                placeholder="Correo Electrónico"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                name="email"
+            />
+            {/* Sección de Teléfonos */}
+            <div style={{ width: '100%', maxWidth: '400px', marginBottom: '16px',}}>
+                <label style={{ 
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    color: '#5a60a5',
+                    fontFamily: 'Segoe UI',
+                    fontWeight: 'bold',
+                    marginBottom: '10px',
+                    paddingTop: '30px'
+                }}>
+                    Teléfonos
+                </label>
+                {telefonos.map((telefono, index) => (
+                    <div key={index} style={{ 
+                        display: 'flex', 
+                        gap: '8px', 
+                        marginBottom: '8px',
+                        alignItems: 'start',
+                        
+                    }}>
+                        <IconoInput
+                            icono={faPhone}
+                            placeholder="Número de teléfono"
+                            value={telefono.numero}
+                            onChange={(e) => updateTelefono(index, 'numero', e.target.value)}
+                            name={`telefono_${index}`}
+                        />
+                        <select
+                            value={telefono.tipo}
+                            onChange={(e) => updateTelefono(index, 'tipo', e.target.value)}
+                            style={{
+                                padding: '8px 12px',
+                                border: '2px solid #cccccc8e',
+                                borderRadius: '4px',
+                                backgroundColor: '#ffffff',
+                                color: '#5a60a5',
+                                fontSize: '14px',
+                                minWidth: '100px'
+                            }}
+                        >
+                            <option value="móvil">Móvil</option>
+                            <option value="fijo">Fijo</option>
+                        </select>
+                        {telefonos.length > 1 && (
                             <button
-                                onClick={() => {
-                                    setAgregandoProveedor(true);
-                                    setProveedorSeleccionadoId(''); // limpia el select si vas a agregar
-                                }}
+                                type="button"
+                                onClick={() => removeTelefono(index)}
                                 style={{
-                                    background: '#5a60a5',
+                                    background: '#e74c3c',
                                     border: 'none',
                                     borderRadius: '4px',
                                     color: 'white',
@@ -535,99 +485,213 @@ const Visitadores = () => {
                                     fontSize: '12px'
                                 }}
                             >
-                                <FontAwesomeIcon icon={faPlus} />
+                                ✕
                             </button>
-                        </div>
-                    )}
+                        )}
+                    </div>
+                ))}
+                <div className={styles.centrarB}>
+
+                    <ButtonIcon
+                        solid = {true}
+                        title={'Agregar Teléfono'}
+                        icon = {faPlus}
+                        onClick={addTelefono}
+                    >
+                    </ButtonIcon>
                 </div>
                 
+            </div>
+            <IconoInput
+                icono={faUser}
+                placeholder="Fecha de Nacimiento (YYYY-MM-DD)"
+                value={fechaNacimiento}
+                onChange={(e) => setFechaNacimiento(e.target.value)}
+                name="fechaNacimiento"
+                type="date"
+            />
 
-                {/* Input para subir documentos PDF */}
-                <div style={{ 
-                    width: '100%', 
-                    maxWidth: '400px', 
-                    marginBottom: '20px',
+            {/* Campo de Proveedor con funcionalidad de agregar nuevo */}
+            <div style={{ width: '100%', maxWidth: '400px', marginBottom: '16px' }}>
+                <label style={{ 
                     display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center'
+                    alignItems: 'center',
+                    gap: '10px',
+                    color: '#5a60a5',
+                    fontFamily: 'Segoe UI',
+                    fontWeight: 'bold',
+                    marginBottom: '10px',
+                    paddingTop: '10px',
+                 
+
                 }}>
-                    <label style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px',
-                        color: '#5a60a5',
-                        fontFamily: 'Segoe UI',
-                        fontWeight: 'bold',
-                        marginBottom: '10px',
-                        
-                    }}>
-                        <FontAwesomeIcon icon={faFilePdf} style={{ color: '#5a60a5' }} />
-                        Subir Documentos (PDF)
-                    </label>
-                    
-
-                    <InputFile
-                        icon={faPen }
-                        placeholder = {"Nombre del archivo"}
-                        value = {documentos}
-                        accept=".pdf"
-                        onChange = {handleFileChange}
-                        name = ""
-                    >
-                    </InputFile>
-                    <input
-                        type="file"
-                        multiple
-                        accept=".pdf"
-                        onChange={handleFileChange}
-                        style={{
-                            width: '100%',
-                            padding: '10px',
-                            border: '2px dashed #5a60a5',
-                            borderRadius: '8px',
-                            backgroundColor: 'transparent',
-                            color: '#5a60a5',
-                            cursor: 'pointer'
-                        }}
-                    />
-                    {documentos.length > 0 && (
-                        <div style={{ 
-                            marginTop: '10px', 
-                            fontSize: '12px', 
-                            color: '#5a60a5',
-                            textAlign: 'center'
-                        }}>
-                            {documentos.length} archivo(s) seleccionado(s)
+                    Proveedor
+                </label>
+                
+                {/* Si está en modo "agregar proveedor nuevo" */}
+                {agregandoProveedor ? (
+                    <>
+                        <div style={{ display: 'flex', gap: '8px', marginBottom: '8px', alignItems: 'start' }}>
+                            <IconoInput
+                                icono={faHouseMedical}
+                                placeholder="Nombre del nuevo proveedor"
+                                type="text"
+                                value={nuevoProveedorNombre}
+                                onChange={handleNuevoProveedorNombre}
+                                formatoAa={true}
+                            />
+                            <button
+                                onClick={() => setAgregandoProveedor(false)}
+                                style={{
+                                    background: '#e74c3c',
+                                    border: 'none',
+                                    borderRadius: '4px',
+                                    color: 'white',
+                                    padding: '11px 12px',
+                                    cursor: 'pointer',
+                                    fontSize: '12px'
+                                }}
+                            >
+                                <FontAwesomeIcon icon={faTimes} />
+                            </button>
                         </div>
-                    )}
-                </div>
 
-                {/* Botón de enviar */}
-                <ButtonForm 
-                    text={loading ? "Enviando..." : "Enviar solicitud para crear cuenta"} 
-                    onClick={handleSubmit}
-                    disabled={loading}
-                />
+                        <IconoInput 
+                            icono={faPhone} 
+                            placeholder="Teléfono del proveedor" 
+                            type="text" 
+                            value={nuevoProveedorTelefono}
+                            onChange={handleNuevoProveedorTelefono}
+                        />
 
-                <ButtonText
-                texto="¿Ya tienes una cuenta?"
-                textoButton="Ir al inicio"
-                accion={handleRedirectToLogin}
-                />
+                        <IconoInput 
+                            icono={faEnvelope} 
+                            placeholder="Correo del proveedor" 
+                            type="email" 
+                            value={nuevoProveedorCorreo}
+                            onChange={handleNuevoProveedorCorreo}
+                        />
 
-                {/* Mensaje de éxito o error */}
-                {message && (
-                    <p style={{ color: '#003366', marginTop: '10px', fontFamily: 'Segoe UI', fontSize: '14px' }}>
-                        {message}
-                    </p>
-                )}
-                {error && (
-                    <p style={{ color: 'red', marginTop: '10px', fontFamily: 'Segoe UI', fontSize: '14px' }}>
-                        {error}
-                    </p>
+                        <IconoInput 
+                            icono={faLocationDot} 
+                            placeholder="Dirección del proveedor" 
+                            type="text" 
+                            value={nuevoProveedorDireccion}
+                            onChange={handleNuevoProveedorDireccion}
+                        />
+
+                        <ButtonForm
+                            text="Agregar proveedor"
+                            onClick={handleAgregarProveedor}
+                        />
+                    </>
+                ) : (
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'start' }}>
+                        <SelectSearch
+                            icono={faHouseMedical}
+                            placeholder="Nombre del proveedor"
+                            value={proveedorSeleccionadoId}
+                            onChange={(value) => setProveedorSeleccionadoId(value)}
+                            type="text"
+                            options={opcionesProveedores}                    
+                            popup = {false}   
+                        />
+                        <button
+                            onClick={() => {
+                                setAgregandoProveedor(true);
+                                setProveedorSeleccionadoId(''); // limpia el select si vas a agregar
+                            }}
+                            style={{
+                                background: '#5a60a5',
+                                border: 'none',
+                                borderRadius: '4px',
+                                color: 'white',
+                                padding: '11px 12px',
+                                cursor: 'pointer',
+                                fontSize: '12px'
+                            }}
+                        >
+                            <FontAwesomeIcon icon={faPlus} />
+                        </button>
+                    </div>
                 )}
             </div>
+            
+
+            {/* Input para subir documentos PDF */}
+            <div style={{ 
+                width: '100%', 
+                maxWidth: '400px', 
+                marginBottom: '20px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center'
+            }}>
+                <label style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    color: '#5a60a5',
+                    fontFamily: 'Segoe UI',
+                    fontWeight: 'bold',
+                    marginBottom: '10px',
+                    
+                }}>
+                    <FontAwesomeIcon icon={faFilePdf} style={{ color: '#5a60a5' }} />
+                    Subir Documento (PDF)
+                </label>
+                
+
+                <InputFile
+                    id = "documentoVisitadoresE"
+                    icon={faPen }
+                    placeholder = {"Nombre del archivo"}
+                    
+                    accept=".pdf"
+                    onChange = {handleFileChange}
+                    
+                >
+                </InputFile>
+              
+                {documentos.length > 0 && (
+                    <div style={{ 
+                        marginTop: '10px', 
+                        fontSize: '12px', 
+                        color: '#5a60a5',
+                        textAlign: 'center'
+                    }}>
+                        {documentos.length} archivo(s) seleccionado(s)
+                    </div>
+                )}
+            </div>
+
+            {/* Botón de enviar */}
+            <ButtonForm 
+                text={loading ? "Enviando..." : "Enviar solicitud para crear cuenta"} 
+                onClick={handleSubmit}
+                disabled={loading}
+            />
+
+            <ButtonText
+            texto="¿Ya tienes una cuenta?"
+            textoButton="Ir al inicio"
+            accion={handleRedirectToLogin}
+            />
+
+            {/* Mensaje de éxito o error */}
+            {message && (
+                <p style={{ color: '#003366', marginTop: '10px', fontFamily: 'Segoe UI', fontSize: '14px' }}>
+                    {message}
+                </p>
+            )}
+            {error && (
+                <p style={{ color: 'red', marginTop: '10px', fontFamily: 'Segoe UI', fontSize: '14px' }}>
+                    {error}
+                </p>
+            )}
+        </div>
         </BackgroundCross>
+    
     );
 };
 

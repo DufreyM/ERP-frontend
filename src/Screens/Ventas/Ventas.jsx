@@ -3,7 +3,7 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import Filters from '../../components/FIlters/Filters';
 import { Table } from '../../components/Tables/Table';
 import styles from './Ventas.module.css'
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { getToken } from '../../services/authService';
 import { useFetch } from '../../utils/useFetch';
 import { useOpcionesUsuarioDinamicos } from '../../hooks/useOpcionesUsuariosDinamico';
@@ -21,6 +21,18 @@ import {jwtDecode} from 'jwt-decode';
 
 const Ventas = () => {
     const navigate = useNavigate();
+
+     //Maneja las noticiaciones de creación eliminación o edición de un estado
+    const [notificacion, setNotificacion] = useState('');
+    useEffect(() => {
+        if (notificacion) {
+            const timer = setTimeout(() => {
+            setNotificacion('');
+            }, 2500); // se quita en 2.5 segundos
+
+            return () => clearTimeout(timer);
+        }
+    }, [notificacion]);
     
   
 
@@ -237,10 +249,9 @@ const Ventas = () => {
     }, 0);
   }, [sortedData]);
 
-
   const exportarAExcel = () => {
     if (!sortedData || sortedData.length === 0) {
-        alert("No hay datos para exportar");
+        setNotificacion("No hay datos para exportar");
         return;
     }
 
@@ -291,6 +302,11 @@ const Ventas = () => {
 
     return(
         <main className={styles.bodyVentas}>
+           {notificacion && (
+                <div className={styles.toast}>
+                    {notificacion}
+                </div>
+            )}
             <div className={styles.headerVentas}>
                 <div className={styles.titulosVentas}>
                     <h1 className={styles.tituloVentas}>Historial de ventas </h1>

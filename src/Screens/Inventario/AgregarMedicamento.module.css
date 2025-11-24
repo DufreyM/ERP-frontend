@@ -5,8 +5,11 @@
   justify-content: center;
   align-items: flex-start;
   min-height: 100vh;
-  padding: 24px;
+  padding: 30px 0px;
+
+  margin: 0px;
   width: 100%;
+  overflow-x:hidden;
 }
 
 .contentWrapper {
@@ -14,7 +17,8 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 560px;
+  gap: 20px;
+  
 }
 
 .formContainer {
@@ -103,26 +107,44 @@
 }
 
 .selectSearchWrapper {
-  flex: 1;
+  display: flex;
   width: 100%;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #f9f9f9;
+  color: #5a60A5;
+  padding: 12px 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  z-index: 9999;
+  opacity: 1;
+  animation: fadeOut 0.5s ease-in-out 2s forwards;
+  font-weight: bold;
 }
 
 /* Botón de agregar proveedor pegado al dropdown */
 .addProviderButton {
   background: #5a60a5;
   border: none;
-  border-radius: 0 4px 4px 0;
+  border-radius:  4px;
   color: white;
-  padding: 8px 12px;
+  padding: 0px 12px;
+  
   cursor: pointer;
-  font-size: 12px;
-  flex-shrink: 0;
-  height: 42px;
+  font-size: 14px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-left: -1px;
   transition: background-color 0.2s;
+  
 }
 
 .addProviderButton:hover {

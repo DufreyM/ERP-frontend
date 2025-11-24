@@ -5,7 +5,7 @@ import IconoInput from '../../components/Inputs/InputIcono.jsx';
 import ButtonForm from '../../components/ButtonForm/ButtonForm';
 import ButtonText from '../../components/ButtonText/ButtonText';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBox, faDollarSign, faHouseMedical, faPhone, faEnvelope, faLocationDot, faImage, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faBox, faDollarSign, faHouseMedical, faPhone, faEnvelope, faLocationDot, faImage, faPlus, faPen } from '@fortawesome/free-solid-svg-icons';
 import { getToken } from '../../services/authService';
 import SelectSearch from '../../components/Inputs/SelectSearch';
 import { useFetch } from '../../utils/useFetch.jsx';
@@ -13,6 +13,8 @@ import { useCheckToken } from '../../utils/checkToken.js';
 import ButtonHeaders from '../../components/ButtonHeaders/ButtonHeaders';
 import styles from './InventarioScreen.module.css';
 import formStyles from './AgregarMedicamento.module.css';
+import InputSelects from '../../components/Inputs/InputSelects.jsx';
+import InputFile from '../../components/Inputs/InputFile.jsx';
 
 const AgregarMedicamento = () => {
   const { selectedLocal } = useOutletContext();
@@ -86,8 +88,7 @@ const AgregarMedicamento = () => {
     return null;
   };
 
-  const handleImagenChange = (e) => {
-    const file = e.target.files?.[0] || null;
+  const handleImagenChange = (file) => {
     setImagenFile(file);
   };
 
@@ -201,15 +202,17 @@ const AgregarMedicamento = () => {
 
   return (
     <div className={formStyles.pageContainer}>
+      
       <div className={formStyles.contentWrapper}>
         <SimpleTitle text="Agregar nuevo medicamento" />
         
         {notificacion && (
-          <div className={formStyles.notification}>
+          <div className={formStyles.toast}>
             {notificacion}
           </div>
         )}
 
+        
         <div className={formStyles.formContainer}>
         <div className={formStyles.inputWrapper}>
           <IconoInput
@@ -295,14 +298,16 @@ const AgregarMedicamento = () => {
                   type="text"
                   options={opcionesProveedores}
                   tableStyle={false}
+                  icono={faHouseMedical}
                 />
-              </div>
+              
               <button
                 onClick={() => { setAgregandoProveedor(true); setProveedorSeleccionadoId(''); }}
                 className={formStyles.addProviderButton}
               >
                 <FontAwesomeIcon icon={faPlus} />
               </button>
+            </div>
             </div>
           )}
         </div>
@@ -316,6 +321,7 @@ const AgregarMedicamento = () => {
             placeholder="Precio de venta"
             type="number"
             step="0.01"
+            minValue ={"0"}
           />
         </div>
         <div className={formStyles.inputWrapper}>
@@ -327,15 +333,26 @@ const AgregarMedicamento = () => {
             placeholder="Precio de costo"
             type="number"
             step="0.01"
+            minValue ={"0"}
           />
         </div>
         <div className={formStyles.inputWrapper}>
           <label style={{ color:'#5a60a5', fontWeight:600, marginBottom:6, display:'block' }}>¿Requiere receta?</label>
-          <select name="receta" value={formProducto.receta} onChange={handleProductoChange} className={formStyles.selectInput}>
-            <option value="">Seleccione...</option>
-            <option value="true">Sí</option>
-            <option value="false">No</option>
-          </select>
+          <InputSelects
+            name="receta"
+            value={formProducto.receta}
+            icono={faPen}
+            placeholder={"Seleccione una opción"}
+            onChange={handleProductoChange}
+
+            opcions={[
+              {value: "true", label: "Sí"},
+              {value: "false", label: "No"},
+              
+            ]}
+          ></InputSelects>
+
+          
         </div>
         <div className={formStyles.inputWrapper}>
           <IconoInput
@@ -345,6 +362,7 @@ const AgregarMedicamento = () => {
             onChange={handleProductoChange}
             placeholder="Stock mínimo"
             type="number"
+            minValue={0}
           />
         </div>
         <div className={formStyles.inputWrapper}>
@@ -362,26 +380,39 @@ const AgregarMedicamento = () => {
           <label style={{ display:'flex', alignItems:'center', gap:8, color:'#5a60a5', fontWeight:600, marginBottom:6 }}>
             <FontAwesomeIcon icon={faImage} /> Seleccionar imagen (PNG/JPG, máx 10MB)
           </label>
-          <input
+          {/* <input
             type="file"
             accept="image/png, image/jpeg"
             onChange={handleImagenChange}
             className={formStyles.fileInput}
+          /> */}
+
+          <InputFile
+            id = "agregar-foto-m"
+            type='file'
+            accept={"image/png, image/jpeg"}
+            onChange={handleImagenChange}
+          
           />
+
+
+          
         </div>
 
         {/* Botones de acción */}
         <div className={formStyles.actionButtons}>
-          <ButtonForm 
+          <ButtonHeaders 
+            text="Cancelar" 
+            onClick={handleCancelar}
+            onlyLine={false}
+            red = {true}
+          />
+          <ButtonHeaders 
             text={loading ? "Guardando..." : "Guardar medicamento"} 
             onClick={crearProducto}
             disabled={loading}
           />
-          <ButtonHeaders 
-            text="Cancelar" 
-            onClick={handleCancelar}
-            onlyLine={true}
-          />
+          
         </div>
       </div>
       </div>

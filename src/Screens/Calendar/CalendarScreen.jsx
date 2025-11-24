@@ -213,7 +213,7 @@ export const CalendarScreen= () =>{
             const respuesta = await crearEvento(datosEvento);
             closeNuevoEvento();                             //cierra el popUp
             setNotificacion('Evento creado con éxito');     //llama a la notificación
-            console.log('Evento creado:', respuesta);       //asegurarme
+            //console.log('Evento creado:', respuesta);       //asegurarme
             await refetch();                                //hace un refetch para volver a llamar los datos que se actualizaron
             actualizar()                                    //vuelve a renderizar por si acaso
            
@@ -273,7 +273,7 @@ export const CalendarScreen= () =>{
 
         try { //la misma cosa que en crear datos
             const respuesta = await actualizarEvento(eventoAEditar, datos);
-            console.log("Evento actualizado:", respuesta);
+            //console.log("Evento actualizado:", respuesta);
             setNotificacion("Evento actualizado con éxito");
             closeEditarEvento();
             await refetch();
@@ -322,7 +322,11 @@ export const CalendarScreen= () =>{
         )?.label || null;
 
         return (
-            <div className='eventoEnCalendario'>
+            <div className='eventoEnCalendario'
+                style={{
+                    backgroundColor: getColorPorTipo(tipoEventoId),
+                }}
+            >
                 <b>{tipoEvento}</b>
             </div>
         );
@@ -356,6 +360,17 @@ export const CalendarScreen= () =>{
         fechaEvento.setHours(0, 0, 0, 0);
         return fechaEvento > hoy && fechaEvento <= finSemana;
     });
+
+    const getColorPorTipo = (tipoId) => {
+        switch (tipoId) {
+            case 1: return "#37933aff";    // Verde - Visitadores
+            case 2: return "#387eb6ff";    // Azul - Reuniones
+            case 3: return "#c98e36ff";    // Naranja - Recordatorios
+            case 4: return "#E91E63";    // Rosa - Otro
+            default: return "#9E9E9E";   // Gris por defecto
+        }
+    };
+
 
 
 //Por fin, el return

@@ -36,6 +36,7 @@ export default function VisitadorLayout() {
     "/visitador-logged/": "transparent",
     "/visitador-logged/mi-perfil": "blue",
     "/visitador-logged/visitadores-medicos": "transparent",
+    "/visitador-logged/cambiar-contraseña": "blue",
     //"/visitador-logged/calendario": "blue",
   };
 

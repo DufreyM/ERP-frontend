@@ -1,12 +1,13 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import SimpleTitle from '../../components/Titles/SimpleTitle';
 import IconoInput from '../../components/Inputs/InputIcono.jsx';
 import styles from './Notificaciones.module.css';
-import ButtonForm from '../../components/ButtonForm/ButtonForm';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faTrash, faCheck } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faTrash, faCheck, faX, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { getToken } from '../../services/authService';
 import { useFetch } from '../../utils/useFetch.jsx';
+import InputSearch from '../../components/Inputs/InputSearch.jsx';
+
 
 const Notificaciones = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -19,6 +20,18 @@ const Notificaciones = () => {
       headers: token ? { 'Authorization': `Bearer ${token}` } : {}
     }
   );
+
+  //Maneja las noticiaciones de creación eliminación o edición de un estado
+  const [notificacion, setNotificacion] = useState('');
+  useEffect(() => {
+      if (notificacion) {
+          const timer = setTimeout(() => {
+          setNotificacion('');
+          }, 2500); // se quita en 2.5 segundos
+
+          return () => clearTimeout(timer);
+      }
+  }, [notificacion]);
 
   // Función para formatear fecha
   const formatearFecha = (fechaISO) => {
@@ -52,26 +65,40 @@ const Notificaciones = () => {
     return ordenadas;
   }, [notificacionesData, searchTerm]);
 
-  // Dividir por tipo de evento
-  const notificacionesPorTipo = useMemo(() => {
-    const porTipo = {
-      visita_medica: [],
-      notificacion: [],
-      tarea: []
-    };
 
-    notificacionesOrdenadas.forEach(notif => {
-      if (notif.tipo_evento_id === 1) {
-        porTipo.visita_medica.push(notif);
-      } else if (notif.tipo_evento_id === 2) {
-        porTipo.notificacion.push(notif);
-      } else if (notif.tipo_evento_id === 3) {
-        porTipo.tarea.push(notif);
-      }
+  const { pendientes, completadas } = useMemo(() => {
+  const pendientes = [];
+  const completadas = [];
+
+  notificacionesOrdenadas.forEach((n) => {
+      if (n.estado_id === 3) completadas.push(n);
+      else pendientes.push(n);
     });
 
-    return porTipo;
+    return { pendientes, completadas };
   }, [notificacionesOrdenadas]);
+
+
+  // Dividir por tipo de evento
+  const pendientesPorTipo = useMemo(() => {
+    const porTipo = { visita_medica: [], notificacion: [], tarea: [] };
+    pendientes.forEach(n => {
+      if (n.tipo_evento_id === 1) porTipo.visita_medica.push(n);
+      else if (n.tipo_evento_id === 2) porTipo.notificacion.push(n);
+      else if (n.tipo_evento_id === 3) porTipo.tarea.push(n);
+    });
+    return porTipo;
+  }, [pendientes]);
+
+  const completadasPorTipo = useMemo(() => {
+    const porTipo = { visita_medica: [], notificacion: [], tarea: [] };
+    completadas.forEach(n => {
+      if (n.tipo_evento_id === 1) porTipo.visita_medica.push(n);
+      else if (n.tipo_evento_id === 2) porTipo.notificacion.push(n);
+      else if (n.tipo_evento_id === 3) porTipo.tarea.push(n);
+    });
+    return porTipo;
+  }, [completadas]);
 
   const handleSearchInputChange = (e) => {
     setSearchTerm(e.target.value);
@@ -92,10 +119,11 @@ const Notificaciones = () => {
         throw new Error('Error al marcar como completado');
       }
 
+      setNotificacion("Se actualizó la notificación correctamente")
       await refetch();
     } catch (err) {
       console.error(err);
-      alert('No se pudo marcar como completado');
+      setNotificacion('No se pudo marcar como completado');
     }
   };
 
@@ -113,11 +141,11 @@ const Notificaciones = () => {
       if (!resp.ok) {
         throw new Error('Error al eliminar');
       }
-
+      setNotificacion("Se eliminó la notificación correctamente")
       await refetch();
     } catch (err) {
       console.error(err);
-      alert('No se pudo eliminar la notificación');
+      setNotificacion('No se pudo eliminar la notificación');
     }
   };
 
@@ -127,36 +155,50 @@ const Notificaciones = () => {
 
     return (
       <div key={notif.id || notif.codigo} className={className}>
+        
         <div className={styles.notificacionHeader}>
+          <div className={styles.contenidonoti}>
           <h3 className={styles.titulo}>{notif.titulo}</h3>
-          <span className={styles.fecha}>{formatearFecha(notif.fecha)}</span>
-        </div>
-        <p className={styles.detalles}>{notif.detalles}</p>
-        <div className={styles.notificacionFooter}>
+          <p className={styles.detalles}>{notif.detalles}</p>
+         </div>
+
           <div className={styles.botonesContainer}>
-            <ButtonForm
-              text="Completar"
+             <span className={styles.fecha}>{formatearFecha(notif.fecha)}</span>
+            {!esCompletada && (
+             
+
+              <button
+              className={styles.botonCompletar}
               onClick={() => marcarCompletado(notif.id || notif.codigo)}
-              disabled={esCompletada}
-            />
-            <button
-              className={styles.botonBorrar}
-              onClick={() => marcarEliminado(notif.id || notif.codigo)}
-            >
-              <FontAwesomeIcon icon={faTrash} /> Eliminar
-            </button>
+              >
+                <FontAwesomeIcon icon={faCheck} />
+              </button>
+            )}
+
+            {esCompletada && (
+              <button
+                className={styles.botonBorrar}
+                onClick={() => marcarEliminado(notif.id || notif.codigo)}
+              >
+                <FontAwesomeIcon icon={faXmark} />
+              </button>
+           )}
+           
           </div>
+         
         </div>
+        
+       
       </div>
     );
   };
 
-  const renderSeccion = (titulo, notificaciones) => {
+  const renderSeccion = ( notificaciones) => {
     if (notificaciones.length === 0) return null;
 
     return (
       <div className={styles.seccion}>
-        <h2 className={styles.tituloSeccion}>{titulo}</h2>
+  
         <div className={styles.listaNotificaciones}>
           {notificaciones.map(renderNotificacion)}
         </div>
@@ -166,14 +208,20 @@ const Notificaciones = () => {
 
   return (
     <div className={styles.notificacionesContainer}>
+      {notificacion && (
+            <div className={styles.toast}>
+                {notificacion}
+            </div>
+        )}
       <SimpleTitle text="Notificaciones" />
       
       <div className={styles.buscadorContainer}>
         <div style={{ display: 'flex', flexDirection: 'column', minWidth: '400px' }}>
-          <label style={{ color: '#5a60a5', fontWeight: 500, marginBottom: 4 }}>Buscar notificación</label>
-          <IconoInput
+         
+
+          <InputSearch
             icono={faSearch}
-            placeholder="Buscar por título..."
+            placeholder="Buscar notificación por título..."
             value={searchTerm}
             onChange={handleSearchInputChange}
             type="text"
@@ -186,20 +234,57 @@ const Notificaciones = () => {
       {error && <div className={styles.error}>Error: {String(error)}</div>}
 
       <div className={styles.contenido}>
-        {renderSeccion('Visita Médica', notificacionesPorTipo.visita_medica)}
-        {renderSeccion('Notificaciones Generales', notificacionesPorTipo.notificacion)}
-        {renderSeccion('Tareas Pendientes', notificacionesPorTipo.tarea)}
-        
-        {!loading && 
-         notificacionesPorTipo.visita_medica.length === 0 &&
-         notificacionesPorTipo.notificacion.length === 0 &&
-         notificacionesPorTipo.tarea.length === 0 && (
-          <div className={styles.sinNotificaciones}>
-            {searchTerm ? 'No se encontraron notificaciones con ese título' : 'No hay notificaciones'}
+        <div className={styles.contenidoDosColumnas}>
+          {/* COLUMNA PENDIENTES */}
+          <div className={styles.columna}>
+            <h2 className={styles.tituloColumna}>Pendientes</h2>
+
+            {loading ? (
+              <div className={styles.sinNotificaciones}>Cargando notificaciones...</div>
+            ) : (
+              <>
+                {renderSeccion(pendientesPorTipo.visita_medica)}
+                {renderSeccion(pendientesPorTipo.notificacion)}
+                {renderSeccion(pendientesPorTipo.tarea)}
+
+                {/* Si no hay nada */}
+                {pendientes.length === 0 && (
+                  <div className={styles.sinNotificaciones}>
+                    No hay notificaciones pendientes para mostrar
+                  </div>
+                )}
+              </>
+            )}
           </div>
-        )}
+
+          {/* COLUMNA COMPLETADAS */}
+          <div className={styles.columna}>
+            <h2 className={styles.tituloColumna}>Completadas</h2>
+
+            {loading ? (
+              <div className={styles.sinNotificaciones}>Cargando notificaciones...</div>
+            ) : (
+              <>
+                {renderSeccion(completadasPorTipo.visita_medica)}
+                {renderSeccion(completadasPorTipo.notificacion)}
+                {renderSeccion(completadasPorTipo.tarea)}
+
+                {/* Si no hay nada */}
+                {completadas.length === 0 && (
+                  <div className={styles.sinNotificaciones}>
+                    No hay notificaciones completadas para mostrar
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+          </div>
+          </div>
+          
+        
+      
       </div>
-    </div>
+    
   );
 };
 

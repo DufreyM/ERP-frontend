@@ -25,11 +25,35 @@
   text-align: center;
 }
 
+
 .contenido {
   display: flex;
   flex-direction: column;
   gap: 32px;
 }
+
+.contenidoDosColumnas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin-top: 20px;
+}
+
+.columna {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.tituloColumna {
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  border-bottom: 2px solid #ddd;
+  color: #5a60a5;
+  padding-bottom: 5px;
+}
+
 
 .seccion {
   margin-bottom: 32px;
@@ -86,7 +110,7 @@
 }
 
 .titulo {
-  color: #1e40af;
+  color: #294293;
   font-size: 1.2rem;
   font-weight: 700;
   margin: 0;
@@ -114,15 +138,22 @@
   margin-top: 16px;
 }
 
+.contenidonoti{
+  display: flex;
+  flex-direction: column;
+
+}
+
 .botonesContainer {
   display: flex;
+  flex-direction: column;
   gap: 12px;
   align-items: center;
 }
 
-.botonBorrar {
-  background: #dc2626;
-  color: white;
+.botonCompletar{
+  background: transparent;
+  color: #575d9d;
   border: none;
   border-radius: 6px;
   padding: 10px 16px;
@@ -131,16 +162,57 @@
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
-  transition: background 0.2s;
+  transition: transform 0.2s;
+  font-size: 20px;
+}
+
+.botonCompletar:hover {
+  transform: scale(1.03);
+}
+
+.botonCompletar:active {
+  transform: scale(0.95);
+}
+
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #f9f9f9;
+  color: #5a60A5;
+  padding: 12px 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  z-index: 9999;
+  opacity: 1;
+  animation: fadeOut 0.5s ease-in-out 2s forwards;
+  font-weight: bold;
+}
+
+
+
+.botonBorrar {
+  background: transparent;
+  color: #8e4728;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s;
+  font-size: 20px;
 }
 
 .botonBorrar:hover {
-  background: #b91c1c;
+  transform: scale(1.03);
 }
 
 .botonBorrar:active {
-  background: #991b1b;
+  transform: scale(0.95);
 }
 
 .sinNotificaciones {
@@ -153,3 +225,10 @@
   border: 1px dashed #cbd5e1;
 }
 
+@media (max-width: 768px) {
+  .contenidoDosColumnas {
+    display: flex;
+    flex-direction: column;
+  }
+
+}

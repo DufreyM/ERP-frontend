@@ -25,6 +25,17 @@ const MiPerfil = () => {
     fechanacimiento: null,
   });
 
+  //Maneja las noticiaciones de creación eliminación o edición de un estado
+  const [notificacion, setNotificacion] = useState('');
+  useEffect(() => {
+      if (notificacion) {
+          const timer = setTimeout(() => {
+          setNotificacion('');
+          }, 2500); // se quita en 2.5 segundos
+
+          return () => clearTimeout(timer);
+      }
+  }, [notificacion]);
  
   const token = getToken();
 
@@ -60,7 +71,8 @@ const MiPerfil = () => {
         return roleMap[rol_id] || "Usuario";
       }
     } catch (error) {
-      console.error("Error al decodificar el token:", error);
+      setNotificacion("Error al decodificar el token:", error); 
+      //console.error("Error al decodificar el token:", error);
     }
     return "Usuario";
   };
@@ -80,7 +92,8 @@ const MiPerfil = () => {
       });
 
       if (!token) {
-        console.warn("No hay token, no reviso expiración");
+        setNotificacion("No hay token, no reviso expiración"); 
+        //console.warn("No hay token, no reviso expiración");
       } else if (!checkToken(response)) {
         return; // corta ejecución si expiró
       }
@@ -93,19 +106,22 @@ const MiPerfil = () => {
         }
       }
     } catch (error) {
-      console.error("Error al cargar la foto de perfil:", error);
+      setNotificacion("Error al cargar la foto de perfil:", error); 
+      //console.error("Error al cargar la foto de perfil:", error);
     }
   };
 
   // Función para subir una nueva foto de perfil
   const uploadProfilePhoto = async (file) => {
     setUploadingPhoto(true);
-    setError("");
+    //setError("");
+    setNotificacion("");
     
     try {
       const token = getToken();
       if (!token) {
-        setError("No hay token de autenticación");
+        //setError("No hay token de autenticación");
+        setNotificacion("No hay token de autenticación");
         return;
       }
 
@@ -128,11 +144,12 @@ const MiPerfil = () => {
 
       // Recargar la foto después de subirla
       await fetchProfilePhoto();
-      setSuccess("Foto de perfil actualizada correctamente");
-      setTimeout(() => setSuccess(""), 3000);
+      setNotificacion("Foto de perfil actualizada correctamente");
+      //setTimeout(() => setSuccess(""), 3000);
       
     } catch (error) {
-      setError(`Error al subir la foto de perfil: ${error.message}`);
+      setNotificacion(`Error al subir la foto de perfil: ${error.message}`);
+      //setError(`Error al subir la foto de perfil: ${error.message}`);
       console.error("Error uploading profile photo:", error);
     } finally {
       setUploadingPhoto(false);
@@ -145,13 +162,13 @@ const MiPerfil = () => {
     if (file) {
       // Validar que sea una imagen
       if (!file.type.startsWith('image/')) {
-        setError("Por favor selecciona un archivo de imagen válido");
+        setNotificacion("Por favor selecciona un archivo de imagen válido");
         return;
       }
       
       // Validar tamaño del archivo (máximo 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        setError("La imagen debe ser menor a 5MB");
+        setNotificacion("La imagen debe ser menor a 5MB");
         return;
       }
 
@@ -166,15 +183,15 @@ const MiPerfil = () => {
 
   const fetchUserData = async () => {
     setLoading(true);
-    setError("");
+    setNotificacion("");
     
     try {
       const token = getToken();
       
 
-      console.log('Token found:', token.substring(0, 20) + '...');
-      console.log('API_BASE_URL:', API_BASE_URL);
-      console.log('Fetching user data from:', `${API_BASE_URL}/api/usuario/me`);
+      // console.log('Token found:', token.substring(0, 20) + '...');
+      // console.log('API_BASE_URL:', API_BASE_URL);
+      // console.log('Fetching user data from:', `${API_BASE_URL}/api/usuario/me`);
       
       // Verificar que la URL sea válida
       if (!API_BASE_URL || API_BASE_URL === 'undefined') {
@@ -200,9 +217,9 @@ const MiPerfil = () => {
       }
       
 
-      console.log('Response status:', response.status);
-      console.log('Response ok:', response.ok);
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+      // console.log('Response status:', response.status);
+      // console.log('Response ok:', response.ok);
+      // console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
       if (!response.ok) {
         let errorMessage = `HTTP ${response.status}`;
@@ -220,7 +237,7 @@ const MiPerfil = () => {
       }
 
       const userData = await response.json();
-      console.log('User data received:', userData);
+      //console.log('User data received:', userData);
       
       // Validar que los datos recibidos sean válidos
       if (!userData || typeof userData !== 'object') {
@@ -242,15 +259,15 @@ const MiPerfil = () => {
       
       // Mensajes de error más específicos
       if (err.message.includes('Failed to fetch')) {
-        setError("No se pudo conectar con el servidor. Verifica que el backend esté ejecutándose.");
+        setNotificacion("No se pudo conectar con el servidor. Verifica que el backend esté ejecutándose.");
       } else if (err.message.includes('401')) {
-        setError("Token de autenticación expirado o inválido. Por favor, inicia sesión nuevamente.");
+        setNotificacion("Token de autenticación expirado o inválido. Por favor, inicia sesión nuevamente.");
       } else if (err.message.includes('404')) {
-        setError("Endpoint no encontrado. Verifica la configuración de la API.");
+        setNotificacion("Endpoint no encontrado. Verifica la configuración de la API.");
       } else if (err.message.includes('500')) {
-        setError("Error interno del servidor. Intenta más tarde.");
+        setNotificacion("Error interno del servidor. Intenta más tarde.");
       } else {
-        setError(`Error al cargar los datos del perfil: ${err.message}`);
+        setNotificacion(`Error al cargar los datos del perfil: ${err.message}`);
       }
     } finally {
       setLoading(false);
@@ -260,27 +277,6 @@ const MiPerfil = () => {
   useEffect(() => {
     const role = getUserRole();
     setUserRole(role);
-    
-    // Función para probar la conectividad
-    const testConnection = async () => {
-      try {
-        console.log('Testing connection to:', API_BASE_URL);
-        const response = await fetch(`${API_BASE_URL}/api/usuario/me`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }); 
-        //arreglar la cosa esa y luego descomentar esto
-        //if (!checkToken(response)) return;
-        
-        console.log('Connection test response:', response.status);
-      } catch (error) {
-        console.error('Connection test failed:', error);
-      }
-    };
-    
-    testConnection();
     fetchUserData();
     fetchProfilePhoto();
   }, []);
@@ -296,8 +292,8 @@ const MiPerfil = () => {
 
   const handleSubmit = async () => {
     setSaving(true);
-    setError("");
-    setSuccess("");
+    setNotificacion("");
+    //setSuccess("");
     
 
     try {
@@ -343,13 +339,13 @@ const MiPerfil = () => {
       
       // Actualizar datos originales
       setOriginalData(updatedUser);
-      setSuccess("Perfil actualizado correctamente");
+      setNotificacion("Perfil actualizado correctamente");
       
       // Limpiar mensaje de éxito después de 3 segundos
-      setTimeout(() => setSuccess(""), 3000);
+      //setTimeout(() => setSuccess(""), 3000);
       
     } catch (err) {
-      setError("Error al actualizar el perfil");
+      setNotificacion("Error al actualizar el perfil");
       console.error("Error updating profile:", err);
     } finally {
       setSaving(false);
@@ -409,10 +405,14 @@ const MiPerfil = () => {
     setIsEditing(false);
   };
 
-  const nombreCompleto = `${formData.nombre} ${formData.apellidos}`.trim() || "Nombre de usuario";
 
   return (
     <div className={styles.container}>
+      {notificacion && (
+            <div className="toast">
+                {notificacion}
+            </div>
+        )}
       <div className={styles.header}>
         <SimpleTitle text="Mi Perfil"/>
         <ButtonIcon icon = {faSignOutAlt}  title = "Cerrar sesión" red = {true} onClick={handleLogout}></ButtonIcon>
@@ -420,10 +420,11 @@ const MiPerfil = () => {
       </div>
       
       {loading && <div style={{ color: '#5a60a5', fontWeight: 600, marginBottom: 12 }}>Cargando perfil...</div>}
-      {error && <div style={{ color: '#e74c3c', fontWeight: 600, marginBottom: 12 }}>{error}</div>}
-      {success && <div style={{ color: '#1bbf5c', fontWeight: 600, marginBottom: 12 }}>{success}</div>}
+      {/* {error && <div style={{ color: '#e74c3c', fontWeight: 600, marginBottom: 12 }}>{error}</div>}
+      {success && <div style={{ color: '#1bbf5c', fontWeight: 600, marginBottom: 12 }}>{success}</div>} */}
       
       <div className={styles.profileSection}>
+        <div className={styles.fotoContainer2}> 
         <div className={styles.fotoContainer} onClick={handlePhotoClick}>
           <img
             src={profilePhoto || "/default-user.svg"}
@@ -444,6 +445,7 @@ const MiPerfil = () => {
             onChange={handlePhotoChange}
             style={{ display: 'none' }}
           />
+        </div>
         </div>
         
         <div className={styles.profileInfo}>

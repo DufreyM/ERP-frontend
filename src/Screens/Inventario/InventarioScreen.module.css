@@ -6,28 +6,84 @@
 /* Contenedor principal de controles */
 .controlsContainer {
   display: flex;
+  width: 100%;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: space-between;
   gap: 16px;
   margin-bottom: 24px;
+ 
+}
+
+.contentImage{
+  display: flex;
+  flex-direction: row;
+  gap: 40px;
+}
+
+.prow{
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  gap: 40px;
+  justify-content: space-between;
+}
+
+.contentImage2{
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  justify-content: left;
 }
 
 /* Contenedor de búsqueda */
 .searchContainer {
   display: flex;
+  min-width: 500px;
+ 
+}
+
+.textoAd{
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+  padding: 10px;
+  color: #33386d;
+
+}
+
+.bp{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loteCard{
+  display: flex;
   flex-direction: column;
-  min-width: 300px;
-  flex: 0 0 auto;
+  gap: 10px;
+  padding-top: 15px;
+  padding-bottom: 20px;
+  border-top: 1px #a8abccbb solid ;
+  color: #33386d;
+}
+
+.controlsContainer2{
+  display: flex;
+  flex-direction: row;
 }
 
 /* Grupo de controles (Filters, OrderBy, Botones) */
 .controlsGroup {
   display: flex;
   flex-wrap: wrap;
+  width: 20%;
   align-items: center;
   gap: 12px;
   flex: 1 1 auto;
-  justify-content: flex-start;
+  justify-content: end;
+
 }
 
 /* Contenedor de botones de acción */
@@ -37,6 +93,7 @@
   gap: 12px;
   flex: 0 1 auto;
   justify-content: flex-start;
+
 }
 
 /* Media queries para pantallas más pequeñas */
@@ -49,61 +106,67 @@
 /* Cuando la pantalla se corta a la mitad, todos los controles se bajan */
 @media (max-width: 1024px) {
   .controlsContainer {
-    flex-direction: column;
-    align-items: flex-start;
+    display: flex;
+    flex-direction: column-reverse;
+    
   }
+
+  
   
   .searchContainer {
+    display: flex;
     width: 100%;
-    min-width: 100%;
+    
+    
   }
   
   .controlsGroup {
+    display: flex;
+    flex-direction: row-reverse;
     width: 100%;
-    justify-content: flex-start;
+    margin-top: 20px;
+    justify-content: center;
+   
   }
   
   .buttonsContainer {
-    width: 100%;
+    display: flex;
     justify-content: flex-start;
+   
   }
 }
 
 @media (max-width: 768px) {
   .controlsContainer {
-    flex-direction: column;
-    align-items: stretch;
+    display: flex;
+    flex-direction: column-reverse;
+    
   }
   
   .searchContainer {
-    min-width: 100%;
+    display: flex;
+    width: 100%;
+  
+   
   }
   
   .controlsGroup {
+    display: flex;
+    margin-top: 20px;
+    flex-direction: row-reverse;
     width: 100%;
-    flex-direction: column;
-    align-items: stretch;
+    justify-content: center;
+   
   }
   
   .buttonsContainer {
-    width: 100%;
+    display: flex;
     justify-content: flex-start;
+   
   }
 }
 
-@media (max-width: 480px) {
-  .inventarioContainer {
-    padding: 16px;
-  }
-  
-  .buttonsContainer {
-    flex-direction: column;
-  }
-  
-  .buttonsContainer > * {
-    width: 100%;
-  }
-}
+
 
 .contenedorGeneral {
     height: 100dvh;
@@ -140,13 +203,30 @@
   border-radius: 24px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   padding: 24px 20px 20px 20px;
-  width: 220px;
+  flex: 1 1 260px;
+  
+  min-width: 220px;
   cursor: pointer;
   transition: box-shadow 0.2s, transform 0.2s;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
+
+
+
+/*  Stock = 0 */
+.sinStock {
+  border: 2px solid #d9534f;
+  background: #ffe5e5;
+}
+
+/* Stock bajo (entre 1 y stock_minimo) */
+.pocoStock {
+  border: 2px solid #f0ad4e;
+  background: #f7efd5;
+}
+
 .productoCard:hover {
   box-shadow: 0 4px 16px rgba(30,64,175,0.12);
   transform: translateY(-4px) scale(1.03);
@@ -195,11 +275,11 @@
 /* Popup styles */
 .popupContent {
   display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  gap: 32px;
+  flex-direction: column;
+  align-items: center;
+  gap: 0px;
   padding: 16px 8px;
-  min-width: 420px;
+  max-width: 420px;
 }
 .popupImg {
   width: 120px;
@@ -213,6 +293,9 @@
   flex-direction: column;
   gap: 8px;
   min-width: 220px;
+  width: 50%;
+  justify-content: center;
+  align-items: center;
 }
 .detalles {
   color: #475569;

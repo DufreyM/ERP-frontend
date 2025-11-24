@@ -17,7 +17,7 @@ export default function ProtectedRoute() {
   if (publicRoutes.includes(location.pathname)) return <Outlet />;
 
   if (!token) {
-    console.log("🚪 Sesión expirada o sin token. Redirigiendo al login...");
+    //console.log("🚪 Sesión expirada o sin token. Redirigiendo al login...");
     return <Navigate to="/" replace />;
   }
 

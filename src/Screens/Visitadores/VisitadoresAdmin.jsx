@@ -38,6 +38,18 @@ const VisitadoresAdmin = () => {
   const shouldFetch = Boolean(token);
   const checkToken = useCheckToken();
 
+  //Maneja las noticiaciones de creación eliminación o edición de un estado
+  const [notificacion, setNotificacion] = useState('');
+  useEffect(() => {
+      if (notificacion) {
+          const timer = setTimeout(() => {
+          setNotificacion('');
+          }, 2500); // se quita en 2.5 segundos
+
+          return () => clearTimeout(timer);
+      }
+  }, [notificacion]);
+
   const decodedToken = token ? jwtDecode(token) : null; 
   const rolUsuario = decodedToken ? decodedToken.rol_id : null;
   const usuarioIdToken = decodedToken ? decodedToken.id : null;
@@ -294,7 +306,7 @@ const VisitadoresAdmin = () => {
         ].filter(Boolean)
       };
 
-      console.log('Data to send:', data);
+      //console.log('Data to send:', data);
 
       const response = await fetch(`${import.meta.env.VITE_API_URL}/visitadores/${visitadorAEditar.id}`, {
         method: 'PUT',
@@ -307,19 +319,19 @@ const VisitadoresAdmin = () => {
       if (!checkToken(response)) return;
 
 
-      console.log('Response status:', response.status);
+      //console.log('Response status:', response.status);
       if (!response.ok) {
         const errorText = await response.text();
-        console.log('Error text:', errorText);
+        setNotificacion('Error text:', errorText);
         throw new Error('Error al actualizar');
       }
 
       await refetch();
       closeEditarVisitador();
-      alert('Visitador actualizado correctamente');
+      setNotificacion('Visitador actualizado correctamente');
     } catch (error) {
       console.error(error);
-      alert('Error al actualizar visitador');
+      setNotificacion('Error al actualizar visitador');
     }
   };
 
@@ -338,10 +350,10 @@ const VisitadoresAdmin = () => {
 
       await refetch();
       closeAdvertencia();
-      alert('Visitador eliminado correctamente');
+      setNotificacion('Visitador eliminado correctamente');
     } catch (error) {
       console.error(error);
-      alert('Error al eliminar visitador');
+      setNotificacion('Error al eliminar visitador');
     }
   };
 
@@ -361,7 +373,7 @@ const VisitadoresAdmin = () => {
       await refetch();
     } catch (error) {
       console.error(error);
-      alert('Error al cambiar estado');
+      setNotificacion('Error al cambiar estado');
     }
   };
 
@@ -426,8 +438,8 @@ const VisitadoresAdmin = () => {
       const formData = new FormData();
       formData.append('documento', file);
       
-      console.log('Subiendo documento a:', `${import.meta.env.VITE_API_URL}/visitadores/${visitadorActual.id}/documento`);
-      console.log('Archivo:', file.name, file.type, file.size);
+      //console.log('Subiendo documento a:', `${import.meta.env.VITE_API_URL}/visitadores/${visitadorActual.id}/documento`);
+      //console.log('Archivo:', file.name, file.type, file.size);
       
       const response = await fetch(`${import.meta.env.VITE_API_URL}/visitadores/${visitadorActual.id}/documento`, {
         method: 'POST',
@@ -447,6 +459,7 @@ const VisitadoresAdmin = () => {
           const errorData = await response.json();
           errorText = JSON.stringify(errorData);
           console.error('Error completo del servidor:', errorData);
+          setNotificacion('Error completo del servidor')
         } catch (e) {
           // Si falla el JSON, usar el status y statusText
           errorText = `Error ${response.status}: ${response.statusText}`;
@@ -470,6 +483,7 @@ const VisitadoresAdmin = () => {
       }, 3000);
     } catch (error) {
       console.error('Error al subir documento:', error);
+      setNotificacion('Error al subir documento')
       setMensajeDocumento(`Error: ${error.message || 'No se pudo subir el documento'}`);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
@@ -481,11 +495,17 @@ const VisitadoresAdmin = () => {
 
   return (
     <div className={styles.contenedorGeneral}>
+      {notificacion && (
+          <div className={styles.toast}>
+              {notificacion}
+          </div>
+      )}
       <div className={styles.contenedorEncabezado}>
         <div className={styles.contenedorTitle}>
           <SimpleTitle text="Visitadores médicos" />
         </div>
 
+      <div className={styles.contbotonesV}>
         <div className={styles.buscadorContainer}>
           <InputSearch
             icono={faSearch}
@@ -496,6 +516,7 @@ const VisitadoresAdmin = () => {
             name="busqueda"
           />
         </div>
+        
 
         <div className={styles.filtersContainer}>
         {!esVisitador &&(
@@ -564,6 +585,7 @@ const VisitadoresAdmin = () => {
           )}
         </>
         )}
+      </div>
       </div>
 
       <div className={styles.contenedorTabla}>

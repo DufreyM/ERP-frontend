@@ -200,7 +200,7 @@ const Clientes = () => {
             setNotificacion('Cliente creado exitosamente');
         } catch (e) {
             console.error('Error creando cliente:', e);
-            alert(`No se pudo crear el cliente. ${e.message || ''}`);
+            setNotificacion(`No se pudo crear el cliente. ${e.message || ''}`);
         }
     };
 
@@ -247,7 +247,7 @@ const Clientes = () => {
             setNotificacion('Cliente actualizado exitosamente');
         } catch (e) {
             console.error('Error actualizando cliente:', e);
-            alert(`No se pudo actualizar el cliente. ${e.message || ''}`);
+            setNotificacion(`No se pudo actualizar el cliente. ${e.message || ''}`);
         }
     };
 
@@ -278,7 +278,7 @@ const Clientes = () => {
             setNotificacion('Cliente eliminado exitosamente');
         } catch (e) {
             console.error('Error eliminando cliente:', e);
-            alert(`No se pudo eliminar el cliente. ${e.message || ''}`);
+            setNotificacion(`No se pudo eliminar el cliente. ${e.message || ''}`);
         }
     };
 
@@ -338,7 +338,7 @@ const Clientes = () => {
                 <div className={styles.contenedorTitle}>
                     <h1 className={styles.tituloClientes}>Clientes</h1>
                 </div>
-
+                <div className={styles.opcionesE}>
                 <div className={styles.buscadorContainer}>
                     <InputSearch
                         icono={faSearch}
@@ -365,14 +365,15 @@ const Clientes = () => {
                         onClick={openNuevoCliente}
                     />
                 </div>
+                </div>
             </div>
 
             <div className={styles.contenedorTabla}>
-                {loading && <p style={{color:'#5a60A5'}}>Cargando clientes...</p>}
+                {/* {loading && <p style={{color:'#5a60A5'}}>Cargando clientes...</p>}
                 {error && <p style={{color:'crimson'}}>Error: {String(error)}</p>}
                 {!loading && !error && clientesData.length === 0 && (
                     <p style={{color:'#666'}}>No hay clientes registrados</p>
-                )}
+                )} */}
                 <Table
                     nameColumns={columnas}
                     data={sortedData.map(cliente => ({

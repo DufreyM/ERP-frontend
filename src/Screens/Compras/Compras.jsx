@@ -4,7 +4,7 @@ import ButtonHeaders from '../../components/ButtonHeaders/ButtonHeaders';
 
 import { useFetch } from '../../utils/useFetch';
 import { getToken } from '../../services/authService';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Table } from '../../components/Tables/Table';
 import { useOpcionesUsuarioDinamicos } from '../../hooks/useOpcionesUsuariosDinamico';
 import { useFiltroGeneral } from '../../hooks/useFiltroGeneral';
@@ -23,6 +23,17 @@ import {jwtDecode} from 'jwt-decode';
 const Compras = () => {
     
     const navigate = useNavigate();
+     //Maneja las noticiaciones de creación eliminación o edición de un estado
+    const [notificacion, setNotificacion] = useState('');
+    useEffect(() => {
+        if (notificacion) {
+            const timer = setTimeout(() => {
+            setNotificacion('');
+            }, 2500); // se quita en 2.5 segundos
+
+            return () => clearTimeout(timer);
+        }
+    }, [notificacion]);
 
 
     //Obtener datos de la base de datos
@@ -264,7 +275,7 @@ const Compras = () => {
 
     const exportarAExcel = () => {
         if (!sortedData || sortedData.length === 0) {
-            alert("No hay datos para exportar");
+            setNotificacion("No hay datos para exportar");
             return;
         }
 
@@ -318,6 +329,11 @@ const Compras = () => {
 
     return(
         <main className={styles.bodyVentas}>
+             {notificacion && (
+                                <div className={styles.toast}>
+                                    {notificacion}
+                                </div>
+                            )}
             <div className={styles.headerVentas}>
                 <div className={styles.titulosVentas}>
                     <h1 className={styles.tituloVentas}>Historial de Compras </h1>
@@ -331,7 +347,7 @@ const Compras = () => {
                     ></ExportarComo>
                     
                     <Filters
-                      title = {"Ventas"}
+                      title = {"Compras"}
                       panelAbierto={panelAbierto}
                       setPanelAbierto={setPanelAbierto}
                       mostrarRangoFecha = {true}

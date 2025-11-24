@@ -38,7 +38,7 @@ const Dashboard = () => {
     {
         headers: {'Authorization': `Bearer ${token}`}
     });
-    console.log(datosVentasCompras)
+    //console.log(datosVentasCompras)
 
     const {
         data: datosTopClientes, 

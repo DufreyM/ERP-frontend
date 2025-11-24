@@ -42,6 +42,7 @@ export default function DependienteLayout() {
     "/dependiente/historial-vc": "transparent",
     "/dependiente/inventario": "blue",
     "/dependiente/calendario": "transparent",
+    "/dependiente/cambiar-contraseña": "blue",
   };
 
   //posiciones del fondo
